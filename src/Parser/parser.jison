@@ -29,21 +29,25 @@
 %nonassoc  ITE NOSIG INFIXEXP
 %nonassoc  OP "::"
 
-%start module_
+%start start_
 %error-verbose
 %debug
 %%
 
-/* 4 Declarations and Bindings */
+start_
+    : module_ EOF    { return $1; }
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// 5.1 Module Structure
 
 module_ // : object
-  : "module" modid "where" body EOF
-         {{return {name: "module", modid: $2, body: $4, pos: @$}; }}
-//        //unspecified export means export everything.
-  | "module" modid '(' exports ')' "where" body EOF
-        {{return {name: "module", modid: $2, exports: $4, body: $6, pos: @$}; }}
-  | body EOF
-      {{ return {name: "module", body: $1, pos:@$}; }}
+  : "module" modid "where" body
+       {{$$ = {name: "module", modid: $2, body: $4, pos: @$}; }}
+  | "module" modid '(' exports ')' "where" body
+       {{$$ = {name: "module", modid: $2, exports: $4, body: $6, pos: @$}; }}
+  | body
+      {{$$ = {name: "module", body: $1, pos:@$}; }}
          // no modid since missing. defaults to 'Main'.
          // no exports since missing. everything exported.
   ;
@@ -78,51 +82,47 @@ topdecls_nonempty // : [topdecl]
   | topdecl                           {{ $$ = [$1]; }}
   ;
 
+////////////////////////////////////////////////////////////////////////////////
+/* 4 Declarations and Bindings */
+
 topdecl // : object
-    : decl                              
-        {{ $$ = {name: "topdecl-decl", decl: $1, pos: @$}; }}
-    | "data" simpletype
-        {{$$ = {name: "topdecl-data", typ: $2, constrs: [], pos: @$}; }}
-    | "data" simpletype "=" constrs
-        {{$$ = {name: "topdecl-data", typ: $2, constrs: $3, pos: @$}; }}
-    | impdecl
-        {{ $$ = $1;}}
+    : decl                          {{$$ = {name: "topdecl-decl", decl: $1, pos: @$};}}
+    | "data" simpletype             {{$$ = {name: "topdecl-data", typ: $2, constrs: [], pos: @$};}}
+    | "data" simpletype "=" constrs {{$$ = {name: "topdecl-data", typ: $2, constrs: $4, pos: @$};}}
+    | impdecl                       {{$$ = $1;}}
     ;
 
+/*
 decls // : [decl]
   : '{' '}'                           {{ $$ = []; }}
   | '{' list_decl_comma_1 '}'         {{ $$ = $2; }}
   ;
-  
+
 list_decl_comma_1 // : [decl]
   : list_decl_comma_1 ";" decl        {{ ($1).push($3); $$ = $1; }}
   | decl                              {{ $$ = [$1]; }}
   ;
+*/
 
 decl // : object
-  : funlhs rhs              
-    {{ $$ = {name: "decl-fun", lhs: $1, rhs: $2, pos:@$}; }}
+  : funlhs rhs          {{$$ = {name: "decl-fun", lhs: $1, rhs: $2, pos:@$};}}
     //| pat rhs
   // | gendecl
   ;
 
 funlhs // : object
-    : var apats             
-        {{$$ = {name: "fun-lhs", ident: $1, args: $2, pos: @$};}}
-    | var 
-        {{$$ = {name:"fun-lhs", ident: $1, args: [], pos: @$};}}
+    : var apats       {{$$ = {name: "fun-lhs", ident: $1, args: $2, pos: @$};}}
+    | var             {{$$ = {name:"fun-lhs", ident: $1, args: [], pos: @$};}}
 //  | pat varop pat
     ;
 
 rhs // : object
-    : '=' exp               {{$$ = $2;}}
+    : '=' exp        {{$$ = $2;}}
     ; //TODO
 
 simpletype // : object
-    : tycon 
-        {{$$ = {name: "simpletype", con: $1, vars: [], pos: @$}; }}
-    | tycon tyvars
-        {{$$ = {name: "simpletype", con: $1, vars: $2, pos: @$}; }}
+    : tycon         {{$$ = {name: "simpletype", tycon: $1, vars: [], pos: @$};}}
+    | tycon tyvars  {{$$ = {name: "simpletype", tycon: $1, vars: $2, pos: @$};}}
     ;
 
 constrs // : [constr]
@@ -131,17 +131,23 @@ constrs // : [constr]
     ;
 
 constr // : object
-    : con 
-        {{$$ = {name: "constr", con: $1, types: [], pos: @$}; }}
-    | con atypes
-        {{$$ = {name: "constr", con: $1, types: [], pos: @$}; }}
-     
+    : con
+        {{$$ = {name: "constr", dacon: $1, types: [], pos: @$};}}
+    | con constr_atypes
+        {{$$ = {name: "constr", dacon: $1, types: $2, pos: @$};}}
     ;
-/* 5 Modules */
-  
+
+constr_atypes // : [atype]
+    : constr_atypes atype      {{$1.push($2); $$ = $1;}}
+    | atype                    {{$$ = [$1];}}
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// 5.2 Export Lists
+
 exports // : [export]
-    : exports_inner         {{ $$ = $1; }}
-    | exports_inner ','     {{ $$ = $1; }}
+    : exports_inner         {{$$ = $1;}}
+    | exports_inner ','     {{$$ = $1;}}
     ;
 
 exports_inner // : [export]
@@ -150,234 +156,272 @@ exports_inner // : [export]
     ;
 
 export // : object
-    : qvar 
+    : qvar
         {{$$ = {name: "export-qvar", exp: $1, pos: @$};}}
     | "module" modid 
         {{$$ = {name: "export-module", exp: $2, pos: @$};}}
-    | qtycon         
+    | qtycon
         {{$$ = {name: "export-type-unspec", exp: $1, pos: @$};}}
-    | qtycon '(' ".." ')' 
+    | qtycon '(' ".." ')'
         {{$$ = {name: "export-type-all", exp: $1, pos: @$};}}
-    | qtycon '(' vars ')'
+    | qtycon '(' list_cname_0_comma ')'
         {{$$ = {name: "export-type-vars", exp: $1, vars: $3, pos: @$};}}
     ; //TODO: export types and classes
 
-    
+////////////////////////////////////////////////////////////////////////////////
+// 5.3 Import Declarations
+
 impdecl // : object
-    : "import" modid 
-        {{$$ = {name: "impdecl", modid: $2, pos: @$}; }}
-    | "import" modid impspec
-        {{$$ = {name: "impdecl", modid: $2, impspec: $3, pos: @$}; }}
+    : "import" modid
+        {{$$ = {name: "impdecl", modid: $2, pos: @$};}}
+    | "import" modid '(' imports ')'
+        {{$$ = {name: "impdecl", modid: $2, hiding: false, imports: $4, pos: @$};}}
+    | "import" modid "hiding" '(' imports ')'
+        {{$$ = {name: "impdecl", modid: $2, hiding: true, imports: $5, pos: @$};}}
     ; //TODO: qualified and renamed imports
-
+/*
 impspec // : object
-    : '(' imports ')' 
+    : '(' imports ')'
         {{$$ = {name: "impspec", imports: $2, pos: @$};}}
-    | "hiding" '(' imports ')' 
-        {{$$ = {name: "impspec-hiding", imports: $2, pos: @$};}}
+    | "hiding" '(' imports ')'
+        {{$$ = {name: "impspec-hiding", imports: $3, pos: @$};}}
     ;
-
+*/
 imports // : [import]
-    : imports_inner         {{ $$ = $1; }}
-    | imports_inner ','     {{ $$ = $1; }}
+    : list_import_1_comma         {{$$ = $1;}}
+    | list_import_1_comma ','     {{$$ = $1;}}
+    | ','                         {{$$ = [];}}
+    |                             {{$$ = [];}}
     ;
 
-imports_inner // : [import]
-    : imports_inner ',' import_a      {{$1.push($3); $$ = $1;}}
-    | import_a                        {{$$ = [$1];}}
+list_import_1_comma // : [import]
+    : list_import_1_comma ',' import_a   {{$1.push($3); $$ = $1;}}
+    | import_a                           {{$$ = [$1];}}
     ;
 
+// Q:why can this not be called 'import' without getting strange conflicts ?
 import_a // : object
-    : var           {{$$ = $1;}}                          
-    ; //TODO: constructors and classes
+    : var                              {{$$ = {name: "import-var", varname: $1, pos: @$};}}
+    | tycon                            {{$$ = {name: "import-tycon", tycon: $1, all: false, pos: @$};}}
+    | tycon '(' ".." ')'               {{$$ = {name: "import-tycon", tycon: $1, all: true, pos: @$};}}
+    | tycon '(' list_cname_0_comma ')' {{$$ = {name: "import-tycon", tycon: $1, all: false, list:$3, pos: @$};}}
+    ; //TODO: classes
 
-/* 3 Expressions */
+////////////////////////////////////////////////////////////////////////////////
+// 3 Expressions
 
 exp // : object
-  : infixexp "::" "int"               
-    {{ $$ = {name:"typed-exp",infixexp:$1,pos:@$}; }}
-  | infixexp %prec NOSIG              
-    {{ $$ = {name:"untyped-exp",infixexp:$1,pos:@$}; }}
+  : infixexp "::" "int"  {{$$ = {name:"constrained-exp",exp:$1,sig:"int",pos:@$};}}
+  | infixexp %prec NOSIG {{$$ = $1;}}
   ;
 
 infixexp // : [lexp | qop | '-']
-  : infixexpLR lexp %prec INFIXEXP {{ ($1).push($2); $$ = $1; }}
+  : infixexpLR lexp %prec INFIXEXP {{($1).push($2); $$ = {name:"infixexp",exps:$1,pos:@$};}}
   ;
 
 infixexpLR // : [lexp | qop | '-']. re-written to be left recursive.
-  : infixexpLR lexp qop            {{ ($1).push($2,$3); $$ = $1; }}
-  | infixexpLR '-'                {{ ($1).push($2);    $$ = $2; }}
-  |                               {{ $$ = []; }}
+  : infixexpLR lexp qop           {{($1).push($2,$3); $$ = $1;}}
+  | infixexpLR '-'                {{($1).push($2);    $$ = $2;}}
+  |                               {{$$ = [];}}
   ;
-//infixexp // list of lexp, OP, and '-'. should use left-recursion and ".push".
-//  : lexp OP infixexp            {{ ($3).unshift($1,$2); $$ = $3; }}
-//  | '-' infixexp                {{ ($2).shift($1);      $$ = $2; }}
-//  | lexp                        {{ $$ = [$1]; }}
-//  ;
+//  lexp OP infixexp            {{ ($3).unshift($1,$2); $$ = $3; }}
+//  '-' infixexp                {{ ($2).shift($1);      $$ = $2; }}
+//  lexp                        {{ $$ = [$1]; }}
 
 lexp // : object
   : //"let" decls "in" exp                        {$$ = ["letrec",$2,$4];}
-  //|
-    "if" exp "then" exp "else" exp %prec ITE 
-        {{ $$ = {name:"ite",e1:$2,e2:$4,e3:$6,pos:@$}; }}
-  | fexp                                
-    {{ $$ = {name:"fexp", exps:$1,pos:@$}; }}
-  | '\' apats "->" exp 
-    {{$$ = {name:"lambda", args: $2, rhs: $4, pos: @$}; }}
-  | "case" exp "of" "{" alts "}"
-    {{$$ = {name:"case", exp: $2, alts: $5}; }}
+    "if" exp "then" exp "else" exp %prec ITE {{$$ = {name:"ite",e1:$2,e2:$4,e3:$6,pos:@$};}}
+  | fexp                                     {{$$ = {name:"application", exps:$1,pos:@$};}}
+  | '\' apats "->" exp                       {{$$ = {name:"lambda", args: $2, rhs: $4, pos: @$};}}
+  | "case" exp "of" "{" alts "}"             {{$$ = {name:"case", exp: $2, alts: $5};}}
   ;
 
-fexp //: [aexp]
-  : aexp              {{ $$ = [$1]; }}
-  | fexp aexp         {{ $1.push($2); $$ = $1; }}
-  ;  
+// list of 1 or more 'aexp' without separator
+fexp // : [aexp]
+  : aexp              {{$$ = [$1];}}
+  | fexp aexp         {{($1).push($2); $$ = $1;}}
+  ;
 
+// list of 1 or more non-qualified variable names
+/*
+vars // : [var]
+    : vars ',' var  {{$1.push($3); $$ = $1;}}
+    | var           {{$$ = [$1];}}
+    ;
+*/
+
+////////////////////////////////////////////////////////////////////////////////
+// case expression alternatives
+
+// ';' separated list of 1 or more 'alt'
 alts // : [alt]
     : alts ";" alt      {{$1.push($3); $$ = $1;}}
     | alt               {{$$ = [$1];}}
     ;
-    
+
 alt // : object
-    : pat "->" exp
-        {{$$ = {name:"alt", pat: $1, exp: $3}; }}
+    : pat "->" exp      {{$$ = {name:"alt", pat: $1, exp: $3};}}
+    // TODO: incomplete
     ;
-    
+
+////////////////////////////////////////////////////////////////////////////////
+// 3.2 Variables, Constructors, Operators, and Literals
+
+list_cname_0_comma // : [cname]
+    : list_cname_1_comma     {{$$ = $1;}}
+    |                        {{$$ = [];}}
+    ;
+list_cname_1_comma // : [cname]
+    : list_cname_1_comma ',' cname   {{$1.push($3); $$ = $1;}}
+    | cname                          {{$$ = [$1];}}
+    ;
+
+// non-qualified variable name (record selector) or data constructor name
+cname // : VarName | DaCon
+    :  con        {{$$ = $1;}}
+    // | var      {{$$ = $1;}}      // record selectors
+    ;
+
 aexp // : object
-  : qvar             {{$$ = $1; }}
-  | literal            {{ $$ = $1; }}
-  | "(" exp ")"         {{ $$ = $2; }}
+  : qvar                {{$$ = $1;}}
+  | gcon                {{$$ = $1;}}
+  | literal             {{$$ = $1;}}
+  | "(" exp ")"         {{$$ = $1;}}
+  // TODO: incomplete
   ;
-  
-/* 3.2 Variables, Constructors, Operators and Literals */
 
-modid // : qcon
-    : qcon
+modid // : object # {conid .} conid
+    : qconid              {{$$ = new JSHC.ModName($1, @$, yy.lexer.recent.qual);}}
+    | conid               {{$$ = new JSHC.ModName($1, @$);}}
     ;
 
-literal  // : object
-    : integer {{$$ = {name: "integer-lit", value: Number($1), pos: @$}; }}
+// optionally qualified binary operators in infix expressions
+qop // : object
+    : qvarop            {{$$ = {name: "qop", id: $1, pos: @$};}}
+    | qconop            {{$$ = {name: "qop", id: $1, pos: @$};}}
+      // Q: is 'qconop' in lexer ?
     ;
 
-vars // : [var]
-    : vars ',' var  {{$1.push($3); $$ = $1; }}
-    | var           {{$$ = [$1];}}
-    ;
-    
-var // : object
-    : varid 
-        {{$$ = {name: "var", id: $1, pos: @$};}}
-    | '(' varsym ')' 
-        {{$$ = {name: "var-op", id: $2, pos: @$};}}
+// optionally qualified variable symbol or variable id as a symbol
+qvarop // : object
+    : qvarsym           {{$$ = {name: "qvarop", id: $1, pos: @$};}}
+    | varop             {{$$ = $1;}}
+    | '`' qvarid '`'    {{$$ = {name: "qvarop-var", id: $2, pos: @$};}}
     ;
 
-qvar // : object
-    : qvarid
-        {{$$ = {name: "qvar", id: $1, pos: @$};}}
-    | '(' qvarsym ')'
-        {{$$ = {name: "qvar-op", id: $2, pos: @$};}}
-    | var {{$$ = $1;}}
+// non-qualified variable symbol or variable id as a symbol
+varop // : object
+    : varsym            {{$$ = {name: "varop", id: $1, pos: @$};}}
+    | '`' varid '`'     {{$$ = {name: "varop-var", id: $2, pos: @$};}}
     ;
 
-//tyvars // : [tyvar]
-//    : tyvars_inner          {{$$ = $1;}}
-//    |                       {{$$ = [];}}
-//    ;
-tyvars // : [tyvar]
+// list of 0 or more tyvars without separator
+tyvars // : [TyVar]
     : tyvars tyvar          {{$1.push($2); $$ = $1;}}
-    | tyvar                       {{$$ = [$1];}}
-    ;
-    
-tyvar // : object
-    : varid
-        {{$$ = {name: "tyvar", id: $1, pos: @$}; }}
+    | tyvar                 {{$$ = [$1];}}
     ;
 
-gcon // : object
-    : qcon
+// type variable
+tyvar // : JSHC.TyVar
+    : varid      {{$$ = new JSHC.TyVar($1, @$);}}
     ;
 
-qcon // : object
-    : qconid
-        {{$$ = {name: "qcon", id: $1, pos: @$}; }}
-    | gconsym       {{$$ = {name: "qcon-op", id: $1, pos: @$}; }}
+// non-qualified type constructor id name
+tycon // : JSHC.TyCon
+    : conid      {{$$ = new JSHC.TyCon($1, @$);}}
+    ;
+
+// optionally qualified type constructor id name
+qtycon // : JSHC.TyCon
+    : qconid     {{$$ = new JSHC.TyCon($1, @$, yy.lexer.recent.qual);}}
+    | tycon      {{$$ = $1;}}
+    ;
+
+// non-qualified data constructor id (or symbol in parentheses) name
+con // : JSHC.DaCon
+    : conid              {{$$ = new JSHC.DaCon($1, @$, false);}}
+    | '(' consym ')'     {{$$ = new JSHC.DaCon($2, @$, true);}}
+    ;
+
+// optionally qualified data constructor id (or symbol in parentheses) name
+qcon // : JSHC.DaCon
+    : qconid        {{$$ = new JSHC.DaCon($1, @$, false, yy.lexer.recent.qual);}}
+    | gconsym       {{$$ = new JSHC.DaCon($2, @$, true, yy.lexer.recent.qual);}}
     | con           {{$$ = $1;}}
     ;
 
+// optionally qualified data constructor, or a built-in data constructor
+gcon // : object
+    : qcon
+    // TODO: incomplete
+    ;
+
+// non-qualified variable id (or symbol in parentheses) name
+var // : JSHC.VarName
+    : varid           {{$$ = new JSHC.VarName($1, @$, false);}}
+    | '(' varsym ')'  {{$$ = new JSHC.VarName($2, @$, true);}}
+    ;
+
+// optionally qualified variable id (or symbol in parentheses) name
+qvar // : JSHC.VarName
+    : qvarid          {{$$ = new JSHC.VarName($1, @$, false, yy.lexer.recent.qual);}}
+    | '(' qvarsym ')' {{$$ = new JSHC.VarName($2, @$, true, yy.lexer.recent.qual);}}
+    | var             {{$$ = $1;}}
+    ;
+
 gconsym // : object
-    : ':'           {{$$ = $1;}}
-    | qconsym       {{$$ = $1;}}
-    ;
-    
-con // : object
-    : conid 
-        {{$$ = {name: "con", id: $1, pos: @$};}}
-    | '(' consym ')'
-        {{$$ = {name: "con-op", id: $2, pos: @$};}}
+    : ':'           {{$$ = new JSHC.DaCon($1, @$, true, yy.lexer.recent.qual);}}
+    | qconsym       {{$$ = new JSHC.DaCon($1, @$, true, yy.lexer.recent.qual);}}
     ;
 
-tycon // : object
-    : conid
-        {{$$ = {name: "tycon", id: $1, pos: @$}; }}
-    ;
+////////////////////////////////////////////////////////////////////////////////
+// 4.1.2 Syntax of Types
 
-qop // : object
-    : qvarop            {{$$ = $1;}}
-    | qconop            {{$$ = $1;}}
-    ;
-
-qvarop // : object
-    : qvarsym
-        {{$$ = {name: "qvarop", id: $1, pos: @$};}}
-    | '`' qvarid '`'
-        {{$$ = {name: "qvarop-var", id: $2, pos: @$};}}
-    | varop {{$$ = $1;}}
-    ;
-    
-varop // : object
-    : varsym 
-        {{$$ = {name: "varop", id: $1, pos: @$};}}
-    | '`' varid '`'
-        {{$$ = {name: "varop-var", id: $2, pos: @$};}}
-    ;
-atypes // : [atype]
-    : atypes atype      {{$1.push($2); $$ = $1; }}
-    | atype             {{$$ = [$1]; }}
-    ;
-     
 atype // : object
-    : gtycon
-    | tyvar
+    : gtycon            {{$$ = $1;}}
+    | tyvar             {{$$ = $1;}}
+    // TODO: incomplete
     ;
 
+// optionally qualified type constructor, or a built-in type constructor
 gtycon // : object
-    : qtycon
+    : qtycon            {{$$ = $1;}}
+    // TODO: incomplete
     ;
 
-qtycon // : object
-    : qconid
-        {{$$ = {name: "qtycon", id: $1, pos: @$}; }}
-    | tycon
-    ; 
-/* 3.17 Pattern matching */
+////////////////////////////////////////////////////////////////////////////////
+// 3.17 Pattern Matching
 
-pat // : 
+pat // : object
     : lpat          {{$$ = $1;}}
+    // TODO: incomplete
     ;
 
 lpat // : object
     : apat          {{$$ = $1;}}
-    | gcon apats
-        {{$$ = {name: "conpat", con: $1, pats: $2}; }}
+    | gcon apats    {{$$ = {name: "conpat", con: $1, pats: $2}; }}
+    // TODO: incomplete
     ;
-    
+
+// list of 1 or more apat without separator
 apats // : [apat]
     : apat              {{$$ = [$1];}}
     | apats apat        {{$1.push($2); $$ = $1;}}
     ;
-    
+
 apat // : object
     : var               {{$$ = $1; }}
-//    | literal           {{$$ = $1; }}
     | gcon              {{$$ = $1; }}
-    ; //TODO: all other pattern matches
+//    | literal           {{$$ = $1; }}
+    // TODO: incomplete
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// ???
+
+literal  // : object
+    : integer {{$$ = {name: "integer-lit", value: Number($1), pos: @$};}}
+    // TODO: incomplete
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
