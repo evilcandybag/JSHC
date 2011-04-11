@@ -73,9 +73,14 @@ JSHC.Compiler.compile = function (input) {
 
         var res = "";
         switch (exp.name) {
-            case "untyped-exp":
-                res += comInfixexp(exp.infixexp);
-            break;
+            case "constrained-exp":
+                throw new Error("comExp not defined for name " + exp.name);
+                break;
+            case "infixexp":
+                res += comInfixexp(exp.exps);
+                break;
+            default: 
+                throw new Error("comExp not defined for name " + exp.name);
         }
         return res;
     }
@@ -84,7 +89,7 @@ JSHC.Compiler.compile = function (input) {
 
         var res = "";
         switch (pat.name) {
-            case "con":
+            case "dacon":
                 res += "[\"" + pat.id  + "\"]";
                 break;
             case "conpat":
@@ -94,7 +99,7 @@ JSHC.Compiler.compile = function (input) {
                 }
                 res += "]"
                 break;
-            case "var":
+            case "varname":
                 res += "\"" + pat.id + "\""
                 break;
             default:
@@ -106,8 +111,8 @@ JSHC.Compiler.compile = function (input) {
 
         var res = "";
         switch (apat.name) {
-            case "var":
-            case "var-op":
+            case "varname":
+//            case "var-op":
                 res += apat.id;
                 break;
             default:
@@ -123,7 +128,7 @@ JSHC.Compiler.compile = function (input) {
         var res = "";
         for (var i = 0; i < exp.length; i++) {
             switch (exp[i].name) {
-             case "fexp":
+             case "application":
                 res += comFexp(exp[i].exps);
                 break;
              case "lambda":
@@ -132,9 +137,9 @@ JSHC.Compiler.compile = function (input) {
              case "case":
                 res += comCase(exp[i]);
                 break;
-             case "integer-lit":
-                res += exp.value
-                break;
+//             case "integer-lit":
+//                res += exp.value
+//                break;
              default:
                 throw new Error("comInfixexp not defined for name " + exp[i].name); 
             }
@@ -147,7 +152,7 @@ JSHC.Compiler.compile = function (input) {
         
         var res = "";
         switch (exp[0].name) {
-            case "var":
+            case "varname":
             case "qvar":
                 res += comFname(exp[0]);
                 for (var i = 1; i < exp.length; i++) {
@@ -177,10 +182,14 @@ JSHC.Compiler.compile = function (input) {
 
     var comCase = function(cas) {
 
-        var res = "JSHC.internal.match(comExp(cas.alts[i]) , [\n";
+        var ex = comExp(cas.exp)
+        var res = "JSHC.Internal.match(" + ex + ", [\n";
         for (var i = 0; i < cas.alts.length; i++) {
+            var binds = JSHC.comUtils.getBinds(ex, cas.alts[i].pat);
+            var bindStrs = JSHC.comUtils.getBindStrs(cas.alts[i].pat);
             res += "{p: " + comPat(cas.alts[i].pat) + ",";
-            res += "f: function(" + JSHC.comUtils.getBinds(cas.alts[i].pat).join(","); 
+            res += "b: [" + binds.join(",") + "],"; 
+            res += "f: function(" + bindStrs.join(","); 
             res += "){return " + comExp(cas.alts[i].exp) + "}},\n";             
         }
         res += "])\n"
@@ -201,7 +210,7 @@ JSHC.Compiler.compile = function (input) {
         var res = "";
         switch (exp.name) {
 //            case "var-op":
-            case "var":
+            case "varname":
                 res += exp.id;
                 break;
             case "qvar":
@@ -219,7 +228,7 @@ JSHC.Compiler.compile = function (input) {
         var res = "";
         switch (exp.name) {
 //            case "var-op":
-            case "var":
+            case "varname":
                 res += exp.id;
                 break;
             case "qvar":

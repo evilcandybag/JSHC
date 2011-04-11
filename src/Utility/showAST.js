@@ -12,21 +12,27 @@ var showAST2 = function(sb,ast){
 	sb.push("\"" + ast.toString() + "\"");
     } else if( typeof ast === "number" ){
 	sb.push(ast.toString());
+	} else if( typeof ast === "boolean" ){
+	sb.push(ast.toString());
     } else if( ast instanceof Array ){
 	sb.push("[");
 	sb.push(showNode(sb,ast));
 	sb.push("]");
     } else if( ast instanceof Object ){
-	sb.push("{");
-	for(k in ast){
-	    sb.push(k+": ");
-	    //if( k==="rhs" )document.write("yy"+ast[k] +"<br>");
-	    showAST2(sb,ast[k]);
-	    //document.write(s +"<br>");
-	    sb.push(", ");
-	}
-	sb.pop();
-	sb.push("}");
+//        if (typeof ast.toString === "function") {
+//            sb.push(ast.toString());
+//        } else {
+//       	    sb.push("{");
+	        for(k in ast){
+	            sb.push(k+": ");
+	            //if( k==="rhs" )document.write("yy"+ast[k] +"<br>");
+	            showAST2(sb,ast[k]);
+	            //document.write(s +"<br>");
+	            sb.push(", ");
+	        }
+	        sb.pop();
+	        sb.push("}");
+//	    }
     } else {
 	throw "showAST2: unhandled case: "+typeof ast;
     }

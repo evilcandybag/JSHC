@@ -6,6 +6,7 @@
 <script src="src/Utility/errors.js"></script>
 <script src="src/Utility/showError.js"></script>
 <script src="src/Utility/Names.js"></script>
+<script src="src/Utility/showAST.js"></script>
 
 <script src="src/Internal/Internal.js"></script>
 <script src="src/Internal/lazy.js"></script>
@@ -26,16 +27,18 @@
 
 <script>
 
-try{
+<!--try{-->
 
 var tst = new tests();
 
 JSHC.testCompile(tst.lambda);
 
 
-}catch(err){
-  alert(JSHC.showError(err));
-}
+
+
+<!--}catch(err){-->
+<!--  alert(JSHC.showError(err));-->
+<!--}-->
 
 </script>
         </body>

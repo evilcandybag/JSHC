@@ -43,7 +43,19 @@ JSHC.int32read = function(s){
 //returns: an array with any bound variables if successful, Boolean false if failed
 JSHC.Internal.match = function(exp, alts) {
 
-//    for 
+    var match_ = function (exp, pat) {
+        if (typeof pat === "string") {
+            return true;
+        } else if (pat instanceof Array) {
+            return pat[0] === exp[0];
+        } else return false;
+    }
+    
+    for (var i = 0; i < alts.length; i++) {
+        if (match_(exp, alts[i].p)) 
+            return alts[i].f.apply(undefined,alts[i].b);
+    }
+    throw new Error("Unhandled case in pattern match!"); //TODO: proper error reporting would be?
     
 }
 

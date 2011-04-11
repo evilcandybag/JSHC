@@ -32,18 +32,29 @@ JSHC.testCompile = function (tests) {
 }
 
 JSHC.testParse = function (tests) {
+
+    var format = function (input) {
+        var r = input.replace(/\[/g,"<br>[<br>");
+        var s = r.replace(/\]/g, "<br>]<br>");
+        var v = s.replace(/\},/g, "},<br>");
+        return v;
+    }
+
     for (var i = 0; i < tests.length; i++) {
         document.writeln("<p> Parsing program: <br>" + tests[i] + "<br>" + fakeLex(tests[i]) + "<br>");
-        try {
-            res = parse(tests[i]);
+//        try {
+            res = JSHC.parse(tests[i]);
             document.writeln("Success!<br>");
-            document.writeln(format(showAST(res)));
+            document.writeln(format(JSHC.showAST(res)));
             document.writeln("</p>");
-        } catch (e) {
-            document.writeln("Encountered error:<br>");
-            document.writeln(e.message + "</p>")
-        }
+//        } catch (e) {
+//            document.writeln("Encountered error:<br>");
+//            document.writeln(e.message + "</p>")
+//        }
     }
+    
 }
+
+
 
 
