@@ -47,7 +47,7 @@ module_ // : object
   | "module" modid '(' exports ')' "where" body
        {{$$ = {name: "module", modid: $2, exports: $4, body: $6, pos: @$}; }}
   | body
-      {{$$ = {name: "module", body: $1, pos:@$}; }}
+      {{$$ = {name: "module", modid: new JSHC.ModName("Main"), body: $1, pos:@$}; }}
          // no modid since missing. defaults to 'Main'.
          // no exports since missing. everything exported.
   ;

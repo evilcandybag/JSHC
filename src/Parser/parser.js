@@ -15,7 +15,7 @@ case 2:this.$ = {name: "module", modid: $$[$0-2], body: $$[$0], pos: this._$};
 break;
 case 3:this.$ = {name: "module", modid: $$[$0-5], exports: $$[$0-3], body: $$[$0-1], pos: this._$}; 
 break;
-case 4:this.$ = {name: "module", body: $$[$0], pos:this._$}; 
+case 4:this.$ = {name: "module", modid: new JSHC.ModName("Main"), body: $$[$0], pos:this._$}; 
 break;
 case 5: 
         var imps = [], decs = [], atdecs = false;
