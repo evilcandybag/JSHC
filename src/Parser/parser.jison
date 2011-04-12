@@ -286,12 +286,12 @@ aexp // : object
   : qvar                {{$$ = $1;}}
   | gcon                {{$$ = $1;}}
   | literal             {{$$ = $1;}}
-  | "(" exp ")"         {{$$ = $1;}}
+  | "(" exp ")"         {{$$ = $2;}}
   // TODO: incomplete
   ;
 
 modid // : object # {conid .} conid
-    : qconid              {{$$ = new JSHC.ModName($1, @$, yy.lexer.recent.qual);}}
+    : qconid              {{$$ = new JSHC.ModName($1, @$, yy.lexer.previous.qual);}}
     | conid               {{$$ = new JSHC.ModName($1, @$);}}
     ;
 
@@ -333,7 +333,7 @@ tycon // : JSHC.TyCon
 
 // optionally qualified type constructor id name
 qtycon // : JSHC.TyCon
-    : qconid     {{$$ = new JSHC.TyCon($1, @$, yy.lexer.recent.qual);}}
+    : qconid     {{$$ = new JSHC.TyCon($1, @$, yy.lexer.previous.qual);}}
     | tycon      {{$$ = $1;}}
     ;
 
@@ -345,8 +345,8 @@ con // : JSHC.DaCon
 
 // optionally qualified data constructor id (or symbol in parentheses) name
 qcon // : JSHC.DaCon
-    : qconid        {{$$ = new JSHC.DaCon($1, @$, false, yy.lexer.recent.qual);}}
-    | gconsym       {{$$ = new JSHC.DaCon($2, @$, true, yy.lexer.recent.qual);}}
+    : qconid        {{$$ = new JSHC.DaCon($1, @$, false, yy.lexer.previous.qual);}}
+    | gconsym       {{$$ = new JSHC.DaCon($2, @$, true, yy.lexer.previous.qual);}}
     | con           {{$$ = $1;}}
     ;
 
@@ -364,14 +364,14 @@ var // : JSHC.VarName
 
 // optionally qualified variable id (or symbol in parentheses) name
 qvar // : JSHC.VarName
-    : qvarid          {{$$ = new JSHC.VarName($1, @$, false, yy.lexer.recent.qual);}}
-    | '(' qvarsym ')' {{$$ = new JSHC.VarName($2, @$, true, yy.lexer.recent.qual);}}
+    : qvarid          {{$$ = new JSHC.VarName($1, @$, false, yy.lexer.previous.qual);}}
+    | '(' qvarsym ')' {{$$ = new JSHC.VarName($2, @$, true, yy.lexer.previous.qual);}}
     | var             {{$$ = $1;}}
     ;
 
 gconsym // : object
-    : ':'           {{$$ = new JSHC.DaCon($1, @$, true, yy.lexer.recent.qual);}}
-    | qconsym       {{$$ = new JSHC.DaCon($1, @$, true, yy.lexer.recent.qual);}}
+    : ':'           {{$$ = new JSHC.DaCon($1, @$, true, yy.lexer.previous.qual);}}
+    | qconsym       {{$$ = new JSHC.DaCon($1, @$, true, yy.lexer.previous.qual);}}
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -412,7 +412,7 @@ apats // : [apat]
 apat // : object
     : var               {{$$ = $1; }}
     | gcon              {{$$ = $1; }}
-//    | literal           {{$$ = $1; }}
+    | literal           {{$$ = $1; }}
     // TODO: incomplete
     ;
 

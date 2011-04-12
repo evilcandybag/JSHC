@@ -32,23 +32,28 @@ JSHC.comUtils.getBinds = function(exp, pat) {
     return res;
 }
 
-JSHC.comUtils.getBindStrs = function(pat) {
+JSHC.comUtils.getBindStrs = function(p) {
 
     var res = []
-    switch (pat.name) {
-    case "conpat":
-        for (var i = 0; i < pat.pats.length; i++) {
-            res.push(pat.pats[i].id);
+    
+    var inner = function (pat) {
+        switch (pat.name) {
+        case "conpat":
+            for (var i = 0; i < pat.pats.length; i++) {
+                inner(pat.pats[i]);
+            }
+            break;
+        case "varname":
+            res.push(pat.id);
+            break;
+        case "dacon":
+        case "integer-lit":
+            break;
+        default:
+            throw new Error ("illegal pattern in getBinds: " + pat.name)
         }
-        break;
-    case "varname":
-        res.push(pat.id);
-        break;
-    case "dacon":
-        break;
-    default:
-        throw new Error ("illegal pattern in getBinds: " + pat.name)
     }
+    inner(p);
     return res;
    
 }

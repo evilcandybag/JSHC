@@ -18,11 +18,13 @@ modules.Prelude = {
 //  "-": function(a,b){return JSHC.int32sub(JSHC.TR(a),JSHC.TR(b))},
 //  "*": function(a,b){return JSHC.int32mul(JSHC.TR(a),JSHC.TR(b))},
 //  "/": function(a,b){return JSHC.int32div(JSHC.TR(a),JSHC.TR(b))},
-  add: function(a,b){return JSHC.int32add(JSHC.TR(a),JSHC.TR(b))},
+  add: function(a){return function (b) {return JSHC.int32add(JSHC.TR(a),JSHC.TR(b))}},
   sub: function(a,b){return JSHC.int32sub(JSHC.TR(a),JSHC.TR(b))},
   mul: function(a,b){return JSHC.int32mul(JSHC.TR(a),JSHC.TR(b))},
-  div: function(a,b){return JSHC.int32div(JSHC.TR(a),JSHC.TR(b))}
+  div: function(a,b){return JSHC.int32div(JSHC.TR(a),JSHC.TR(b))}, 
  }
+
+modules.Prelude["undefined"] = function() {throw "undefined"};
 
 /*
 various type classes and instances

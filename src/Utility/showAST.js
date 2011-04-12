@@ -22,7 +22,7 @@ var showAST2 = function(sb,ast){
 //        if (typeof ast.toString === "function") {
 //            sb.push(ast.toString());
 //        } else {
-//       	    sb.push("{");
+       	    sb.push("{");
 	        for(k in ast){
 	            sb.push(k+": ");
 	            //if( k==="rhs" )document.write("yy"+ast[k] +"<br>");

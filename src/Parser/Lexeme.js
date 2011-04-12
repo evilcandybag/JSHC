@@ -3,8 +3,10 @@ function Token (v, r, c, t) {
     this.row = r;
     this.col = c;
     this.typ = t;
+    
     this.toString = function() {
-        return ("[ val: " + this.val + ", row: " + this.row + ", col: " + this.col + "]");
+        var q = (this.qual !== undefined)? this.qual : "undefined"; 
+        return ("[ val: " + this.val + ", row: " + this.row + ", col: " + this.col + ", typ: " + this.typ + ", qual: " + q + "]");
     }
 }
 

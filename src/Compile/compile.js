@@ -95,7 +95,7 @@ JSHC.Compiler.compile = function (input) {
             case "conpat":
                 res += "[\"" + pat.con.id + "\","
                 for (var i = 0; i < pat.pats.length; i++) {
-                    res += "\"" + pat.pats[i].id + "\","
+                    res += comPat(pat.pats[i]) + ", ";
                 }
                 res += "]"
                 break;
@@ -107,6 +107,7 @@ JSHC.Compiler.compile = function (input) {
         }
         return res;
     }
+
     var comApat = function(apat) {
 
         var res = "";
@@ -153,12 +154,19 @@ JSHC.Compiler.compile = function (input) {
         var res = "";
         switch (exp[0].name) {
             case "varname":
-            case "qvar":
-                res += comFname(exp[0]);
+                res += "JSHC.TC(" + comFname(exp[0]);
                 for (var i = 1; i < exp.length; i++) {
                     res += "(" + comAexp(exp[i]) + ")";
                 }
+                res += ")";
                 break; 
+            case "dacon":
+                res += "JSHC.TC([\"" + exp[0].id + "\"";
+                for (var i = 1; i < exp.length; i++) {
+                    res += ", " + comAexp(exp[i]);
+                }
+                res += "])"
+                break;
             case "integer-lit":
                 res += comAexp(exp[0]);
                 break;
@@ -177,7 +185,7 @@ JSHC.Compiler.compile = function (input) {
         } else {
             res +=  comExp(lamb.rhs);
         }
-        return res
+        return res;
     }
 
     var comCase = function(cas) {
@@ -187,8 +195,9 @@ JSHC.Compiler.compile = function (input) {
         for (var i = 0; i < cas.alts.length; i++) {
             var binds = JSHC.comUtils.getBinds(ex, cas.alts[i].pat);
             var bindStrs = JSHC.comUtils.getBindStrs(cas.alts[i].pat);
-            res += "{p: " + comPat(cas.alts[i].pat) + ",";
-            res += "b: [" + binds.join(",") + "],"; 
+            res += "{p: " + comCasePat(cas.alts[i].pat) + ",";//+ "{name: \"" + cas.alts[i].pat.name + "\", "
+//            res +=            "p: " + comPat(cas.alts[i].pat) + "},";
+//            res += "b: [" + binds.join(",") + "],"; 
             res += "f: function(" + bindStrs.join(","); 
             res += "){return " + comExp(cas.alts[i].exp) + "}},\n";             
         }
@@ -196,27 +205,47 @@ JSHC.Compiler.compile = function (input) {
         return res;
     }
 
-    var comCaseBinds = function(binds) {
+    var comCasePat = function(pat) {
 
         var res = "";
-        switch (binds.name) {
-            case "var":
-                res += "var " + binds.id + " = " + ""
+        switch (pat.name) {
+            case "dacon":
+                res += "[\"" + pat.id  + "\"]";
+                break;
+            case "conpat":
+                res += "[\"" + pat.con.id + "\","
+                for (var i = 0; i < pat.pats.length; i++) {
+                    res += comCasePat(pat.pats[i]) + ", ";
+                }
+                res += "]"
+                break;
+            case "varname":
+                res += "\"" + pat.id + "\""
+                break;
+            case "integer-lit":
+                res += pat.value;
+                break;
+            default:
+                throw new Error("comCasePat not defined for name " + pat.name);
         }
+        return "{name: \"" + pat.name + "\", p: " + res + "}";
     }
     
     var comFname = function(exp) {
 
         var res = "";
         switch (exp.name) {
-//            case "var-op":
             case "varname":
-                res += exp.id;
-                break;
-            case "qvar":
-                var r = JSHC.comUtils.splitQvarid(exp.id);
-                res += "modules." + r.q + "[\"" + r.i + "\"]";
-                break;
+                if (exp.loc !== undefined) {
+                    var x = JSHC.comUtils.splitQvarid(exp.id);
+                    var r = exp.loc;
+                    r = r.substr(0, r.length-1);
+                    res += "modules." + r + "[\"" + x.i + "\"]";
+                    break;
+                } else {
+                    res += exp.id ;
+                    break;
+                }
             default:
                 throw new Error("comFname not defined for name " + exp.name);
         }
@@ -227,16 +256,26 @@ JSHC.Compiler.compile = function (input) {
 
         var res = "";
         switch (exp.name) {
-//            case "var-op":
+            case "dacon":
+                res += "JSHC.TC([\"" + exp.id + "\"])"
+                break; 
             case "varname":
-                res += exp.id;
-                break;
-            case "qvar":
-                var r = JSHC.comUtils.splitQvarid(exp.id);
-                res += r.q + "[\"" + r.i + "\"]";
-                break;
+                if (exp.loc !== undefined) {
+                    var x = JSHC.comUtils.splitQvarid(exp.id);
+                    var r = exp.loc
+                    r = r.substr(0, r.length-1);
+                    res += "JSHC.TC("
+                    res += "modules." + r + "[\"" + x.i + "\"])";
+                    break;
+                } else {
+                    res += "JSHC.TC(" + exp.id + ")";
+                    break;
+                }
             case "integer-lit":
-                res += exp.value
+                res += "JSHC.TC(" + exp.value + ")"
+                break;
+            case "infixexp":
+                res += comExp(exp);
                 break;
             default:
                 throw new Error("comAexp not defined for name " + exp.name);

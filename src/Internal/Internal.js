@@ -43,19 +43,39 @@ JSHC.int32read = function(s){
 //returns: an array with any bound variables if successful, Boolean false if failed
 JSHC.Internal.match = function(exp, alts) {
 
+    var binds = [];
+    
     var match_ = function (exp, pat) {
-        if (typeof pat === "string") {
-            return true;
-        } else if (pat instanceof Array) {
-            return pat[0] === exp[0];
-        } else return false;
+        switch (pat.name) {
+            case "varname":
+                binds.push(exp);
+                return true;
+                break;
+            case "integer-lit":
+                return exp === pat;
+                break;
+            case "dacon":
+                return (pat.p[0] === exp[0] && pat.p.length === exp.length);
+                break;
+            case "conpat":
+                var res = pat.p.length === exp.length
+                var res = res && (pat.p[0] === exp[0])
+                for (var i = 1; i < pat.p.length; i++)
+                    res = res && match_(JSHC.TR(exp[i]),pat.p[i]);
+                return res;
+                break;
+            default: 
+                throw new Error("match_ needs definition for: " + pat.name);
+        }
     }
     
     for (var i = 0; i < alts.length; i++) {
-        if (match_(exp, alts[i].p)) 
-            return alts[i].f.apply(undefined,alts[i].b);
+        if (match_(JSHC.TR(exp), alts[i].p)) {
+            return alts[i].f.apply(undefined,binds);
+        } else
+            binds = [];
     }
-    throw new Error("Unhandled case in pattern match!"); //TODO: proper error reporting would be?
+    throw new Error("Unhandled case in pattern match! <br>" + JSHC.showAST(JSHC.TR(exp)) ); //TODO: proper error reporting would be?
     
 }
 

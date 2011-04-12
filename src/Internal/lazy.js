@@ -11,29 +11,43 @@ can not store the arguments on the function, since the function is a shared
 object between thunks.
 */
 
+JSHC.Thunk = function (data, strict) {
+    if (strict)
+        this.v = data;
+    else
+        this.c = data;
+}
+
 // reads a thunk
 function thunk_read(thunk){
-  if( thunk.v === undefined ){
-    ar = thunk.as.pop();
-    thunk.v = TR(TC(thunk.c(ar),thunk.as));
+  if( thunk.v === undefined ) {
+    thunk.v = thunk.c
     delete thunk.c
-    delete thunk.as
   }
   return thunk.v
 }
 JSHC.TR = thunk_read
 
-// e.g for integers, etc..
-function thunk_create_from_strict(v){
-  return { v: v }
-}
-JSHC.TS = thunk_create_from_strict
 
-function thunk_create_from_computation(c,as){
-  JSHC.assert(typeof c == "function", "invalid computation when creating a thunk: "+typeof c)
-  return { c: c, as: as.reverse() }
+function thunk_create(t){
+  if (t instanceof JSHC.Thunk)
+    return t;
+  else if (typeof t === "function")
+    return new JSHC.Thunk(t,false);
+  else
+    return new JSHC.Thunk(t,true);
+
 }
-JSHC.TC = thunk_create_from_computation
+JSHC.TC = thunk_create
+
+//// e.g for integers, etc..
+//function thunk_create_from_strict(v){
+//  if (v instanceof Thunk)
+//    return v;
+//  else
+//    return new JSHC.Thunk(v,true);
+//}
+//JSHC.TS = thunk_create_from_strict
 
 /*
 // TODO: need to have a way to handle functions of arbitrary arity.
