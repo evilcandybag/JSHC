@@ -3,42 +3,50 @@
 /*
   creates a namespace containing all top-level declarations and writes it to
   '.body.tspace' in the module AST.
- */
-JSHC.addToplevelNamespace = function(module_ast){
-    // compute top-level namespace
-    var tspace = JSHC.computeToplevelNames(topdecls);
+  the namespace maps non-qualified names to name objects.
 
-    // save the top-level namespace in the body so that it can be used to
-    // lookup names in the name check, etc..
-    module_ast.body.tspace = tspace;
-};
+  qualifies all declared names with the name of the current module.
 
-////////////////////////////////////////////////////////////////////////////////
-
-/*
-  given a list of top-level declarations, returns a namespace containing all
-  top-level names.
+  adds information to data constructors so that one knows which type
+  constructor it belongs to.
 */
-JSHC.computeToplevelNames = function(ts){
+JSHC.addToplevelNamespace = function(module){
     var ns,i,j;
-    ns = new JSHC.Namespace();
-    // builds up a top-level namespace with all names that should be available
-    // to all top-level declarations.
+    ns = {};
+
+    // TODO: must check that declarations do not overlap.
+    //       i.e for any name added to the tspace, check if it already exists.
+    //       return a list of errors ?
+    //       e.g if data constructors overlap between different datatypes,
+    //       it must be tested for here, as it will not be found later on.
+
+    const ts = module.body.topdecls;
     for(i=0;i<ts.length;i++){
         if( ts[i].name === "topdecl-decl" ){
-            ns.addName(JSHC.var_id, ts[i].decl.lhs.ident.id, "");
+            // qualify name and add to tspace
+            const varname = ts[i].decl.lhs.ident;
+            assert.ok( varname.loc === undefined );
+            varname.loc = module.modid.id;
+            ns[varname.toString(false)] = varname;
         } else if( ts[i].name === "topdecl-data" ){
             // add type constructor
-            ns.addName(JSHC.tycon_id, ts[i].typ.tycon.id, "");
+            const tycon = ts[i].typ.tycon;
+            assert.ok( tycon.loc === undefined );
+            tycon.loc = module.modid.id;
+            ns[tycon.toString(false)] = tycon;
             // add all data constructors
             for(j=0;j<ts[i].constrs.length;j++){
-                ns.addName(JSHC.dacon_id, ts[i].constrs[j].dacon.id, "");
+                const dacon = ts[i].constrs[j].dacon;
+                assert.ok( dacon.loc === undefined );
+                dacon.loc = module.modid.id;
+                dacon.memberOf = tycon;
+                ns[dacon.toString(false)] = dacon;
             }
         } else {
             throw new JSHC.CompilerError("unknown top-level declaration");
         }
     }
-    return ns;
+    module.body.tspace = ns;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
