@@ -1,7 +1,7 @@
 
-// requires JSHC/Test/utility.js
+// requires src/Test/utility.js
 
-JSHC.Test.Tests = {};
+if( JSHC.Test.Tests === undefined )JSHC.Test.Tests = {};
 
 ////////////////////////////////////////////////////////////////////////////////
 
