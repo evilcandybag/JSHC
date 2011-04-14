@@ -1,0 +1,47 @@
+<html>
+<body>
+<script src="src/Utility/stacktrace.js"></script>
+<script src="src/Utility/assert.js"></script>
+<script src="src/Utility/utility.js"></script>
+<script src="src/Utility/errors.js"></script>
+<script src="src/Utility/showError.js"></script>
+<script src="src/Utility/Names.js"></script>
+<script src="src/Utility/showAST.js"></script>
+
+<script src="src/Internal/Internal.js"></script>
+<script src="src/Internal/lazy.js"></script>
+<script src="src/Internal/prelude.js"></script>
+
+<script src="src/Parser/Lexeme.js"></script>
+<script src="src/Parser/tokenize.js"></script>
+<script src="src/Parser/preL.js"></script>
+<script src="src/Parser/iterL.js"></script>
+<script src="src/Parser/parser.js"></script>
+<script src="src/Parser/parse.js"></script>
+
+<script src="src/Check/Fixity.js"></script>
+<script src="src/Check/addToplevelNamespace.js"></script>
+
+<script src="src/Compile/comUtils.js"></script>
+<script src="src/Compile/compile.js"></script>
+
+<!--stuff for testing:-->
+<script src="test/tests.js"></script>
+<script src="test/testing.js"></script>
+
+<script src="src/Test/utility.js"></script>
+<script src="src/Test/tests.js"></script>
+
+<script>
+
+try{
+
+document.write(JSHC.Test.runtests(JSHC.Test.Tests, true));
+
+}catch(err){
+  alert(JSHC.showError(err));
+}
+
+</script>
+</body>
+</html>
