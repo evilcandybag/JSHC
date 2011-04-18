@@ -5,7 +5,7 @@
 JSHC.Compiler.compile = function (input,namespace) {
     if (namespace === undefined)
         namespace = "modules";
-    assert.ok(namespace instanceof String, "The supplied namespace must be of type String!");
+    assert.ok(typeof namespace === "string", "The supplied namespace must be of type String!");
     
     
     var modid;
