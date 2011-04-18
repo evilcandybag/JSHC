@@ -2,15 +2,19 @@
 //        Internal.lazy.js
 //        Compile.comUtils
 
-JSHC.Compiler.compile = function (input) {
-
-    var modid
+JSHC.Compiler.compile = function (input,namespace) {
+    if (namespace === undefined)
+        namespace = "modules";
+    assert.ok(namespace instanceof String, "The supplied namespace must be of type String!");
+    
+    
+    var modid;
     
     var comModule = function(module) {
         if (module.name !== "module") 
            throw new Error("Top level node in AST is not a module, but a " + module.name);
            
-        modid = "modules." + ((module.modid) ? module.modid.id : "Main");
+        modid = namespace + "." + ((module.modid) ? module.modid.id : "Main");
         if (module.exports) {
            throw new Error ("compilation of exports not defined!");
         }
@@ -235,7 +239,7 @@ JSHC.Compiler.compile = function (input) {
                     var x = JSHC.comUtils.splitQvarid(exp.id);
                     var r = exp.loc;
                     r = r.substr(0, r.length-1);
-                    res += "modules." + r + "[\"" + x.i + "\"]";
+                    res += namespace + "." + r + "[\"" + x.i + "\"]";
                     break;
                 } else {
                     res += exp.id ;
@@ -260,7 +264,7 @@ JSHC.Compiler.compile = function (input) {
                     var r = exp.loc
                     r = r.substr(0, r.length-1);
                     res += (strict)? "" : "JSHC.TC(function(){return ";
-                    res += "modules." + r + "[\"" + x + "\"]()";
+                    res += namespace + "." + r + "[\"" + x + "\"]()";
                     res += (strict)? "" : "})"; 
                     break;
                 } else {
