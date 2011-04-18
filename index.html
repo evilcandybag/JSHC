@@ -34,7 +34,10 @@ try{
 
 var tst = new tests();
 
-JSHC.testCompile(tst.lazy);
+
+
+JSHC.tryCompile(tst.demo);
+
 
 }catch(err){
   alert(JSHC.showError(err));

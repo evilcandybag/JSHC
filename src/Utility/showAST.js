@@ -36,6 +36,8 @@ JSHC.showAST = (function(){
 		//	    }
 	    } else if( ast === null ){ // typeof null === "object"
 	        sb.push("null");
+	    } else if( ast === undefined){
+	        sb.push("undefined");
 	    } else {
 		throw new Error("unhandled case: "+typeof ast);
 	    }

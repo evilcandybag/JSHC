@@ -79,7 +79,23 @@ var tests = function () {
     ]
     
     this.lazy = [
-        "e = D Prelude.undefined 2\nf = \\ a -> case a of\n  D x 0 -> x\n  D x y -> y\n",
-        "e = \\ -> Main.e",
+        "e = D Prelude.undefined 2\nf = \\ a -> case a of\n  D x 0 -> x\n  D x y -> y\ng = Main.f Main.e",
+        "e = Main.e",
     ]
+
+    this.demo = [
+        "f = B.x y",
+        "module A where\nf = \\ a -> case a of\n  B x y -> x y 2\n  C -> 1\n  x -> 9\ng = C\nk = A.f A.g",
+        "module B where\nf = \\ a -> case a of\n  B x y -> x y 2\n  C -> 1\n  x -> 9\ng = B Prelude.mul 4\nk = B.f B.g",
+        "module C where\nf = \\ a -> case a of\n  B x y -> x y 2\n  C -> 1\n  x -> 9\ng = B Prelude.add 1\nk = C.f C.g",
+        "module D where\nf = \\ a -> case a of\n  x -> 9\n  B x y -> x y 2\n  C -> 1\ng = C\nk = D.f D.g",
+        "module E where\nf = \\ a -> case a of\n  x -> 9\n  B x y -> x y 2\n  C -> 1\ng = B Prelude.mul 4\nk = E.f E.g",
+        "module F where\nf = \\ a -> case a of\n  x -> 9\n  B x y -> x y 2\n  C -> 1\ng = B Prelude.add 1\nk = F.f F.g",        
+        "module G where\nf = \\ a -> case a of\n  B x y -> x y 2\n  x -> 9\n  C -> 1\ng = Q\nk = G.f G.g",
+        "module H where\nf = \\ a -> case a of\n  B x y -> x y 2\n  x -> 9\n  C -> 1\ng = B Prelude.mul 4\nk = H.f H.g",
+        "module I where\nf = \\ a -> case a of\n  B x y -> x y 2\n  x -> 9\n  C -> 1\ng = B Prelude.add 1\nk = I.f I.g",
+        "module J where\nf = \\ a -> case a of\n  B x y -> x y 2\n  x -> 9\n  C -> 1\ng = C\nk = J.f J.g",
+        "module K where\nf = \\ a -> \\ b -> Prelude.sub  (Prelude.mul b a) (Prelude.add a b)\nk = K.f 3 4",
+    ]
+    
 }

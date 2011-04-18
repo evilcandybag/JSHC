@@ -66,7 +66,7 @@ JSHC.Compiler.compile = function (input) {
 
     var comRhs = function(rhs) {
 
-        return comExp(rhs);
+        return "function() {return " + comExp(rhs) + "}";
     }
 
     var comExp = function(exp) {
@@ -153,25 +153,20 @@ JSHC.Compiler.compile = function (input) {
         
         var res = "";
         switch (exp[0].name) {
-            case "varname":
-                res += "JSHC.TC(" + comFname(exp[0]);
-                for (var i = 1; i < exp.length; i++) {
-                    res += "(" + comAexp(exp[i]) + ")";
-                }
-                res += ")";
-                break; 
             case "dacon":
-                res += "JSHC.TC([\"" + exp[0].id + "\"";
+                res += "[\"" + exp[0].id + "\"";
                 for (var i = 1; i < exp.length; i++) {
                     res += ", " + comAexp(exp[i]);
                 }
-                res += "])"
-                break;
-            case "integer-lit":
-                res += comAexp(exp[0]);
+                res += "]"
                 break;
             default:
-                throw new Error("comFexp not defined for name: " + exp[0].name);
+                res += comAexp(exp[0],true);
+                for (var i = 1; i < exp.length; i++) {
+                    res += "(" + comAexp(exp[i]) + ")";
+                }
+//                res += ")";
+                break;
         }
         return res;
     }
@@ -252,27 +247,31 @@ JSHC.Compiler.compile = function (input) {
         return res;
     }
     
-    var comAexp = function(exp) {
+    var comAexp = function(exp, strict) {
 
         var res = "";
         switch (exp.name) {
             case "dacon":
-                res += "JSHC.TC([\"" + exp.id + "\"])"
+                res += "[\"" + exp.id + "\"]"
                 break; 
             case "varname":
                 if (exp.loc !== undefined) {
-                    var x = JSHC.comUtils.splitQvarid(exp.id);
+                    var x = exp.id.substr(exp.loc.length);
                     var r = exp.loc
                     r = r.substr(0, r.length-1);
-                    res += "JSHC.TC("
-                    res += "modules." + r + "[\"" + x.i + "\"])";
+                    res += (strict)? "" : "JSHC.TC(function(){return ";
+                    res += "modules." + r + "[\"" + x + "\"]()";
+                    res += (strict)? "" : "})"; 
                     break;
                 } else {
-                    res += "JSHC.TC(" + exp.id + ")";
+                    if (strict) 
+                        res += exp.id;
+                    else
+                        res += "JSHC.TC(function() {return " + exp.id + "})";
                     break;
                 }
             case "integer-lit":
-                res += "JSHC.TC(" + exp.value + ")"
+                res += exp.value;
                 break;
             case "infixexp":
                 res += comExp(exp);

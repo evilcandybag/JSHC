@@ -11,43 +11,30 @@ can not store the arguments on the function, since the function is a shared
 object between thunks.
 */
 
-JSHC.Thunk = function (data, strict) {
-    if (strict)
-        this.v = data;
-    else
-        this.c = data;
+JSHC.Thunk = function (exp) {
+    this.v = exp
 }
 
-// reads a thunk
-function thunk_read(thunk){
-  if( thunk.v === undefined ) {
-    thunk.v = thunk.c
-    delete thunk.c
-  }
-  return thunk.v
-}
-JSHC.TR = thunk_read
+JSHC.Thunk.prototype = {
+    get v(){
+        if (this._v instanceof Function)
+            this._v = this._v();
+        return this._v;
+    },
+    set v(val){
+        this._v = val;
+    }
+};
+
 
 
 function thunk_create(t){
   if (t instanceof JSHC.Thunk)
     return t;
-  else if (typeof t === "function")
-    return new JSHC.Thunk(t,false);
-  else
-    return new JSHC.Thunk(t,true);
-
+  else 
+    return new JSHC.Thunk(t);
 }
 JSHC.TC = thunk_create
-
-//// e.g for integers, etc..
-//function thunk_create_from_strict(v){
-//  if (v instanceof Thunk)
-//    return v;
-//  else
-//    return new JSHC.Thunk(v,true);
-//}
-//JSHC.TS = thunk_create_from_strict
 
 /*
 // TODO: need to have a way to handle functions of arbitrary arity.

@@ -60,8 +60,12 @@ JSHC.Internal.match = function(exp, alts) {
             case "conpat":
                 var res = pat.p.length === exp.length
                 var res = res && (pat.p[0] === exp[0])
-                for (var i = 1; i < pat.p.length; i++)
-                    res = res && match_(JSHC.TR(exp[i]),pat.p[i]);
+                for (var i = 1; i < pat.p.length; i++) {
+                    if (exp[i] instanceof JSHC.Thunk)
+                        res = res && match_(exp[i].v,pat.p[i]);
+                    else
+                        res = res && match_(exp[i],pat.p[i]);
+                }
                 return res;
                 break;
             default: 
@@ -70,12 +74,21 @@ JSHC.Internal.match = function(exp, alts) {
     }
     
     for (var i = 0; i < alts.length; i++) {
-        if (match_(JSHC.TR(exp), alts[i].p)) {
+        var x = (exp instanceof JSHC.Thunk);
+        if (x && match_(exp.v, alts[i].p)) {
+            assert.ok(alts[i].f instanceof Function, "rhs of pattern is not a function!");
+//            document.writeln("<br>matched something: " + alts[i].f);
+//            document.writeln("<br>with binds: " + binds);
             return alts[i].f.apply(undefined,binds);
-        } else
+        } else if (match_(exp, alts[i].p)) {
+//            document.writeln("<br>matched something: " + alts[i].f);
+//            document.writeln("<br>with binds: " + binds);
+//            
+            return alts[i].f.apply(undefined,binds);
+        } else        
             binds = [];
     }
-    throw new Error("Unhandled case in pattern match! <br>" + JSHC.showAST(JSHC.TR(exp)) ); //TODO: proper error reporting would be?
+    throw new Error("Unhandled case in pattern match! <br>" + JSHC.showAST((exp instanceof JSHC.Thunk)? exp.v : exp) ); //TODO: proper error reporting would be?
     
 }
 
