@@ -12,8 +12,8 @@ var iterL = function() {
     
     //set the lexer's input, required by the JISON scanner API
     this.setInput = function(inp) {
+//        document.writeln("<p>lexer initiated: " + inp + "</p>")
         this.input = inp.reverse();
-//        document.writeln("<p>lexer initiated: " + this.input + "</p>")
     }
     
     this.lex = function() {
@@ -85,6 +85,7 @@ var iterL = function() {
             //L (< n >: ts) (m : ms) = } : (L (< n >: ts) ms) if n < m
                 } else if (this.stack.length > 0 && x.col < peek(this.stack)) {
                     this.stack.pop();
+                    this.input.pop();
                     this.updRecent(new Token("}",x.row,x.col,"}"));
                     return this.yyname;
             //L (< n >: ts) ms = L ts ms
@@ -131,7 +132,7 @@ var iterL = function() {
             //current element is something else
             case "ERR":
             break;
-            //fuckall error shit
+           
             default:
             throw new Error("Something is srsly wrong with var what.");
         }
