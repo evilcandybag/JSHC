@@ -17,9 +17,11 @@ JSHC.parse = function(input) {
     var y = JSHC.Parser.preL(x);
     parser.lexer = new iterL();
     parser.yy.parseError = function (str, hash) {
-        throw new JSHC.ParseError(str + " expected: " + hash.expected +
-                             "<br>Lexer returned: " + parser.yy.lexer.recent,
-                             parser.yy.lexer.yylloc);
+        if (!parser.yy.lexer.parseError()) {
+            throw new JSHC.ParseError(str + " expected: " + hash.expected +
+                                 "<br>Lexer returned: " + parser.yy.lexer.recent,
+                                  parser.yy.lexer.yylloc);
+        } 
     }
     var res = parser.parse(y);
     return res;

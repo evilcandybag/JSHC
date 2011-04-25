@@ -3,6 +3,7 @@
 
 var JSHC = new Object();
 JSHC.Parser = new Object();
+JSHC.Simplify = new Object();
 
 modules = new Object();
 

@@ -18,18 +18,18 @@ modules.Prelude = {
 //  "-": function(a,b){return JSHC.int32sub(JSHC.TR(a),JSHC.TR(b))},
 //  "*": function(a,b){return JSHC.int32mul(JSHC.TR(a),JSHC.TR(b))},
 //  "/": function(a,b){return JSHC.int32div(JSHC.TR(a),JSHC.TR(b))},
-  add: function(a) {
+  add: function () {return function(a) {
     return function (b) {
-        return JSHC.int32add((a instanceof JSHC.Thunk)? a.v : a,(b instanceof JSHC.Thunk)? b.v : b)}},
-  sub: function(a) {
+        return JSHC.int32add((a instanceof JSHC.Thunk)? a.v : a,(b instanceof JSHC.Thunk)? b.v : b)}}},
+  sub: function () { return function(a) {
     return function (b) {
-        return JSHC.int32sub((a instanceof JSHC.Thunk)? a.v : a,(b instanceof JSHC.Thunk)? b.v : b)}},
-  mul: function(a) {
+        return JSHC.int32sub((a instanceof JSHC.Thunk)? a.v : a,(b instanceof JSHC.Thunk)? b.v : b)}}},
+  mul: function () { return function(a) {
     return function (b) {
-        return JSHC.int32mul((a instanceof JSHC.Thunk)? a.v : a,(b instanceof JSHC.Thunk)? b.v : b)}},
-  div: function(a) {
+        return JSHC.int32mul((a instanceof JSHC.Thunk)? a.v : a,(b instanceof JSHC.Thunk)? b.v : b)}}},
+  div: function () {return function(a) {
     return function (b) {
-        return JSHC.int32div((a instanceof JSHC.Thunk)? a.v : a,(b instanceof JSHC.Thunk)? b.v : b)}},
+        return JSHC.int32div((a instanceof JSHC.Thunk)? a.v : a,(b instanceof JSHC.Thunk)? b.v : b)}}},
  }
 
 modules.Prelude["undefined"] = undefined;

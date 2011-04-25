@@ -68,8 +68,11 @@ JSHC.Parser.preL = function(input) {
 		    if (input[i].val === "where" || 
 		        input[i].val === "let" ||
 		        input[i].val === "do" ||
-		        input[i].val === "of") 
+		        input[i].val === "of") {
 		        newBlock = true;
+//		        document.writeln("<br> newblock was set because of " + input[i].val)
+		    }
+		        
 
 		}
 	}

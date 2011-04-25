@@ -19,8 +19,12 @@ JSHC.comUtils.getBinds = function(exp, pat) {
     case "conpat":
         for (var i = 0; i < pat.pats.length; i++) {
             res.push(pat.pats[i].id);
-        }
+        }   
         break;
+    case "tuple_pat":
+        for (var i = 0; i < pat.members.length; i++) {
+            res.push(pat.members[i].id);
+        }
     case "varname":
         res.push(exp);
         break;
@@ -41,6 +45,11 @@ JSHC.comUtils.getBindStrs = function(p) {
         case "conpat":
             for (var i = 0; i < pat.pats.length; i++) {
                 inner(pat.pats[i]);
+            }
+            break;
+        case "tuple_pat":
+            for (var i = 0; i < pat.members.length; i++) {
+                inner(pat.members[i]);
             }
             break;
         case "varname":

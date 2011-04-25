@@ -92,7 +92,7 @@ topdecl // : object
     | impdecl                       {{$$ = $1;}}
     ;
 
-/*
+
 decls // : [decl]
   : '{' '}'                           {{ $$ = []; }}
   | '{' list_decl_comma_1 '}'         {{ $$ = $2; }}
@@ -102,7 +102,7 @@ list_decl_comma_1 // : [decl]
   : list_decl_comma_1 ";" decl        {{ ($1).push($3); $$ = $1; }}
   | decl                              {{ $$ = [$1]; }}
   ;
-*/
+
 
 decl // : object
   : funlhs rhs          {{$$ = {name: "decl-fun", lhs: $1, rhs: $2, pos:@$};}}
@@ -229,11 +229,11 @@ infixexpLR // : [lexp | qop | '-']. re-written to be left recursive.
 //  lexp                        {{ $$ = [$1]; }}
 
 lexp // : object
-  : //"let" decls "in" exp                        {$$ = ["letrec",$2,$4];}
-    "if" exp "then" exp "else" exp %prec ITE {{$$ = {name:"ite",e1:$2,e2:$4,e3:$6,pos:@$};}}
-  | fexp                                     {{$$ = {name:"application", exps:$1,pos:@$};}}
-  | '\' apats "->" exp                       {{$$ = {name:"lambda", args: $2, rhs: $4, pos: @$};}}
-  | "case" exp "of" "{" alts "}"             {{$$ = {name:"case", exp: $2, alts: $5};}}
+  : "if" exp "then" exp "else" exp %prec ITE {{$$ = {name:"ite",e1:$2,e2:$4,e3:$6,pos:@$}; }}
+  | fexp                                     {{$$ = {name:"application", exps:$1,pos:@$}; }}
+  | '\' apats "->" exp                       {{$$ = {name:"lambda", args: $2, rhs: $4, pos: @$}; }}
+  | "case" exp "of" "{" alts "}"             {{$$ = {name:"case", exp: $2, alts: $5, pos: @$}; }}
+  | "let" decls "in" exp                     {{$$ = {name:"let", decls: $2, exp: $4, pos: @$}; }}
   ;
 
 // list of 1 or more 'aexp' without separator
@@ -287,8 +287,18 @@ aexp // : object
   | gcon                {{$$ = $1;}}
   | literal             {{$$ = $1;}}
   | "(" exp ")"         {{$$ = $2;}}
+  | tuple               {{$$ = $1;}}
   // TODO: incomplete
   ;
+
+tuple // : object
+    : "(" exp "," list_exp_1_comma ")" {{$4.unshift($2); $$ = {name: "tuple", members: $4, pos: @$}; }}
+    ;
+
+list_exp_1_comma
+    : list_exp_1_comma ',' exp   {{$1.push($3); $$ = $1; }}
+    | exp                          {{$$ = [$1];}}
+    ;
 
 modid // : object # {conid .} conid
     : qconid              {{$$ = new JSHC.ModName($1, @$, yy.lexer.previous.qual);}}
@@ -413,7 +423,17 @@ apat // : object
     : var               {{$$ = $1; }}
     | gcon              {{$$ = $1; }}
     | literal           {{$$ = $1; }}
+    | tuple_pat         {{$$ = $1; }}
     // TODO: incomplete
+    ;
+
+tuple_pat // object
+    :  "(" pat "," pat_list_1_comma ")" {{$4.unshift($2); $$ = {name: "tuple_pat", members: $4, pos: @$}; }}
+    ;
+    
+pat_list_1_comma // : [pat]
+    : pat_list_1_comma "," pat      {{$1.push($3); $$ = $1; }}
+    | pat                           {{$$ = [$1]; }}
     ;
 
 ////////////////////////////////////////////////////////////////////////////////

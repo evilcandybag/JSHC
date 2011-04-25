@@ -22,8 +22,8 @@ var tests = function () {
         "module A (a) where\nimport B ",
         "module A (a,b) where\nimport B ",
         "module A (a,b,)where\nimport B ",
-        "module A where\na x = x 1\nimport B ",
-        "module A where\nimport B\nimport C \na x = x 1\nimport D"
+//        "module A where\na x = x 1\nimport B ",
+//        "module A where\nimport B\nimport C \na x = x 1\nimport D"
     ]
 
     this.arith = [
@@ -54,6 +54,26 @@ var tests = function () {
         "f = \\ a -> case a of\n  x -> 9\n  B x y -> x y 2\n  C -> 1",        
         "f = \\ a -> case a of\n  B x y -> x y 2\n  x -> 9\n  C -> 1",
     ] 
+
+    this.ite = [
+        "f = \\ a -> if a then 1 else 2",
+        "f = if a then 1 else 2",
+    ]
+
+    this.tuple = [
+        "f = (1)",
+        "f = (1,B)",
+        "f = (2,4,5)",
+    ]
+
+    this.lets = [
+//        "let x in x "
+        "f = let { x = 1 } in x",
+        "f = let { x = 1 ; y = 2 } in Prelude.add x y",
+        "f = let { x = 1 ; y = 2 ; z = 5 } in Prelude.mul (Prelude.add x y) z",
+//        "f = \n let\n x = 1\n y = 2\n z = 5\nin Prelude.mul (Prelude.add x y) z",
+
+    ]
     
     this.constr = [
         "f = B",

@@ -142,9 +142,6 @@ JSHC.Compiler.compile = function (input,namespace) {
              case "case":
                 res += comCase(exp[i]);
                 break;
-//             case "integer-lit":
-//                res += exp.value
-//                break;
              default:
                 throw new Error("comInfixexp not defined for name " + exp[i].name); 
             }
@@ -218,6 +215,13 @@ JSHC.Compiler.compile = function (input,namespace) {
                 }
                 res += "]"
                 break;
+            case "tuple_pat":
+                res += "[" 
+                for (var i = 0; i < pat.members.length; i++) {
+                    res += comCasePat(pat.members[i]) + ", ";
+                }
+                res += "]"
+                break;
             case "varname":
                 res += "\"" + pat.id + "\""
                 break;
@@ -279,6 +283,15 @@ JSHC.Compiler.compile = function (input,namespace) {
                 break;
             case "infixexp":
                 res += comExp(exp);
+                break;
+            case "tuple":
+                res += "[";
+                for (var i = 0; i < exp.members.length; i++) {
+                    res += comExp(exp.members[i])
+                    if (i !== exp.members.length-1)
+                        res += " , "
+                }
+                res += "]"
                 break;
             default:
                 throw new Error("comAexp not defined for name " + exp.name);

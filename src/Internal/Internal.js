@@ -68,6 +68,16 @@ JSHC.Internal.match = function(exp, alts) {
                 }
                 return res;
                 break;
+            case "tuple_pat":
+                var res = pat.p.length === exp.length
+                for (var i = 0; i < pat.p.length; i++) {
+                    if (exp[i] instanceof JSHC.Thunk)
+                        res = res && match_(exp[i].v,pat.p[i]);
+                    else
+                        res = res && match_(exp[i],pat.p[i]);
+                }
+                return res;
+                break;
             default: 
                 throw new Error("match_ needs definition for: " + pat.name);
         }

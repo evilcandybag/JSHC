@@ -9,6 +9,8 @@ var iterL = function() {
     this.yyleng = 0; //contains the indentation of the current token
     this.yyname = ""; //contains the name (token-type) of the current token
     this.pErr = false; //contains info on whether the parser has returned an error message
+    this.hadAnError = false;
+    this.debug = []
     
     //set the lexer's input, required by the JISON scanner API
     this.setInput = function(inp) {
@@ -17,6 +19,14 @@ var iterL = function() {
     }
     
     this.lex = function() {
+//        document.writeln("<p>lexer called, last returned: " + this.recent + "<br>previously returned: " + this. previous + "</p>")
+        if (this.hadAnError){
+            this.hadAnError = false;
+            this.pErr = false;            
+            this.updRecent(new Token("}",x.row,x.col,"}"));
+            return this.yyname;
+           
+        }
         var x = peek(this.input);
         if (this.emptyBlock)
             return (new Token("}",x.row,x.col,"}"));
@@ -45,6 +55,8 @@ var iterL = function() {
                (x instanceof Token && x.val == "}")? "CB":
                (x instanceof Token)? "T":
                "ERR";
+//        if (this.pErr) 
+//            document.writeln("<p>lexer: pErr and token is: " + what);
         switch(what){
         
             //current element is BLOCKIND
@@ -85,7 +97,7 @@ var iterL = function() {
             //L (< n >: ts) (m : ms) = } : (L (< n >: ts) ms) if n < m
                 } else if (this.stack.length > 0 && x.col < peek(this.stack)) {
                     this.stack.pop();
-                    this.input.pop();
+//                    this.input.pop();
                     this.updRecent(new Token("}",x.row,x.col,"}"));
                     return this.yyname;
             //L (< n >: ts) ms = L ts ms
@@ -118,10 +130,14 @@ var iterL = function() {
             case "T":
             //L (t : ts) (m : ms) = } : (L (t : ts) ms) if m= = 0 and parse-error(t)
                 if (this.stack.length > 0 && peek(this.stack) !== 0 && this.pErr) {
+//                    document.writeln("<p>parseError alternative reached in lexer</p>");
                     this.stack.pop();
-                    this.pErr = false;
+//                    this.pErr = false;
+//                    document.writeln("<p>recent is now: " + this.recent + "</p>");
                     this.updRecent(new Token("}",x.row,x.col,"}"));
+//                    document.writeln("<p>recent is now: " + this.recent + "</p>");
                     return this.yyname;
+                    this.hadAnError = true;
             //L (t : ts) ms = t : (L ts ms)
                 } else {
                     this.input.pop();
@@ -139,16 +155,20 @@ var iterL = function() {
     }
     
     this.parseError = function() {
+//        document.writeln("<p>calling parseError from lexer. stack is: " + this.stack + "<br>");
         if (this.stack.length > 0 && peek(this.stack) !== 0) {
-            this.pErr = true
+            this.pErr = true;
+//            document.writeln("returning: true</p>");
             return true;
         } else {
+//        document.writeln("returning: false</p>");
         return false;
         }
     }
     
     this.updRecent = function(token) {
         if (token instanceof Token) {
+//            document.writeln("<p>updating recent: " + token + "</p>");
             this.previous = this.recent;
             this.recent = token;
             this.yytext = token.val;
