@@ -12,7 +12,7 @@ JSHC.Test.Tests.unparsable = function(){
 
 JSHC.Test.Tests.parsable = function(){
     var l;
-    var ls = new tests();
+    var ls = new JSHC.Test.Cases.parsable();
     var ts = {};
     var number = 0;
 

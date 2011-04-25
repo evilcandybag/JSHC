@@ -15,15 +15,15 @@ JSHC.ParseError.prototype.toString = function(){
 JSHC.parse = function(input) {
     var x = JSHC.Parser.tokenize.parse(input);
     var y = JSHC.Parser.preL(x);
-    parser.lexer = new iterL();
-    parser.yy.parseError = function (str, hash) {
-        if (!parser.yy.lexer.parseError()) {
+    JSHCparser.lexer = new iterL();
+    JSHCparser.yy.parseError = function (str, hash) {
+        if (!JSHCparser.yy.lexer.parseError()) {
             throw new JSHC.ParseError(str + " expected: " + hash.expected +
-                                 "<br>Lexer returned: " + parser.yy.lexer.recent,
-                                  parser.yy.lexer.yylloc);
+                                 "<br>Lexer returned: " + JSHCparser.yy.lexer.recent,
+                                  JSHCparser.yy.lexer.yylloc);
         } 
     }
-    var res = parser.parse(y);
+    var res = JSHCparser.parse(y);
     return res;
 }
 

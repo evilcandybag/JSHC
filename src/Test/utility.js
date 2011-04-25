@@ -2,7 +2,7 @@
 // requires assertions
 
 if( JSHC.Test === undefined )JSHC.Test = {};
-
+if( JSHC.Test.Cases === undefined)JSHC.Test.Cases = {};
 ////////////////////////////////////////////////////////////////////////////////
 
 /*
