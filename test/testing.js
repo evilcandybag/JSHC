@@ -39,6 +39,9 @@ JSHC.testCompile = function (tests) {
     }
 }
 
+
+
+
 JSHC.tryCompile = function (tests) {
     for (var i = 0; i < tests.length; i++) {
             var res = JSHC.parse(tests[i]);
@@ -54,6 +57,51 @@ JSHC.tryCompile = function (tests) {
     }
     }
 
+JSHC.tryExp = function (tests) {
+    for (var i = 0; i < tests.length; i++) {
+            var res = JSHC.parseExp(tests[i]);
+            JSHC.Simplify.simplify(res);
+            var prog = JSHC.Compiler.compile(res);
+            document.writeln("<p>");
+            document.writeln(prog);
+            document.writeln("</p>");
+//        } catch (e) {
+//            document.writeln("Encountered error:<br>");
+//            document.writeln(e.message + "</p>")
+//        }
+    }
+    }
+
+
+JSHC.testParseExp = function (tests) {
+
+    var format = function (input) {
+        var r = input.replace(/\[/g,"<br>[<br>");
+        var s = r.replace(/\]/g, "<br>]<br>");
+        var v = s.replace(/\},/g, "},<br>");
+        return v;
+    }  
+    var ret = [];
+    
+    for (var i = 0; i < tests.length; i++) {
+        document.writeln("<p> Parsing program: <br>" + tests[i] + "<br>" + fakeLex(tests[i]) + "<br>");
+//        try {
+            var res = JSHC.parseExp(tests[i]);
+            document.writeln("Success!<br>");
+            document.writeln(format(JSHC.showAST(res)));
+            document.writeln("</p>");
+            
+//        } catch (e) {
+//            document.writeln("Encountered error:<br>");
+//            document.writeln(e.message + "</p>")
+//        }
+            JSHC.Simplify.simplify(res);
+            document.writeln("<p>After applying simplify:<br>" )
+            document.writeln(format(JSHC.showAST(res)));
+            document.writeln("</p>");
+    }
+    return ret;
+}
 
 JSHC.testParse = function (tests) {
 
@@ -84,7 +132,5 @@ JSHC.testParse = function (tests) {
     }
     return ret;
 }
-
-
 
 

@@ -1,3 +1,4 @@
 *~
 tstPH.html
-src/Parser/parser.jison.reduce
+src/Parser/JSHCparser.jison.reduce
+

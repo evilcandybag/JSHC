@@ -53,6 +53,11 @@ JSHC.Simplify.simplify["decl-fun"] = function(ast){
     }
 };
 
+JSHC.Simplify.simplify["infixexp"] = function(ast) {
+    return JSHC.Simplify.reduceExp(ast);
+};
+
+
 JSHC.Simplify.reduceExp = function (e) {
     if (e.name === "infixexp") {
         var exp = e.exps[0];

@@ -23,6 +23,10 @@ JSHC.Compiler.compile = function (input,namespace) {
         return res
 
     }
+    
+    var comSoloExp = function(exp) {
+        return comExp(exp);
+    }
 
     var comBody = function(body) {
         if (body.name !== "body") 
@@ -300,7 +304,9 @@ JSHC.Compiler.compile = function (input,namespace) {
     }
 
 
-    
-    return comModule(input);
+    if (input.name === "infixexp")
+        return comSoloExp(input);
+    else
+        return comModule(input);
     
 }
