@@ -96,6 +96,8 @@ topdecl // : object
 decls // : [decl]
   : '{' '}'                           {{ $$ = []; }}
   | '{' list_decl_comma_1 '}'         {{ $$ = $2; }}
+  | '{' error '}'                        {{ $$ = []; }}
+  | '{' list_decl_comma_1 error '}'      {{ $$ = $2; }}
   ;
 
 list_decl_comma_1 // : [decl]
@@ -233,7 +235,8 @@ lexp // : object
   | fexp                                     {{$$ = {name:"application", exps:$1,pos:@$}; }}
   | '\' apats "->" exp                       {{$$ = {name:"lambda", args: $2, rhs: $4, pos: @$}; }}
   | "case" exp "of" "{" alts "}"             {{$$ = {name:"case", exp: $2, alts: $5, pos: @$}; }}
-  | "let" decls "in" exp                     {{$$ = {name:"let", decls: $2, exp: $4, pos: @$}; }}
+//  | "let" decls "in" exp                     {{$$ = {name:"let", decls: $2, exp: $4, pos: @$}; }}
+  | "let" decls "in" exp               {{$$ = {name:"let", decls: $2, exp: $4, pos: @$}; }}
   ;
 
 // list of 1 or more 'aexp' without separator

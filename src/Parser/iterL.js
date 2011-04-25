@@ -10,7 +10,9 @@ var iterL = function() {
     this.yyname = ""; //contains the name (token-type) of the current token
     this.pErr = false; //contains info on whether the parser has returned an error message
     this.hadAnError = false;
-    this.debug = []
+    var debugging = false;
+    var troublemaker;
+    if(debugging) this.debugArr = [];
     
     //set the lexer's input, required by the JISON scanner API
     this.setInput = function(inp) {
@@ -23,7 +25,7 @@ var iterL = function() {
         if (this.hadAnError){
             this.hadAnError = false;
             this.pErr = false;            
-            this.updRecent(new Token("}",x.row,x.col,"}"));
+            this.updRecent(troublemaker);
             return this.yyname;
            
         }
@@ -132,12 +134,13 @@ var iterL = function() {
                 if (this.stack.length > 0 && peek(this.stack) !== 0 && this.pErr) {
 //                    document.writeln("<p>parseError alternative reached in lexer</p>");
                     this.stack.pop();
-//                    this.pErr = false;
+                    this.pErr = false;
+                    this.hadAnError = true;
 //                    document.writeln("<p>recent is now: " + this.recent + "</p>");
-                    this.updRecent(new Token("}",x.row,x.col,"}"));
+                    troublemaker = this.recent;
+                    this.updRecent(new Token("}",x.row,x.col,"}"),"ERROR");
 //                    document.writeln("<p>recent is now: " + this.recent + "</p>");
                     return this.yyname;
-                    this.hadAnError = true;
             //L (t : ts) ms = t : (L ts ms)
                 } else {
                     this.input.pop();
@@ -158,15 +161,15 @@ var iterL = function() {
 //        document.writeln("<p>calling parseError from lexer. stack is: " + this.stack + "<br>");
         if (this.stack.length > 0 && peek(this.stack) !== 0) {
             this.pErr = true;
-//            document.writeln("returning: true</p>");
+            if(debugging)console.log("calling parseError from lexer. stack is: " + this.stack + "\n" + "returning: true");
             return true;
         } else {
-//        document.writeln("returning: false</p>");
+            if(debugging)console.log("calling parseError from lexer. stack is: " + this.stack + "\n" + "returning: false");
         return false;
         }
     }
     
-    this.updRecent = function(token) {
+    this.updRecent = function(token, sender) {
         if (token instanceof Token) {
 //            document.writeln("<p>updating recent: " + token + "</p>");
             this.previous = this.recent;
@@ -177,7 +180,8 @@ var iterL = function() {
             this.yyname = token.typ;
             this.yylloc = {first_line: token.row, first_column: token.col, 
                            last_line: token.row, last_column: token.col + token.val.length};
-//            document.writeln("<p>lexer returning token: " + this.recent + "</p>")
+            if(debugging)console.log("lexer returning token: " + this.recent + sender );
+            if(debugging)this.debugArr.push(this.recent.val);
         } else {//TODO: replace alerts by proper error handling!
             throw new Error("There should be no elems not of type Token in input for lexer!");
         }

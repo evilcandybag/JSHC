@@ -17,6 +17,8 @@ JSHC.parse = function(input) {
     var y = JSHC.Parser.preL(x);
     JSHCparser.lexer = new iterL();
     JSHCparser.yy.parseError = function (str, hash) {
+        if (JSHCparser.yy.lexer.debugArr !== undefined)
+            console.log("parse error happened, lexer has so far returned:<br>" + JSHCparser.yy.lexer.debugArr)
         if (!JSHCparser.yy.lexer.parseError()) {
             throw new JSHC.ParseError(str + " expected: " + hash.expected +
                                  "<br>Lexer returned: " + JSHCparser.yy.lexer.recent,

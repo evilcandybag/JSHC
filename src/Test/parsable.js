@@ -67,11 +67,15 @@ JSHC.Test.Cases.parsable = function () {
     ]
 
     this.lets = [
-//        "let x in x "
+        "f = let x = 1 in x",
+        "f = let\n x = 1\n y = 2\n in Prelude.add x y",
+        "f = let\n x = 1\n y = 2\n z = 5 in Prelude.mul (Prelude.add x y) z",
+        "f = let\n x = 1\n y = 2 in Prelude.add x y",
+        "f = let x = 1\n        y = 2\n        z = 5 in Prelude.mul (Prelude.add x y) z",
+        "f = let x = 1\n        y = 2\n        z = 5\n in Prelude.mul (Prelude.add x y) z",
         "f = let { x = 1 } in x",
         "f = let { x = 1 ; y = 2 } in Prelude.add x y",
         "f = let { x = 1 ; y = 2 ; z = 5 } in Prelude.mul (Prelude.add x y) z",
-//        "f = \n let\n x = 1\n y = 2\n z = 5\nin Prelude.mul (Prelude.add x y) z",
 
     ]
     
