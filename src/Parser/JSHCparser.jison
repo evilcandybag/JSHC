@@ -109,7 +109,7 @@ list_decl_comma_1 // : [decl]
 decl // : object
   : funlhs rhs          {{$$ = {name: "decl-fun", lhs: $1, rhs: $2, pos:@$};}}
     //| pat rhs
-  // | gendecl
+  | gendecl
   ;
 
 funlhs // : object
@@ -121,6 +121,12 @@ funlhs // : object
 rhs // : object
     : '=' exp        {{$$ = $2;}}
     ; //TODO
+
+gendecl // : type declaration | fixity
+    : "infixl" literal op_list_1_comma        {{ $$ = {name: "infixl", num: $2, ops: $3, pos: @$}; }}
+    | "infixr" literal op_list_1_comma        {{ $$ = {name: "infixr", num: $2, ops: $3, pos: @$}; }}
+    | "infix" literal op_list_1_comma        {{ $$ = {name: "infix", num: $2, ops: $3, pos: @$}; }}
+    ;
 
 simpletype // : object
     : tycon         {{$$ = {name: "simpletype", tycon: $1, vars: [], pos: @$};}}
@@ -315,6 +321,21 @@ qop // : object
       // Q: is 'qconop' in lexer ?
     ;
 
+op_list_1_comma // : [op]
+    : op_list_1_comma "," op {{ $1.push($3); $$ = $1; }}
+    | op                     {{ $$ = [$1]; }}
+    ;
+
+op // : object
+    : varop {{ $$ = $1; }}
+    | conop {{ $$ = $1; }}
+    ;
+
+conop // : object           TODO: something in Names instead?
+    : consym                {{ $$ = {name: "conop", id: $1, pos: @$}; }}
+    | '`' conid '`'         {{ $$ = {name: "conop-var", id: $1, pos: @$}; }}
+    ;
+    
 // optionally qualified variable symbol or variable id as a symbol
 qvarop // : object
     : qvarsym           {{$$ = {name: "qvarop", id: $1, pos: @$};}}

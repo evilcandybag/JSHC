@@ -78,6 +78,13 @@ JSHC.Test.Cases.parsable = function () {
         "f = let { x = 1 ; y = 2 ; z = 5 } in Prelude.mul (Prelude.add x y) z",
 
     ]
+
+    this.ops = [
+        "(+++) x y = x + y",
+        "infixl 3 +",
+        "infixr 5 +,-",
+        "infix 7 +,-,*",
+    ]
     
     this.constr = [
         "f = B",
