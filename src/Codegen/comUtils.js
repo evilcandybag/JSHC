@@ -1,5 +1,5 @@
 JSHC.comUtils = new Object();
-JSHC.Compiler = new Object();
+JSHC.Codegen = new Object();
 
 //used to separate the qualifier part from a qvarid
 JSHC.comUtils.splitQvarid = function(input) {

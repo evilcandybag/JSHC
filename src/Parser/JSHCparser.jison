@@ -119,13 +119,14 @@ funlhs // : object
     ;
 
 rhs // : object
-    : '=' exp        {{$$ = $2;}}
+    : '=' exp                  {{$$ = $2;}}
+    | '=' exp "where" decls    {{$$ = {name: "fun-where", exp: $2, decls: $4, pos: @$}; }}
     ; //TODO
 
 gendecl // : type declaration | fixity
-    : "infixl" literal op_list_1_comma        {{ $$ = {name: "infixl", num: $2, ops: $3, pos: @$}; }}
-    | "infixr" literal op_list_1_comma        {{ $$ = {name: "infixr", num: $2, ops: $3, pos: @$}; }}
-    | "infix" literal op_list_1_comma        {{ $$ = {name: "infix", num: $2, ops: $3, pos: @$}; }}
+    : "infixl" literal op_list_1_comma        {{ $$ = {name: "fixity", fix: "leftfix", num: $2, ops: $3, pos: @$}; }}
+    | "infixr" literal op_list_1_comma        {{ $$ = {name: "fixity", fix: "rightfix", num: $2, ops: $3, pos: @$}; }}
+    | "infix" literal op_list_1_comma        {{ $$ = {name: "fixity",  fix: "nonfix",num: $2, ops: $3, pos: @$}; }}
     ;
 
 simpletype // : object
