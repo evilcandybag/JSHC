@@ -3,6 +3,12 @@ if( JSHC.Ymacs === undefined )JSHC.Ymacs = {};
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// Interpreter Buffer
+JSHC.Ymacs.IB = {};
+JSHC.Ymacs.IB.prompt = "> ";
+
+////////////////////////////////////////////////////////////////////////////////
+
 // create interpreter buffer (if missing) and switch to it
 JSHC.Ymacs.switchToInterpreter = function(ymacs){
     const bs = ymacs.buffers;
@@ -55,12 +61,12 @@ JSHC.Ymacs.switchToInterpreter = function(ymacs){
 
 // create new interpreter
 JSHC.Ymacs.makeNewInterpreterBuffer = function(ymacs){
-    const PROMPT = "> ";
+
+    const PROMPT = JSHC.Ymacs.IB.prompt;
 
     // create a standard buffer. it is modified below.
     var buf = ymacs.createBuffer({ name: "jshc-interpreter" });
 
-    buf.prompt = PROMPT;
     buf.JSHC_commandHistory = [];
     buf.JSHC_commandHistoryPos = -1;
 

@@ -10,7 +10,6 @@ DEFINE_SINGLETON("JSHC_IB_Keymap", Ymacs_Keymap, function(D){
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// TODO: just a copy of the markdown tokenizer to get rid of errors
 Ymacs_Tokenizer.define("JSHC_IB", function(stream, tok) {
 
         var PARSER = { next: next, copy: copy };
@@ -31,23 +30,15 @@ Ymacs_Tokenizer.define("JSHC_IB", function(stream, tok) {
         function next() {
 	    stream.checkStop();
 	    var tmp;
-	    if (stream.col == 0 && (tmp = stream.lookingAt(/^(#+)/))) {
-		foundToken(0, stream.col = stream.lineLength(), "markdown-heading" + tmp[0].length);
-	    }
-	    else if (stream.line > 0 && stream.col == 0 && (tmp = stream.lookingAt(/^[=-]+$/)) && /\S/.test(stream.lineText(stream.line - 1))) {
-		tmp = tmp[0].charAt(0) == "=" ? 1 : 2;
-		tmp = "markdown-heading" + tmp;
-		tok.onToken(stream.line - 1, 0, stream.lineLength(stream.line - 1), tmp);
-		foundToken(0, stream.col = stream.lineLength(), tmp);
-	    }
-	    else if (stream.col == 0 && (tmp = stream.lookingAt(/^[>\s]*/))) {
-		tmp = tmp[0].replace(/\s+/g, "").length;
-		if (tmp > 3)
-		    tmp = "";
-		tmp = "markdown-blockquote" + tmp;
-		foundToken(0, stream.col = stream.lineLength(), tmp);
-	    }
-	    else {
+
+	    if (stream.col == 0 && (tmp = stream.lookingAt(JSHC.Ymacs.IB.prompt))) {
+		// color command prompt
+		foundToken(0, stream.col = stream.lineLength(), "keyword");
+
+	    } else if (stream.col == 0 && (tmp = stream.lookingAt("error: "))) 
+		// color error messages
+		foundToken(0, stream.col = stream.lineLength(), "error");
+	    } else {
 		foundToken(stream.col, ++stream.col, null);
 	    }
         };
@@ -80,11 +71,13 @@ Ymacs_Buffer.newCommands({
 			return ymacs.getActiveBuffer();
 		    });
 
-		const line = buf.code[buf.code.length-1].substr(buf.prompt.length);
+		const PROMPT = JSHC.Ymacs.IB.prompt;
+
+		const line = buf.code[buf.code.length-1].substr(PROMPT.length);
 		var result = JSHC.Ymacs.interpreter.autoComplete(line);
 		if( result.line !== undefined ){
-		    buf._replaceLine(buf.code.length-1, buf.prompt + result.line);
-		    buf.caretMarker.setPosition(buf.prompt.length + result.index);
+		    buf._replaceLine(buf.code.length-1, PROMPT + result.line);
+		    buf.caretMarker.setPosition(PROMPT.length + result.index);
 		} else if( result.matches !== undefined ){
 		    result.matches.forEach(function(match){
 			    buf.__insertText(match.id,pos);

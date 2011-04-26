@@ -9,7 +9,6 @@ DEFINE_SINGLETON("Haskell_Keymap", Ymacs_Keymap, function(D){
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// TODO: just a copy of the markdown tokenizer to get rid of errors
 Ymacs_Tokenizer.define("haskell", function(stream, tok) {
 
         var PARSER = { next: next, copy: copy };
@@ -24,6 +23,7 @@ Ymacs_Tokenizer.define("haskell", function(stream, tok) {
         };
 
         function next() {
+	    // TODO: color keywords, etc..
 	    stream.checkStop();
 	    tok.onToken(stream.line, stream.col, ++stream.col, null);
         };
