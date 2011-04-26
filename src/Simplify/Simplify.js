@@ -42,11 +42,15 @@ JSHC.Simplify.simplify["decl-fun"] = function(ast){
     // take all parameters in the LHS and add as lambdas on the RHS.
     var i;
     var old_rhs = (ast.rhs.name === "infixexp")? 
-                    JSHC.Simplify.reduceExp(ast.rhs) : ast.rhs;
+                        JSHC.Simplify.reduceExp(ast.rhs) : 
+                  (ast.rhs.name === "fun-where")? 
+                        JSHC.Simplify.reduceWhere(ast.rhs) :
+                            ast.rhs;
     
     // TODO: should remove position information recursively from ast.lhs.args.
     if(ast.lhs.args.length > 0) {
-        ast.rhs = {name:"lambda", args: ast.lhs.args, rhs: old_rhs, pos: ast.pos};
+        old_rhs = {name:"lambda", args: ast.lhs.args, rhs: old_rhs, pos: ast.pos};
+        ast.rhs = {name: "infixexp", exps: [old_rhs], pos: ast.pos};
         ast.lhs.args = [];
     } else {
         ast.rhs = old_rhs;
@@ -60,7 +64,6 @@ JSHC.Simplify.simplify["infixexp"] = function(ast) {
 JSHC.Simplify.simplify["fixity"] = function(ast) {
     
 };
-
 
 JSHC.Simplify.reduceExp = function (e) {
     if (e.name === "infixexp") {
@@ -101,6 +104,31 @@ JSHC.Simplify.reduceExp = function (e) {
         }
     }
     return e;
-}
+};
+
+JSHC.Simplify.reduceWhere = function (e) {
+    
+    var new_exp = {name:"tuple",members: [],pos: e.decls.pos};
+    var new_pat = {name:"tuple_pat", members: [],pos: e.decls.pos};
+    for (var i = 0; i < e.decls.length; i++) {
+        var temp = e.decls[i];
+        JSHC.Simplify.simplify(temp);
+        switch (temp.name) {
+            case "decl-fun":
+                new_exp.members.push(temp.rhs);
+                new_pat.members.push(temp.lhs.ident);
+                break;
+            default:
+                throw new Error("Simplify.reduceExp not defined for " + exp.decls[i].name);
+        }
+    }
+    new_exp = {name:"application", exps: [new_exp], pos: new_exp.pos};
+    new_exp = {name:"infixexp", exps:[new_exp], pos: new_exp.pos};
+                
+    var new_case = {name:"case", exp: new_exp, 
+                             alts: [{name:"alt", pat: new_pat, exp: e.exp}]};
+
+    return {name: "infixexp", exps: [new_case], pos: e.pos}
+};
 
 ////////////////////////////////////////////////////////////////////////////////

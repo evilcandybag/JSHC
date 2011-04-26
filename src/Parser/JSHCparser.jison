@@ -119,7 +119,8 @@ funlhs // : object
     ;
 
 rhs // : object
-    : '=' exp        {{$$ = $2;}}
+    : '=' exp                  {{$$ = $2;}}
+    | '=' exp "where" decls    {{$$ = {name: "fun-where", exp: $2, decls: $4, pos: @$}; }}
     ; //TODO
 
 gendecl // : type declaration | fixity

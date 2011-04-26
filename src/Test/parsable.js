@@ -26,10 +26,22 @@ JSHC.Test.Cases.parsable = function () {
 //        "module A where\nimport B\nimport C \na x = x 1\nimport D"
     ]
 
+    this.app = [
+        "f x y = Prelude.add x y"
+    ]    
+    
     this.arith = [
         "f = 1",
         "f x = x + 1",
         "f x y = x - y + x"        
+    ]
+
+    this.where = [
+        "f = x where x = 1",
+        "f = x 1 where x z = Prelude.add 1 z",
+        "f = Prelude.add x y where\n x = 1\n y = 2",
+        "f = Prelude.add x y where x = 1\n                          y = 2",
+        "f = Prelude.add x y\n where\n  x = 1\n  y = 2",
     ]
 
     this.lambda = [

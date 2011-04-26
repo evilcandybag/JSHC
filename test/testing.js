@@ -27,7 +27,7 @@ JSHC.testCompile = function (tests) {
         document.writeln("<p> Compiling program: <br>" + tests[i] + "<br>" + fakeLex(tests[i]) + "<br>");
 //        try {
             res = JSHC.parse(tests[i]);
-            var prog = JSHC.Compiler.compile(res);
+            var prog = JSHC.Codegen.codegen(res);
             document.writeln("Success!<br>");
             document.writeln(format(JSHC.showAST(res)) + "<br>");
             document.writeln(prog);
@@ -44,9 +44,7 @@ JSHC.testCompile = function (tests) {
 
 JSHC.tryCompile = function (tests) {
     for (var i = 0; i < tests.length; i++) {
-            var res = JSHC.parse(tests[i]);
-            JSHC.Simplify.simplify(res);
-            var prog = JSHC.Compiler.compile(res);
+            var prog = JSHC.Compile.compile(tests[i]);
             document.writeln("<p>");
             document.writeln(prog);
             document.writeln("</p>");
@@ -61,7 +59,7 @@ JSHC.tryExp = function (tests) {
     for (var i = 0; i < tests.length; i++) {
             var res = JSHC.parseExp(tests[i]);
             JSHC.Simplify.simplify(res);
-            var prog = JSHC.Compiler.compile(res);
+            var prog = JSHC.Codegen.codegen(res);
             document.writeln("<p>");
             document.writeln(prog);
             document.writeln("</p>");
