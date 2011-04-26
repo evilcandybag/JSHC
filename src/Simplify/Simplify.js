@@ -57,13 +57,7 @@ JSHC.Simplify.simplify["infixexp"] = function(ast) {
     return JSHC.Simplify.reduceExp(ast);
 };
 
-JSHC.Simplify.simplify["infixr"] = function(ast) {
-    
-};
-JSHC.Simplify.simplify["infixl"] = function(ast) {
-    
-};
-JSHC.Simplify.simplify["infix"] = function(ast) {
+JSHC.Simplify.simplify["fixity"] = function(ast) {
     
 };
 

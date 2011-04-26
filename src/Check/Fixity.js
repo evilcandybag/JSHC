@@ -24,7 +24,18 @@ JSHC.Fixity.findInfo = function(module_ast){
     //       declarations and producing a map from operators to fixity.
     //       Q:is this affected by built-in syntax and if the Prelude was
     //         imported ?
-    return {};
+    assert.ok(module_ast.name === "module", "argument to Fixity.findInfo must be a module AST!");
+    var map = {};
+    for (var decl in module_ast.body.topdecls) {
+        if (decl.name === "topdecl-decl") {
+            if (decl.decl.name === "fixity") {
+                for (var nam in decl.decl.ops) {
+                    map[nam.id] = {fix: decl.decl.fix, prec: decl.decl.num};
+                }
+            }
+        }
+    }
+    return map;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

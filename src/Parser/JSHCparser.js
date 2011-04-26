@@ -94,13 +94,13 @@ function anonymous(yytext, yyleng, yylineno, yy, yystate, $$, _$) {
         this.$ = $$[$0];
         break;
       case 24:
-        this.$ = {name:"infixl", num:$$[$0 - 1], ops:$$[$0], pos:this._$};
+        this.$ = {name:"fixity", fix:"leftfix", num:$$[$0 - 1], ops:$$[$0], pos:this._$};
         break;
       case 25:
-        this.$ = {name:"infixr", num:$$[$0 - 1], ops:$$[$0], pos:this._$};
+        this.$ = {name:"fixity", fix:"rightfix", num:$$[$0 - 1], ops:$$[$0], pos:this._$};
         break;
       case 26:
-        this.$ = {name:"infix", num:$$[$0 - 1], ops:$$[$0], pos:this._$};
+        this.$ = {name:"fixity", fix:"nonfix", num:$$[$0 - 1], ops:$$[$0], pos:this._$};
         break;
       case 27:
         this.$ = {name:"simpletype", tycon:$$[$0], vars:[], pos:this._$};
