@@ -60,6 +60,10 @@ JSHC.Ymacs.makeNewInterpreterBuffer = function(ymacs){
     // create a standard buffer. it is modified below.
     var buf = ymacs.createBuffer({ name: "jshc-interpreter" });
 
+    buf.prompt = PROMPT;
+    buf.JSHC_commandHistory = [];
+    buf.JSHC_commandHistoryPos = -1;
+
     // write prompt for first line
     buf.cmd("insert", "JSHC interpreter\n"+PROMPT);
 
@@ -95,31 +99,41 @@ JSHC.Ymacs.makeNewInterpreterBuffer = function(ymacs){
     };
 
     // insert all text at end of buffer, and run commands when writing newline
-    const old_insert = buf._insertText;
+    buf.__insertText = buf._insertText;
     buf._insertText = function(text,pos){
+	if( text.length === 0 )return;
+
 	// move to end of buffer whenever text is inserted
 	this.caretMarker.setPosition(this.getCodeSize());
 	//this.cmd("end_of_buffer");
 
 	if( text === "\n" ){
+	    const line = this.code[this.code.length-1].substr(PROMPT.length);
 
-	    // TODO: run command
-	    const line = this.code[this.code.length-1];
-	    //console.log("command: "+line);
-	    JSHC.Ymacs.interpreter.onInputLine(line);
+	    this.JSHC_commandHistory.push(line);
+
+	    // NOTE: currently running commands synchronuously.
+	    //       should probably be done asynchronuously instead.
+	    const output = JSHC.Ymacs.interpreter.onInputLine(line);
+
+	    // insert new line + output
+	    this.__insertText(text,pos);
+	    this.__insertText(output,pos);
 	    
 	    // insert new line + prompt
-	    old_insert.call(this,text,pos);
-	    old_insert.call(this,PROMPT,pos);
+	    this.__insertText(text,pos);
+	    this.__insertText(PROMPT,pos);
 	    
 	    // clear undo information
 	    this.__undoQueue = [];
 	    this.__redoQueue = [];
 	} else {
 	    // insert user text
-	    old_insert.call(this,text,pos);
+	    this.__insertText(text,pos);
 	}
     };
+
+    buf.cmd("JSHC_IB_mode");
     return buf;
 };
 
