@@ -82,7 +82,7 @@ JSHC.Load.Module.done = function(name, contents, source, date){
     }
 
     try {
-	m.ast = JSHC.parseModule(m.contents);
+	m.ast = JSHC.parse(m.contents);
 	m.status = "success";
     } catch(err){
 	if( err instanceof JSHC.ParseError ){

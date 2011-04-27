@@ -44,6 +44,7 @@ assert.equal = function(actual, expected, message){
     if( actual == expected ){
 	return;
     }
+    
     throw new assert.AssertionError({message: message,
 				     actual: actual,
 				     expected: expected});
@@ -53,6 +54,7 @@ assert.notEqual = function(actual, expected, message){
     if( actual != expected ){
 	return;
     }
+
     throw new assert.AssertionError({message: message,
 				     actual: actual,
 				     expected: expected});

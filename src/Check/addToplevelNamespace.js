@@ -20,6 +20,10 @@ JSHC.addToplevelNamespace = function(module){
     //       e.g if data constructors overlap between different datatypes,
     //       it must be tested for here, as it will not be found later on.
 
+    // Can not give a fixity signature for an imported name.
+    // must check that for each fixity declaration, the name exists in the
+    // tspace in the AST body.
+
     const ts = module.body.topdecls;
     for(i=0;i<ts.length;i++){
         if( ts[i].name === "topdecl-decl" ){

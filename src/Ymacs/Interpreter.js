@@ -75,7 +75,7 @@ JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
 	break;
 
     case ":load":
-	// :load modulename+   // specify new targets. reloads.
+        // :load modulename+   // specify new targets. reloads.
 	//     default to a subset or the prelude in case of failure.
 	//     sets the view set to the same as the target set.
 	// :load              // target and view will be the prelude.
@@ -83,6 +83,11 @@ JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
         this.compiler.setTargets(words.slice(1));
         //this.view = this.compiler.getTargets(); // get copy of targets
         this.compiler.recompile();
+
+        this.compiler.errors.forEach(function(err){
+		msg.push("error: "+err);
+	    });
+
         break;
 
     case ":module":

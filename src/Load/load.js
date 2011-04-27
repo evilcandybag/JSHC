@@ -16,7 +16,7 @@ JSHC.Load.syncLoadURL = function(url, params){
 
     req.send(null);
 
-    assert.ok( req.readyState === 4 );
+    assert.ok( req.readyState === 4, "ready state must be 4 after loading synchronuously" );
 
     return req;
 };
@@ -121,7 +121,7 @@ JSHC.Load.syncLoadName = function(fileSystem, urls, prev){
 	continue; // try next source
 	
 	case 304: // not modified
-	assert.ok( prev.status === "success" || prev.status === "failure" );
+	assert.ok( prev.status === "success" || prev.status === "failure", "HTML response of not modified must mean that the module has previously beed found" );
 	return prev;
 
 	case 404: // not found
@@ -147,7 +147,7 @@ JSHC.Load.asyncLoadName = null; // TODO
 ////////////////////////////////////////////////////////////////////////////////
 
 JSHC.Load.syncLoadNames = function(fileSystem, urls, rootNames, current){
-    assert.ok( rootNames instanceof Array && rootNames.length > 0 );
+    assert.ok( rootNames instanceof Array && rootNames.length > 0, "roots must be a non-zero length array" );
     var remaining, loaded;
 
     loaded = {};
@@ -175,7 +175,7 @@ JSHC.Load.syncLoadNames = function(fileSystem, urls, rootNames, current){
 
 	// reload the module and get a new one
 	mod = this.syncLoadName(fileSystem, urls, mod);
-	assert.ok( mod instanceof JSHC.Load.Module );
+	assert.ok( mod instanceof JSHC.Load.Module, "must get a module from syncLoadName" );
 
 	loaded[name] = mod;
 
