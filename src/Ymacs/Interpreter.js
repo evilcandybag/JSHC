@@ -2,11 +2,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Interpreter
-JSHC.Ymacs.Interpreter = function(buf, module_prefix){
+JSHC.Ymacs.Interpreter = function(buf, modulePrefix){
     assert.ok( buf !== undefined );
-    assert.ok( module_prefix !== undefined );
+    assert.ok( modulePrefix !== undefined );
     this.history = [];    // command history
-    this.compiler = new JSHC.Compiler(module_prefix);
+    this.compiler = new JSHC.Compiler(modulePrefix);
     this.buf = buf;
     this.prompt = JSHC.Ymacs.Interpreter.prompt;
 };
@@ -69,20 +69,21 @@ JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
 	break;
 
     case ":kind":
-	// :kind name     // must be a type constructor
+        // :kind name     // must be a type constructor
 
 	msg.push("error: \""+words[0]+"\" not implemented");
 	break;
 
     case ":load":
-	// TODO:
 	// :load modulename+   // specify new targets. reloads.
 	//     default to a subset or the prelude in case of failure.
 	//     sets the view set to the same as the target set.
 	// :load              // target and view will be the prelude.
 
-	msg.push("error: \""+words[0]+"\" not implemented");
-	break;
+        this.compiler.setTargets(words.slice(1));
+        //this.view = this.compiler.getTargets(); // get copy of targets
+        this.compiler.recompile();
+        break;
 
     case ":module":
 	// :module [+/-] ([*]modulename)+    // modify the view set
