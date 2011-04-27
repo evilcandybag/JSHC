@@ -3,7 +3,8 @@
 
 DEFINE_SINGLETON("JSHC_IB_Keymap", Ymacs_Keymap, function(D){
 	D.KEYS = {
-	    "TAB" : "JSHC_IB_autocomplete"
+	    "TAB" : "JSHC_IB_autocomplete",
+	    "ENTER" : "JSHC_IB_run_command"
 	    // TODO: add command history to "ARROW_DOWN" and "ARROW_UP".
 	};
 });
@@ -93,6 +94,10 @@ Ymacs_Buffer.newCommands({
 		} else if( result.warning !== undefined ){
 		    buf.signalInfo(result.warning);
 		}
+	    }),
+
+	JSHC_IB_run_command: Ymacs_Interactive_X(function(){
+		this.runCommand();
 	    })
 });
 

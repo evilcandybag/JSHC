@@ -4,6 +4,8 @@
 DEFINE_SINGLETON("Haskell_Keymap", Ymacs_Keymap, function(D){
 	D.KEYS = {
 	    "C-x i" : "jshc_switch_to_interpreter"
+	    // TODO: add command to compile and place generated code in a
+	    //       buffer with corressponding ".js" name.
 	};
 });
 
@@ -52,7 +54,7 @@ Ymacs_Buffer.newMode("haskell_mode", function() {
 Ymacs_Buffer.newCommands({
 	
 	jshc_switch_to_interpreter: Ymacs_Interactive_X(function(){
-		JSHC.Ymacs.switchToInterpreter(this.ymacs);
+		JSHC.Ymacs.switchToInterpreter(this);
 	    })
 });
 
