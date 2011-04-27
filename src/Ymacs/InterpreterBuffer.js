@@ -1,12 +1,4 @@
 
-if( JSHC.Ymacs === undefined )JSHC.Ymacs = {};
-
-////////////////////////////////////////////////////////////////////////////////
-
-// Interpreter Buffer
-JSHC.Ymacs.IB = {};
-JSHC.Ymacs.IB.prompt = "> ";
-
 ////////////////////////////////////////////////////////////////////////////////
 
 // create interpreter buffer (if missing) and switch to it
@@ -46,7 +38,7 @@ JSHC.Ymacs.switchToInterpreter = function(cbuf){
 	if( ymacs.frames[i].buffer === ibuf ){
 	    // switch to a frame already showing the interpreter buffer
 	    ymacs.setActiveFrame(ymacs.frames[i]);
-	    if( modulename )ibuf.runCommand(":load "+modulename);
+	    if( modulename )ibuf.interpreter.runCommand(":load "+modulename);
 	    return;
 	}
     }
@@ -57,7 +49,7 @@ JSHC.Ymacs.switchToInterpreter = function(cbuf){
     bs.remove(ibuf);
     bs.unshift(ibuf);
     ymacs._do_switchToBuffer(ibuf);
-    if( modulename )ibuf.runCommand(":load "+modulename);
+    if( modulename )ibuf.interpreter.runCommand(":load "+modulename);
     return;
 };
 
@@ -66,7 +58,7 @@ JSHC.Ymacs.switchToInterpreter = function(cbuf){
 // create new interpreter
 JSHC.Ymacs.makeNewInterpreterBuffer = function(ymacs){
 
-    const PROMPT = JSHC.Ymacs.IB.prompt;
+    const PROMPT = JSHC.Ymacs.Interpreter.prompt;
 
     // create a standard buffer. it is modified below.
     var buf = ymacs.createBuffer({ name: "jshc-interpreter" });
@@ -121,50 +113,12 @@ JSHC.Ymacs.makeNewInterpreterBuffer = function(ymacs){
 	this.__insertText(text);
     };
 
-    buf.runCommand = function(opt_text){
-	// NOTE: currently running commands synchronuously.
-	//       should probably be done asynchronuously instead.
-
-	var output, line;
-
-	if( opt_text !== undefined ){
-	    // run given command
-
-	    output = JSHC.Ymacs.interpreter.onInputLine(opt_text);
-
-	    // find position where last line begins
-	    var pos = this.getCodeSize() - this.caretMarker.getRowCol().col;
-
-	    // make sure output ends with a newline
-	    if( output[output.length-1] !== "\n" ){
-		output += "\n";
-	    }
-
-	    // insert output before last line
-	    this.__insertText(output, pos);
-
-	} else {
-	    // run command using last line
-
-	    line = this.code[this.code.length-1].substr(PROMPT.length);
-
-	    this.JSHC_commandHistory.push(line);
-
-	    output = JSHC.Ymacs.interpreter.onInputLine(line);
-
-	    // insert new line + output
-	    this.__insertText("\n");
-	    this.__insertText(output);
-	    
-	    // insert new line + prompt
-	    this.__insertText("\n");
-	    this.__insertText(PROMPT);
-	    
-	    // clear undo information
-	    this.__undoQueue = [];
-	    this.__redoQueue = [];
-	}
-    }
+    // NOTE:
+    // since there is only a single interpreter buffer, the prefix for
+    // generated code can be the same.
+    // if one allows several interpreter buffers, then one must create a
+    // unique prefix for each buffer.
+    buf.interpreter = new JSHC.Ymacs.Interpreter(buf,"JSHC.modules.");
 
     buf.cmd("JSHC_IB_mode");
     return buf;

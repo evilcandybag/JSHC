@@ -32,7 +32,7 @@ Ymacs_Tokenizer.define("JSHC_IB", function(stream, tok) {
 	    stream.checkStop();
 	    var tmp;
 
-	    if (stream.col == 0 && (tmp = stream.lookingAt(JSHC.Ymacs.IB.prompt))) {
+	    if (stream.col == 0 && (tmp = stream.lookingAt(JSHC.Ymacs.Interpreter.prompt))) {
 		// color command prompt
 		foundToken(0, stream.col = stream.lineLength(), "keyword");
 
@@ -72,10 +72,10 @@ Ymacs_Buffer.newCommands({
 			return ymacs.getActiveBuffer();
 		    });
 
-		const PROMPT = JSHC.Ymacs.IB.prompt;
+		const PROMPT = JSHC.Ymacs.Interpreter.prompt;
 
 		const line = buf.code[buf.code.length-1].substr(PROMPT.length);
-		var result = JSHC.Ymacs.interpreter.autoComplete(line);
+		var result = buf.interpreter.autoComplete(line);
 		if( result.line !== undefined ){
 		    buf._replaceLine(buf.code.length-1, PROMPT + result.line);
 		    buf.caretMarker.setPosition(PROMPT.length + result.index);
@@ -97,7 +97,7 @@ Ymacs_Buffer.newCommands({
 	    }),
 
 	JSHC_IB_run_command: Ymacs_Interactive_X(function(){
-		this.runCommand();
+		this.interpreter.runCommand();
 	    })
 });
 
