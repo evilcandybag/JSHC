@@ -111,6 +111,7 @@ JSHC.Compiler.prototype.recompile = function(){
 
     // for each graph entry in arbitrary order, simplify and generate code.
     for(k=0 ; k<entries.length ; k++){
+    	// entries[k].values[0].jscode = JSHC.Compile.compile(entries[k].values[0].contents);
     }
 
 };
