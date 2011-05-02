@@ -10,7 +10,7 @@ JSHC.Name = function(){
 };
 JSHC.Name.prototype.equal = function(other){
     return this.id === other.id && this.name === other.name;
-}
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -27,9 +27,10 @@ JSHC.ModName.prototype.toStringN = function(){
 JSHC.ModName.prototype.toStringQ = function(){
     return this.toStringN();
 };
-JSHC.ModName.prototype.toString = function(){
+JSHC.ModName.prototype.toStringV = function(){
     return "module " + this.toStringQ();
 };
+JSHC.ModName.prototype.toString = JSHC.ModName.prototype.toStringN;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -48,9 +49,10 @@ JSHC.TyCls.prototype.toStringN = function(){
 JSHC.TyCls.prototype.toStringQ = function(){
     return (this.loc===undefined ? "" : this.loc) + this.toStringN();
 };
-JSHC.TyCls.prototype.toString = function(){
+JSHC.TyCls.prototype.toStringV = function(){
     return "type class " + this.toStringQ();
 };
+JSHC.TyCls.prototype.toString = JSHC.TyCls.prototype.toStringN;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -67,9 +69,10 @@ JSHC.TyVar.prototype.toStringN = function(){
 JSHC.TyVar.prototype.toStringQ = function(){
     return this.toStringN();
 };
-JSHC.TyVar.prototype.toString = function(){
+JSHC.TyVar.prototype.toStringV = function(){
     return "type variable " + this.toStringQ();
 };
+JSHC.TyVar.prototype.toString = JSHC.TyVar.prototype.toStringN;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -88,9 +91,10 @@ JSHC.TyCon.prototype.toStringN = function(){
 JSHC.TyCon.prototype.toStringQ = function(){
     return (this.loc===undefined ? "" : this.loc) + this.toStringN();
 };
-JSHC.TyCon.prototype.toString = function(){
+JSHC.TyCon.prototype.toStringV = function(){
     return "type constructor " + this.toStringQ();
 };
+JSHC.TyCon.prototype.toString = JSHC.TyCon.prototype.toStringN;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -111,9 +115,10 @@ JSHC.DaCon.prototype.toStringN = function(){
 JSHC.DaCon.prototype.toStringQ = function(){
     return (this.loc===undefined ? "" : this.loc) + this.toStringN();
 };
-JSHC.DaCon.prototype.toString = function(){
+JSHC.DaCon.prototype.toStringV = function(){
     return "data constructor " + this.toStringQ();
 };
+JSHC.DaCon.prototype.toString = JSHC.DaCon.prototype.toStringN;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -134,8 +139,9 @@ JSHC.VarName.prototype.toStringN = function(){
 JSHC.VarName.prototype.toStringQ = function(){
     return (this.loc===undefined ? "" : this.loc) + this.toStringN();
 };
-JSHC.VarName.prototype.toString = function(){
+JSHC.VarName.prototype.toStringV = function(){
     return "variable " + this.toStringQ();
 };
+JSHC.VarName.prototype.toString = JSHC.VarName.prototype.toStringN;
 
 ////////////////////////////////////////////////////////////////////////////////
