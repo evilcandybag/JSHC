@@ -415,13 +415,13 @@ gconsym // : object
 atype // : object
     : gtycon                {{$$ = $1;}}
     | tyvar                 {{$$ = $1;}}
-    | "(" type ")"          {{$$ = $1;}}
+    | "(" type ")"          {{$$ = $2;}}
     // TODO: incomplete
     ;
 
 type // : object
     : apptype               {{$$ = $1;}}
-    | apptype "->" type     {{$$ = {name: "funtype", lhs: $1, rhs: $2, pos: @$};}}
+    | apptype "->" type     {{$$ = {name: "funtype", lhs: $1, rhs: $3, pos: @$};}}
     ;
 
 apptype // : object
