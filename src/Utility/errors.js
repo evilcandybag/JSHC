@@ -10,8 +10,8 @@
   describes an error in the source code being compiled.
 */
 JSHC.SourceError = function(mname, pos, message){
-    assert.ok( mname !== undefined );
-    assert.ok( pos !== undefined );
+    //assert.ok( mname !== undefined );
+    //assert.ok( pos !== undefined );
     assert.ok( message !== undefined );
 
     var err = new Error();  // error object used to initialize some members
