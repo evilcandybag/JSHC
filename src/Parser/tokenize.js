@@ -2571,61 +2571,92 @@ JSHC.Parser.tokenize = (function(){
         
         var savedPos0 = pos;
         if (input.substr(pos, 2) === "..") {
-          var result20 = "..";
+          var result23 = "..";
           pos += 2;
         } else {
-          var result20 = null;
+          var result23 = null;
           if (reportMatchFailures) {
             matchFailed("\"..\"");
           }
         }
-        if (result20 !== null) {
-          var result2 = result20;
+        if (result23 !== null) {
+          var result2 = result23;
         } else {
           if (input.substr(pos, 2) === "::") {
-            var result19 = "::";
+            var result22 = "::";
             pos += 2;
           } else {
-            var result19 = null;
+            var result22 = null;
             if (reportMatchFailures) {
               matchFailed("\"::\"");
             }
           }
-          if (result19 !== null) {
-            var result2 = result19;
+          if (result22 !== null) {
+            var result2 = result22;
           } else {
             if (input.substr(pos, 1) === ":") {
-              var result18 = ":";
+              var result21 = ":";
               pos += 1;
             } else {
-              var result18 = null;
+              var result21 = null;
               if (reportMatchFailures) {
                 matchFailed("\":\"");
               }
             }
-            if (result18 !== null) {
-              var result2 = result18;
+            if (result21 !== null) {
+              var result2 = result21;
             } else {
               if (input.substr(pos, 2) === "=>") {
-                var result17 = "=>";
+                var result20 = "=>";
                 pos += 2;
               } else {
-                var result17 = null;
+                var result20 = null;
                 if (reportMatchFailures) {
                   matchFailed("\"=>\"");
                 }
               }
-              if (result17 !== null) {
-                var result2 = result17;
+              if (result20 !== null) {
+                var result2 = result20;
               } else {
+                var savedPos4 = pos;
                 if (input.substr(pos, 1) === "=") {
-                  var result16 = "=";
+                  var result17 = "=";
                   pos += 1;
                 } else {
-                  var result16 = null;
+                  var result17 = null;
                   if (reportMatchFailures) {
                     matchFailed("\"=\"");
                   }
+                }
+                if (result17 !== null) {
+                  var savedPos5 = pos;
+                  var savedReportMatchFailuresVar2 = reportMatchFailures;
+                  reportMatchFailures = false;
+                  if (input.substr(pos, 1) === "=") {
+                    var result19 = "=";
+                    pos += 1;
+                  } else {
+                    var result19 = null;
+                    if (reportMatchFailures) {
+                      matchFailed("\"=\"");
+                    }
+                  }
+                  reportMatchFailures = savedReportMatchFailuresVar2;
+                  if (result19 === null) {
+                    var result18 = '';
+                  } else {
+                    var result18 = null;
+                    pos = savedPos5;
+                  }
+                  if (result18 !== null) {
+                    var result16 = [result17, result18];
+                  } else {
+                    var result16 = null;
+                    pos = savedPos4;
+                  }
+                } else {
+                  var result16 = null;
+                  pos = savedPos4;
                 }
                 if (result16 !== null) {
                   var result2 = result16;
@@ -5538,3 +5569,4 @@ JSHC.Parser.tokenize = (function(){
   
   return result;
 })();
+
