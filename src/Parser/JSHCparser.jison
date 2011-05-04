@@ -149,11 +149,9 @@ constr // : object
         {{$$ = {name: "constructor", lhs: $1, rhs: $2, pos: @$};}}
     ;
 
-atypes // : object
-    : atypes atype      {{$$ = {name: "apptype", lhs: $1, rhs: $2, pos: @$};}}
-                        //{{$1.push($2); $$ = $1;}}
-    | atype             {{$$ = $1;}}
-                        //{{$$ = [$1];}}
+atypes // : [atype]
+    : atypes atype      {{$1.push($2); $$ = $1;}}
+    | atype             {{$$ = [$1];}}
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -422,8 +420,15 @@ atype // : object
     ;
 
 type // : object
-    : atypes                 {{$$ = $1;}}
-    | atypes "->" type       {{$$ = {name: "funtype", lhs: $1, rhs: $2, pos: @$};}}
+    : apptype               {{$$ = $1;}}
+    | apptype "->" type     {{$$ = {name: "funtype", lhs: $1, rhs: $2, pos: @$};}}
+    ;
+
+apptype // : object
+    : apptype atype     {{$$ = {name: "apptype", lhs: $1, rhs: $2, pos: @$};}}
+                        //{{$1.push($2); $$ = $1;}}
+    | atype             {{$$ = $1;}}
+                        //{{$$ = [$1];}}
     ;
 
 // optionally qualified type constructor, or a built-in type constructor
