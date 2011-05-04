@@ -144,9 +144,9 @@ constrs // : [constr]
 
 constr // : object
     : con
-        {{$$ = {name: "constructor", lhs: $1, rhs: [], pos: @$};}}
+        {{$$ = {name: "constructor", lhs: $1, types: [], pos: @$};}}
     | con atypes
-        {{$$ = {name: "constructor", lhs: $1, rhs: $2, pos: @$};}}
+        {{$$ = {name: "constructor", lhs: $1, types: $2, pos: @$};}}
     ;
 
 atypes // : [atype]
