@@ -47,7 +47,7 @@ JSHC.TyCls.prototype.toStringN = function(){
     return this.id;
 };
 JSHC.TyCls.prototype.toStringQ = function(){
-    return (this.loc===undefined ? "" : this.loc) + this.toStringN();
+    return (this.loc===undefined ? "" : this.loc+".") + this.toStringN();
 };
 JSHC.TyCls.prototype.toStringV = function(){
     return "type class " + this.toStringQ();
@@ -89,7 +89,7 @@ JSHC.TyCon.prototype.toStringN = function(){
     return this.id;
 };
 JSHC.TyCon.prototype.toStringQ = function(){
-    return (this.loc===undefined ? "" : this.loc) + this.toStringN();
+    return (this.loc===undefined ? "" : this.loc+".") + this.toStringN();
 };
 JSHC.TyCon.prototype.toStringV = function(){
     return "type constructor " + this.toStringQ();
@@ -113,7 +113,7 @@ JSHC.DaCon.prototype.toStringN = function(){
     return (this.isSymbol ? "("+this.id+")" : this.id);
 };
 JSHC.DaCon.prototype.toStringQ = function(){
-    return (this.loc===undefined ? "" : this.loc) + this.toStringN();
+    return (this.loc===undefined ? "" : this.loc+".") + this.toStringN();
 };
 JSHC.DaCon.prototype.toStringV = function(){
     return "data constructor " + this.toStringQ();
@@ -137,7 +137,7 @@ JSHC.VarName.prototype.toStringN = function(){
     return (this.isSymbol ? "("+this.id+")" : this.id);
 };
 JSHC.VarName.prototype.toStringQ = function(){
-    return (this.loc===undefined ? "" : this.loc) + this.toStringN();
+    return (this.loc===undefined ? "" : this.loc+".") + this.toStringN();
 };
 JSHC.VarName.prototype.toStringV = function(){
     return "variable " + this.toStringQ();
