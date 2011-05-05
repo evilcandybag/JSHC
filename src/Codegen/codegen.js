@@ -95,6 +95,9 @@ JSHC.Codegen.codegen = function (input,namespace) {
                 break;
             case "application":
             case "lambda":
+            case "dacon":
+            case "varname":
+            case "integer-lit":
             case "case":
 //                alert("compiling expression:\n\n " + JSHC.showAST(exp));
                 res += comInfixexp([exp]);
@@ -152,6 +155,11 @@ JSHC.Codegen.codegen = function (input,namespace) {
              case "application":
 //                alert("compiling application of:\n " + JSHC.showAST(exp[i].exps));
                 res += comFexp(exp[i].exps);
+                break;
+             case "varname":
+             case "integer-lit":
+             case "dacon":
+                res += comFexp([exp[i]]);
                 break;
              case "lambda":
                 res += comLambda(exp[i]);
@@ -332,8 +340,10 @@ JSHC.Codegen.codegen = function (input,namespace) {
     }
 
 
-    if (input.name === "infixexp" || input.name === "application" || 
-        input.name === "case" || input.name === "lambda")
+    if (input.name === "infixexp" || input.name === "application" ||
+        input.name === "varname" || input.name === "dacon" ||
+        input.name === "integer-lit" || input.name === "case" ||
+        input.name === "lambda")
         return comSoloExp(input);
     else
         return comModule(input);
