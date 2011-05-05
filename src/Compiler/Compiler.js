@@ -157,7 +157,7 @@ JSHC.Compiler.compileExp = function (exp){
     JSHC.Fixity.fixityResolution(res);
     JSHC.Check.nameCheck(this.modules,res);    
     JSHC.Simplify.runSimplify(res);
-    return JSHC.Codegen.codegen(res.body.topdecls[0].decl.rhs);
+    return JSHC.Codegen.codegen(res.body.topdecls[0].decl.rhs,this.modulePrefix);
 };
 
 
