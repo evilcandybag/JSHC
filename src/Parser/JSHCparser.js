@@ -150,7 +150,7 @@ case 64:this.$ = [];
 break;
 case 65:this.$ = {name:"ite",e1:$$[$0-4],e2:$$[$0-2],e3:$$[$0],pos:this._$}; 
 break;
-case 66:this.$ = {name:"application", exps:$$[$0],pos:this._$}; 
+case 66: this.$ = ($$[$0].length === 1) ? ($$[$0][0]) : {name:"application", exps:$$[$0],pos:this._$}; 
 break;
 case 67:this.$ = {name:"lambda", args: $$[$0-2], rhs: $$[$0], pos: this._$}; 
 break;
@@ -331,6 +331,8 @@ parse: function parse(input) {
     this.lexer.setInput(input);
     this.lexer.yy = this.yy;
     this.yy.lexer = this.lexer;
+    if (typeof this.lexer.yylloc == 'undefined')
+        this.lexer.yylloc = {};
     var yyloc = this.lexer.yylloc;
     lstack.push(yyloc);
 
@@ -415,7 +417,7 @@ parse: function parse(input) {
                 popStack(1);
                 state = stack[stack.length-1];
             }
-            
+
             preErrorSymbol = symbol; // save the lookahead token
             symbol = TERROR;         // insert generic error symbol as new lookahead
             state = stack[stack.length-1];
@@ -463,7 +465,7 @@ parse: function parse(input) {
                     first_line: lstack[lstack.length-(len||1)].first_line,
                     last_line: lstack[lstack.length-1].last_line,
                     first_column: lstack[lstack.length-(len||1)].first_column,
-                    last_column: lstack[lstack.length-1].last_column,
+                    last_column: lstack[lstack.length-1].last_column
                 };
                 r = this.performAction.call(yyval, yytext, yyleng, yylineno, this.yy, action[1], vstack, lstack);
 

@@ -250,7 +250,7 @@ infixexpLR // : [lexp | qop | '-']. re-written to be left recursive.
 
 lexp // : object
   : "if" exp "then" exp "else" exp  {{$$ = {name:"ite",e1:$2,e2:$4,e3:$6,pos:@$}; }}
-  | fexp                            {{$$ = {name:"application", exps:$1,pos:@$}; }}
+  | fexp                            {{ $$ = ($1.length === 1) ? ($1[0]) : {name:"application", exps:$1,pos:@$}; }}
   | '\' apats "->" exp              {{$$ = {name:"lambda", args: $2, rhs: $4, pos: @$}; }}
   | "case" exp "of" "{" alts "}"    {{$$ = {name:"case", exp: $2, alts: $5, pos: @$}; }}
   | "let" decls "in" exp            {{$$ = {name:"let", decls: $2, exp: $4, pos: @$}; }}
