@@ -35,7 +35,7 @@ modules.JSHC.Internal.Prelude = {
         return JSHC.int32div((a instanceof JSHC.Thunk)? a.v : a,(b instanceof JSHC.Thunk)? b.v : b)}}},
  }
 
-modules.Prelude["undefined"] = undefined;
+modules.Internal.Prelude["undefined"] = undefined;
 
 /*
 various type classes and instances
