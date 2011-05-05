@@ -28,16 +28,18 @@ JSHC.showAST = (function(){
 		//            sb.push(ast.toString());
 		//        } else {
 		sb.push("{");
+		var empty = true;
 	        for(k in ast){
 	            if (typeof ast[k] !== "function") {
-	            sb.push(k+": ");
-	            //if( k==="rhs" )document.write("yy"+ast[k] +"<br>");
-	            showAST2(sb,ast[k]);
-	            //document.write(s +"<br>");
-	            sb.push(", ");
+	                sb.push(k+": ");
+	                //if( k==="rhs" )document.write("yy"+ast[k] +"<br>");
+	                showAST2(sb,ast[k]);
+	                //document.write(s +"<br>");
+	                sb.push(", ");
+	                empty = false;
 	            } 
 	        }
-	        sb.pop();
+	        if( !empty )emptysb.pop();
 	        sb.push("}");
 		//	    }
 	    } else if( ast === null ){ // typeof null === "object"
@@ -57,7 +59,7 @@ JSHC.showAST = (function(){
 	    //document.write(s +"<br>");
 	    showNodeNE(sb,l);
 	};
-
+	
 	var showNodeNE = function(sb,l){
 	    for(var i=0 ; i<l.length-1 ; i=i+1){
 		showAST2(sb,l[i]);
