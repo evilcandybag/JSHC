@@ -26,9 +26,17 @@
 //%left decl
 //%left fexp
 //%left aexp
-%nonassoc   NOSIGNATURE
-%nonassoc   SIGNATURE
-%nonassoc  INFIXEXP
+%nonassoc  prec_infixexp
+%nonassoc  NOSIGNATURE     // lower than "::"
+%nonassoc  INFIXEXP        // lower than varsym, qconop, qvarsym, "`"
+//%nonassoc  VAR
+
+%nonassoc  varsym
+%nonassoc  qconop
+%nonassoc  qvarsym
+%nonassoc  "`"
+%nonassoc  "="
+%nonassoc  ","
 %nonassoc  "::"
 
 %start start_
@@ -127,9 +135,10 @@ rhs // : object
     ; //TODO
 
 gendecl // : type declaration | fixity
-    : "infixl" literal op_list_1_comma        {{ $$ = {name: "fixity", fix: "leftfix", num: $2, ops: $3, pos: @$}; }}
-    | "infixr" literal op_list_1_comma        {{ $$ = {name: "fixity", fix: "rightfix", num: $2, ops: $3, pos: @$}; }}
-    | "infix" literal op_list_1_comma        {{ $$ = {name: "fixity",  fix: "nonfix",num: $2, ops: $3, pos: @$}; }}
+    : //vars "::" type                    {{$$ = {name:"type-signature",vars:$1,sig:$3,pos:@$};}}
+      "infixl" literal op_list_1_comma  {{ $$ = {name: "fixity", fix: "leftfix", num: $2, ops: $3, pos: @$}; }}
+    | "infixr" literal op_list_1_comma  {{ $$ = {name: "fixity", fix: "rightfix", num: $2, ops: $3, pos: @$}; }}
+    | "infix" literal op_list_1_comma   {{ $$ = {name: "fixity",  fix: "nonfix",num: $2, ops: $3, pos: @$}; }}
     ;
 
 simpletype // : object
@@ -222,12 +231,12 @@ import_a // : object
 // 3 Expressions
 
 exp // : object
-  : infixexp "::" type %prec SIGNATURE    {{$$ = {name:"type-signature",exp:$1,sig:$3,pos:@$};}}
-  | infixexp           %prec NOSIGNATURE  {{$$ = $1;}}
+  : infixexp "::" type          {{$$ = {name:"type-signature",exp:$1,sig:$3,pos:@$};}}
+  | infixexp %prec NOSIGNATURE  {{$$ = $1;}}
   ;
 
 infixexp // : [lexp | qop | '-']
-  : infixexpLR lexp               {{($1).push($2); $$ = {name:"infixexp",exps:$1,pos:@$};}}
+  : infixexpLR lexp     %prec INFIXEXP          {{($1).push($2); $$ = {name:"infixexp",exps:$1,pos:@$};}}
   ;
 
 infixexpLR // : [lexp | qop | '-']. re-written to be left recursive.
@@ -254,12 +263,10 @@ fexp // : [aexp]
   ;
 
 // list of 1 or more non-qualified variable names
-/*
 vars // : [var]
-    : vars ',' var  {{$1.push($3); $$ = $1;}}
-    | var           {{$$ = [$1];}}
+    : vars ',' var                {{$1.push($3); $$ = $1;}}
+    | var                         {{$$ = [$1];}}
     ;
-*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // case expression alternatives
@@ -318,8 +325,8 @@ modid // : object # {conid .} conid
 
 // optionally qualified binary operators in infix expressions
 qop // : object
-    : qvarop            {{$$ = {name: "qop", id: $1, pos: @$};}}
-    | qconop            {{$$ = {name: "qop", id: $1, pos: @$};}}
+    : qvarop              {{$$ = {name: "qop", id: $1, pos: @$};}}
+    | qconop              {{$$ = {name: "qop", id: $1, pos: @$};}}
     ;
 
 op_list_1_comma // : [op]
