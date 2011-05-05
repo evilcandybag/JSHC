@@ -70,6 +70,9 @@ JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
 
     case ":kind":
         // :kind name     // must be a type constructor
+        for(var w=1 ; w<words.length ; w++ ){
+            //alert(JSHC.showAST(JSHC.parseExp(words[w])));
+        }
 
 	msg.push("error: \""+words[0]+"\" not implemented");
 	break;
