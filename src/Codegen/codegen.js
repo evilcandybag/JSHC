@@ -273,7 +273,7 @@ JSHC.Codegen.codegen = function (input,namespace) {
     }
     
     var comAexp = function(exp, strict) {
-
+        
         var res = "";
         switch (exp.name) {
             case "dacon":
@@ -286,7 +286,11 @@ JSHC.Codegen.codegen = function (input,namespace) {
                     var r = exp.loc
 //                    r = r.substr(0, r.length-1);
                     res += (strict)? "" : "JSHC.TC(function(){return ";
-                    res += namespace + "." + r + "[\"" + x + "\"]()";
+                    //filter out references to our internal libraries
+                    if (r.substr(0,13) === "JSHC.Internal")
+                        res += r + "[\"" + x + "\"]()";
+                    else
+                        res += namespace + "." + r + "[\"" + x + "\"]()";
                     res += (strict)? "" : "})"; 
                     break;
                 } else {
