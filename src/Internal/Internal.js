@@ -87,18 +87,18 @@ JSHC.Internal.match = function(exp, alts) {
         var x = (exp instanceof JSHC.Thunk);
         if (x && match_(exp.v, alts[i].p)) {
             assert.ok(alts[i].f instanceof Function, "rhs of pattern is not a function!");
-//            document.writeln("<br>matched something: " + alts[i].f);
-//            document.writeln("<br>with binds: " + binds);
+            alert("<br>matched something: " + alts[i].f);
+            alert("<br>with binds: " + binds);
             return alts[i].f.apply(undefined,binds);
         } else if (match_(exp, alts[i].p)) {
-//            document.writeln("<br>matched something: " + alts[i].f);
-//            document.writeln("<br>with binds: " + binds);
-//            
+            alert("<br>matched something: " + alts[i].f);
+            alert("<br>with binds: " + binds);
+            
             return alts[i].f.apply(undefined,binds);
         } else        
             binds = [];
     }
-    throw new Error("Unhandled case in pattern match! <br>" + JSHC.showAST((exp instanceof JSHC.Thunk)? exp.v : exp) ); //TODO: proper error reporting would be?
+    throw new Error("Unhandled case in pattern match! " + JSHC.showAST((exp instanceof JSHC.Thunk)? exp.v : exp) ); //TODO: proper error reporting would be?
     
 }
 

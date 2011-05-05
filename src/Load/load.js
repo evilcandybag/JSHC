@@ -63,7 +63,6 @@ JSHC.Load.syncLoadName = function(fileSystem, urls, prev){
 
     const fileName = modName.replace(/\./g, "/") + ".hs";
 
-
     // try to find the module name in the file system
     if( fileSystem[modName] !== undefined ){
 	return JSHC.Load.Module.done({

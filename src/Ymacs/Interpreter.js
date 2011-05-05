@@ -82,8 +82,12 @@ JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
 
         this.compiler.setTargets(words.slice(1));
         //this.view = this.compiler.getTargets(); // get copy of targets
-        this.compiler.recompile();
-
+        try {
+            this.compiler.recompile();
+        } catch (err) {
+                alert(JSHC.showError(err));
+                msg.push(err);
+        }
         this.compiler.errors.forEach(function(err){
 		msg.push("error: "+err);
 	    });
@@ -148,11 +152,14 @@ JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
 	break;
 
     case ":!":
-	// :! command     // eval javascript code and print result
-
-	msg.push("error: \""+words[0]+"\" not implemented");
-	break;
-
+    case ":js":
+        try {
+        	msg.push(eval(line.substr(3)));
+        } catch (err) {
+            msg.push(err);
+        }
+        break;
+    
     case "":
 	// evaluation of expressions
 	// * names
@@ -168,8 +175,13 @@ JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
 
 	// * import modulename
 	//   equivalent to ":module +modulename"
-
-	msg.push("error: evaluation of expressions not implemented");
+        try {
+            var expr = JSHC.Compiler.compileExp(line);
+        	msg.push(eval(expr));
+        } catch (err) {
+            alert("expression:\n" + line + "\ngenerated code:\n" + expr + "\nwith error:\n\n" + JSHC.showError(err));
+            msg.push(err);
+        }
 	break;
 
     default: msg.push("error: unknown command: "+command);

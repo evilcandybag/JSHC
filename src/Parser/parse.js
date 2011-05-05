@@ -26,6 +26,11 @@ JSHC.parse = function(input) {
         } 
     }
     var res = JSHCparser.parse(y);
+//    try {
+//    alert(JSHC.showAST(res));
+//    } catch (err) {
+//        alert(JSHC.showError(err))
+//    }
     return res;
 }
 

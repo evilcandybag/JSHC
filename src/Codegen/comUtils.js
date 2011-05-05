@@ -29,6 +29,7 @@ JSHC.comUtils.getBinds = function(exp, pat) {
         res.push(exp);
         break;
     case "dacon":
+    case "integer-lit":
         break;
     default:
         throw new Error ("illegal pattern in getBinds: " + pat.name)

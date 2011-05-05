@@ -15,7 +15,7 @@ JSHC.Compiler = function(modulePrefix){
 
     this.warnings = [];
     this.errors = [];
-    this.onError = function(err){
+    this.onError = function(err){eval(this.getAllJSCode());
         this.errors.push(err);
     };
     this.onWarning = function(warn){
@@ -46,10 +46,11 @@ JSHC.Compiler.prototype.setTargets = function(targets){
 
 JSHC.Compiler.prototype.recompile = function(){
     var mods;
-    var entries = {};
+    var entries = [];
     var mod,k;
     var names = this.targets;
-
+    var errs = [];
+ 
     // load files
     mods = this.syncLoad(names);
 
@@ -61,11 +62,14 @@ JSHC.Compiler.prototype.recompile = function(){
 	if( mod.status === "success" ){
 
 	    // compute/check top-level namespace and add it to AST body.
-	    JSHC.addToplevelNamespace.call(this, mod.ast);
-
+	JSHC.addToplevelNamespace.call(this, mod.ast);
+        
+        // calculate operator precendencies and convert to ordinary function calls
+        JSHC.Fixity.fixityResolution(mod.ast);
+        
 	    // produce an entry in the dependency graph
-	    entries[mod.ast.modid.id] =
-		new JSHC.Dep.Entry([mod],[mod.ast.modid.id],mod.deps());
+	entries.push(new JSHC.Dep.Entry([mod],[mod.ast.modid.id],mod.deps()));
+	
 	    //document.write("success: "+mod.ast.modid.id+"<br>");
 	} else if( mod.status === "failure" ){
 	    this.onError("Failed to parse "+mod.name+": "+mod.err);
@@ -81,7 +85,7 @@ JSHC.Compiler.prototype.recompile = function(){
     }
 
     // condense the graph of modules.
-    entries = JSHC.Dep.condense(entries);
+//    entries = JSHC.Dep.condense(entries);
 
     // temporary code to avoid handling module cycles. assumes there is
     // only a single module in each entry below.
@@ -105,16 +109,48 @@ JSHC.Compiler.prototype.recompile = function(){
 
     //traverse the graph in dependency order, and for each module group:
       //name check
+    for (k = 0; k<entries.length ; k++) {
+        this.modules[entries[k].values[0].name] = entries[k].values[0];
+    }
+    
+    for (k in this.modules) {
+        errs = JSHC.Check.nameCheck(this.modules, this.modules[k].ast);
+        for (var i = 0; i < errs.length; i++) {
+            alert(JSHC.showError(errs[i]))
+            this.onError(errs[i]);
+        }
+    } 
       //if errors, return with (errors,warnings)
       //type check
       //if errors, return with (errors,warnings)
 
     // for each graph entry in arbitrary order, simplify and generate code.
-    for(k=0 ; k<entries.length ; k++){
-    	// entries[k].values[0].jscode = JSHC.Compile.compile(entries[k].values[0].contents);
+    for(k in this.modules) {
+        JSHC.Simplify.runSimplify(this.modules[k].ast);
+    	this.modules[k].jscode = JSHC.Codegen.codegen(this.modules[k].ast);
     }
-
+    
+//    alert("GENERATED CODE: \n\n" + this.getAllJSCode())
+    eval(this.getAllJSCode());
+    
 };
+
+
+JSHC.Compiler.compileExp = function (exp){
+    var res = JSHC.parseExp(exp);
+    fake_lhs = {name: "fun-lhs", ident: {name: "varname", id: "Interact+", isSymbol: false}, args: []};
+    res = {name: "decl-fun", lhs: fake_lhs, rhs: res};
+    res = {name: "topdecl-decl", decl: res};
+    res = {name: "body", impdecls: [], topdecls: [res]};
+    res = {name: "module", modid: {name: "modname", id: "interact+"}, body: res};
+    
+    JSHC.addToplevelNamespace(res);
+    JSHC.Fixity.fixityResolution(res);
+    JSHC.Check.nameCheck(this.modules,res);    
+    JSHC.Simplify.runSimplify(res);
+    return JSHC.Codegen.codegen(res.body.topdecls[0].decl.rhs);
+};
+
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -122,8 +158,8 @@ JSHC.Compiler.prototype.getAllJSCode = function(){
     var code = [];
     var m;
 
-    for(m in modules){
-	code.push(modules[m].jscode);
+    for(m in this.modules) {
+	code.push(this.modules[m].jscode);
     }
 
     return code.join("\n");

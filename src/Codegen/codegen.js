@@ -7,7 +7,11 @@ JSHC.Codegen.codegen = function (input,namespace) {
         namespace = "modules";
     assert.ok(typeof namespace === "string", "The supplied namespace must be of type String!");
     
-    
+//    try {
+//    alert("ATTEMPTING COMPILATION OF AST: \n\n" + JSHC.showAST(input));
+//    } catch (err) {
+//        alert(JSHC.showError(err));
+//    }
     var modid;
     
     var comModule = function(module) {
@@ -15,9 +19,9 @@ JSHC.Codegen.codegen = function (input,namespace) {
            throw new Error("Top level node in AST is not a module, but a " + module.name);
            
         modid = namespace + "." + ((module.modid) ? module.modid.id : "Main");
-        if (module.exports) {
-           throw new Error ("compilation of exports not defined!");
-        }
+//        if (module.exports) {
+//           throw new Error ("compilation of exports not defined!");
+//        }
         var res = (modid + " = new Object();\n")
         res += comBody(module.body);
         return res
@@ -37,6 +41,8 @@ JSHC.Codegen.codegen = function (input,namespace) {
             switch (body.topdecls[i].name) {
                 case "topdecl-decl":
                     res += comDecl(body.topdecls[i].decl) + ";\n";
+                    break;
+                case "topdecl-data":
                     break;
                 default:
                     throw new Error("comBody not defined for name " + body.topdecls[i].name);
@@ -87,8 +93,14 @@ JSHC.Codegen.codegen = function (input,namespace) {
             case "infixexp":
                 res += comInfixexp(exp.exps);
                 break;
+            case "application":
+            case "lambda":
+            case "case":
+//                alert("compiling expression:\n\n " + JSHC.showAST(exp));
+                res += comInfixexp([exp]);
+                break;
             default: 
-                throw new Error("comExp not defined for name " + exp.name);
+                throw new Error("comExp not defined for name " + JSHC.showAST(exp));
         }
         return res;
     }
@@ -138,6 +150,7 @@ JSHC.Codegen.codegen = function (input,namespace) {
         for (var i = 0; i < exp.length; i++) {
             switch (exp[i].name) {
              case "application":
+//                alert("compiling application of:\n " + JSHC.showAST(exp[i].exps));
                 res += comFexp(exp[i].exps);
                 break;
              case "lambda":
@@ -268,9 +281,10 @@ JSHC.Codegen.codegen = function (input,namespace) {
                 break; 
             case "varname":
                 if (exp.loc !== undefined) {
-                    var x = exp.id.substr(exp.loc.length);
+//                    var x = exp.id.substr(exp.loc.length);
+                    var x = exp.id.substr(exp.id.lastIndexOf(".")+1);
                     var r = exp.loc
-                    r = r.substr(0, r.length-1);
+//                    r = r.substr(0, r.length-1);
                     res += (strict)? "" : "JSHC.TC(function(){return ";
                     res += namespace + "." + r + "[\"" + x + "\"]()";
                     res += (strict)? "" : "})"; 
@@ -286,6 +300,7 @@ JSHC.Codegen.codegen = function (input,namespace) {
                 res += exp.value;
                 break;
             case "infixexp":
+            case "application":
                 res += comExp(exp);
                 break;
             case "tuple":
@@ -304,7 +319,8 @@ JSHC.Codegen.codegen = function (input,namespace) {
     }
 
 
-    if (input.name === "infixexp")
+    if (input.name === "infixexp" || input.name === "application" || 
+        input.name === "case" || input.name === "lambda")
         return comSoloExp(input);
     else
         return comModule(input);

@@ -7,6 +7,8 @@ JSHC.Ymacs.switchToInterpreter = function(cbuf){
     var bs = ymacs.buffers;
     var ibuf = null;
     var i;
+    var modulename;
+
 
     var ext = cbuf.name.substr(cbuf.name.lastIndexOf("."));
 
@@ -31,6 +33,13 @@ JSHC.Ymacs.switchToInterpreter = function(cbuf){
     if( ymacs.getActiveFrame().buffer === ibuf ) {
 	// interpreter is already in focus
 	return;
+    }
+    
+    //refresh the fileSystem
+    for (i = 0; i < bs.length; i++) {
+        if( bs[i].name.substr(cbuf.name.lastIndexOf(".")) === ".hs" ) {
+            ibuf.interpreter.compiler.fileSystem[bs[i].name.substr(0,bs[i].name.length-3)] = bs[i].getCode();
+        }
     }
 
     // if shown in a frame, then change focus to that frame

@@ -11,23 +11,26 @@
 (/) = JSHC.int32div
 
 */
+modules.JSHC = {};
 
-modules.Prelude = {
+modules.JSHC.Internal = {};
+
+modules.JSHC.Internal.Prelude = {
   // makes thunk computations of javascript operations.
 //  "+": function(a,b){return JSHC.int32add(JSHC.TR(a),JSHC.TR(b))},
 //  "-": function(a,b){return JSHC.int32sub(JSHC.TR(a),JSHC.TR(b))},
 //  "*": function(a,b){return JSHC.int32mul(JSHC.TR(a),JSHC.TR(b))},
 //  "/": function(a,b){return JSHC.int32div(JSHC.TR(a),JSHC.TR(b))},
-  add: function () {return function(a) {
+  int32add: function () {return function(a) {
     return function (b) {
         return JSHC.int32add((a instanceof JSHC.Thunk)? a.v : a,(b instanceof JSHC.Thunk)? b.v : b)}}},
-  sub: function () { return function(a) {
+  int32sub: function () { return function(a) {
     return function (b) {
         return JSHC.int32sub((a instanceof JSHC.Thunk)? a.v : a,(b instanceof JSHC.Thunk)? b.v : b)}}},
-  mul: function () { return function(a) {
+  int32mul: function () { return function(a) {
     return function (b) {
         return JSHC.int32mul((a instanceof JSHC.Thunk)? a.v : a,(b instanceof JSHC.Thunk)? b.v : b)}}},
-  div: function () {return function(a) {
+  int32div: function () {return function(a) {
     return function (b) {
         return JSHC.int32div((a instanceof JSHC.Thunk)? a.v : a,(b instanceof JSHC.Thunk)? b.v : b)}}},
  }

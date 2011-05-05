@@ -9,36 +9,14 @@ JSHC.Fixity = {};  // Fixity module
   modifies the module AST by rewriting infix lists into function applications.
 */
 JSHC.Fixity.fixityResolution = function(module_ast){
-    var info = JSHC.Fixity.findInfo(module_ast);
-    JSHC.Fixity.translateInfixLists(info,module_ast);
+    assert.ok(module_ast.body.fspace !== undefined, "fixityResolution: no fspace in AST!");
+    JSHC.Fixity.translateInfixLists(module_ast.body.fspace,module_ast);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 
-/*
-  produces a map from operator name (both id and symbol possible) to
-  {fix,prec} object.
-*/
-JSHC.Fixity.findInfo = function(module_ast){
-    // TODO: find operator precedences by filtering out all top-level fixity
-    //       declarations and producing a map from operators to fixity.
-    //       Q:is this affected by built-in syntax and if the Prelude was
-    //         imported ?
-    assert.ok(module_ast.name === "module", "argument to Fixity.findInfo must be a module AST!");
-    var map = {};
-    for (var decl in module_ast.body.topdecls) {
-        if (decl.name === "topdecl-decl") {
-            if (decl.decl.name === "fixity") {
-                for (var nam in decl.decl.ops) {
-                    map[nam.id] = {fix: decl.decl.fix, prec: decl.decl.num};
-                }
-            }
-        }
-    }
-    return map;
-};
 
-////////////////////////////////////////////////////////////////////////////////
+
 
 /*
   looks up fixity information and defaults to infixl 9 if missing.
@@ -58,27 +36,28 @@ JSHC.Fixity.fixityLookup = function(info,name){
   operators.
   throws exceptions if anything goes wrong, such as precedence errors.
  */
-JSHC.Fixity.resolve = function(info,exps){
+JSHC.Fixity.resolve = function(info,exps) {
     assert.ok( exps instanceof Array );
     for(var i=0;i<exps.length;i++){
 	assert.ok(exps[i]!==undefined);
     }
-    Array.reverse(exps);
     
     resolve_parseNeg = function(prec, fix){
 	assert.ok( exps.length > 0 );
 	const e0 = exps[0];
+//	alert("resolve parseNeg of: " + JSHC.showAST(e0));
 	if( e0.name === "-" ){
 	    if( prec >= 6 ){
 		throw new JSHC.SourceError("unary minus can not occur here as outer expression has greater (>=6) precedence.");
 	    }
-	    exps.pop();
+	    exps.shift();
 	    rexp = resolve_parseNeg(6, "leftfix");
 	    return {name:"negate",exp:rexp,pos:e0.pos};
 	} else if( e0.name === "qop" ) {
-	    throw new JSHC.CompilerError("unexpected operator in precedence resolution: expected '-' or lexp");
+	    throw new JSHC.CompilerError("unexpected operator in precedence resolution: expected '-' or lexp, got: " + JSHC.showAST(e0));
 	} else {  // some arbitrary expression
-	    exps.pop();
+//	    alert("resolve parse: \n" + JSHC.showAST(exps) + "\n\n" + JSHC.showAST(e0));
+	    exps.shift();
 	    return resolve_parse(prec,fix,e0);
 	}
     };
@@ -96,16 +75,21 @@ JSHC.Fixity.resolve = function(info,exps){
 	    if( prec1 === prec2 && (fix1 !== fix2 || fix1 === "nonfix") ){
 		throw new JSHC.SourceError("same precedence with non-associative operator");
 	    } else if( prec1 > prec2 || (prec1 === prec2 && fix1 == "leftfix" ) ){
-		exps.push(exp2);
+		exps.unshift(exp2);
 		return exp1;
 	    } else {
+//	    alert("resolve_parseNeg:\n\n" + "prec2: " + JSHC.showAST(prec2) + "\n\nfix2: " + JSHC.showAST(fix2));
+	        exps.shift();		
 		var rexp = resolve_parseNeg(prec2, fix2);
+//		alert("right expr is: " + JSHC.showAST(rexp))
 		//rexp = {name:"infix-app", lhs:exp1, op:exp2, rhs:rexp, pos:exp2.pos};
-		rexp = {name:"application", exps:[exp2,exp1,rexp], pos:exp2.pos, orig:"infix"};
+		var opwrap = new JSHC.VarName(exp2.id.id,exp2.pos,true,(exp2.loc !== undefined)? exp2.loc : undefined);
+		rexp = {name:"application", exps:[opwrap,exp1,rexp], pos:exp2.pos, orig:"infix"};
+//		alert("FIXED INFIXEXP: \n\n" + JSHC.showAST(rexp));
 		return resolve_parse(prec1, fix1, rexp);
 	    }
 	} else {
-	    throw new JSHC.CompilerError("expected operator in precedence resolution");
+	    throw new JSHC.CompilerError("expected operator in precedence resolution, found: " + JSHC.showAST(exp2));
 	}
     };
     
@@ -120,7 +104,7 @@ JSHC.Fixity.resolve = function(info,exps){
 */
 JSHC.Fixity.translateInfixMember = function(info, ast, member){
     assert.ok( ast !== undefined && ast.name !== undefined, "param 'ast' must be an AST" );
-    assert.ok(typeof member === "string" );
+    assert.ok(typeof member === "string", "type of member is not string but: " + typeof member );
     if( ast[member].name === "infixexp" ){
 	ast[member] = JSHC.Fixity.resolve(info, ast[member].exps);
 	assert.ok( ast[member] !== undefined );
@@ -148,6 +132,7 @@ JSHC.Fixity.translateInfixExp = function(info, ast){
 */
 JSHC.Fixity.translateInfixLists = function(info, ast){
     assert.ok( ast !== undefined && ast.name !== undefined, "param 'ast' must be an AST" );
+//    alert("translateInfixLists: " + ast.name);
     var f = JSHC.Fixity.translateInfixLists[ast.name];
     if( f === undefined ){
 	throw new Error("no definition for "+ast.name);
@@ -202,6 +187,16 @@ JSHC.Fixity.translateInfixLists["infix-app"] = function(info, ast){
     JSHC.Fixity.translateInfixLists(info, ast.rhs);
 };
 
+JSHC.Fixity.translateInfixLists["case"] = function(info, ast) {
+    JSHC.Fixity.translateInfixMember(info, ast, "exp");
+    JSHC.Fixity.translateInfixLists(info, ast.exp);
+    
+    for (var i = 0; i < ast.alts.length; i++) {
+        JSHC.Fixity.translateInfixMember(info, ast.alts[i], "exp");
+        JSHC.Fixity.translateInfixLists(info, ast.alts[i].exp);
+    }
+};
+
 JSHC.Fixity.translateInfixLists["negate"] = function(info, ast){
     JSHC.Fixity.translateInfixMember(info, ast, "exp");
     JSHC.Fixity.translateInfixLists(info, ast.exp);
@@ -209,7 +204,7 @@ JSHC.Fixity.translateInfixLists["negate"] = function(info, ast){
 
 JSHC.Fixity.translateInfixLists["application"] = function(info, ast){
     var i;
-    
+//    alert("App contains: " + JSHC.showAST(ast));
     for(i=0;i<ast.exps.length;i++){
 	ast.exps[i] = JSHC.Fixity.translateInfixExp(info, ast.exps[i]);
 	JSHC.Fixity.translateInfixLists(info, ast.exps[i]);
@@ -227,5 +222,10 @@ JSHC.Fixity.translateInfixLists["dacon"] = function(info, ast){
 JSHC.Fixity.translateInfixLists["integer-lit"] = function(info, ast){
     // nothing
 };
+
+JSHC.Fixity.translateInfixLists["qop"] = function(info, ast){
+    // nothing
+};
+
 
 ////////////////////////////////////////////////////////////////////////////////

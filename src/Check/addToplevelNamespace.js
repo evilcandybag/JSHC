@@ -11,6 +11,7 @@
   constructor it belongs to.
 */
 JSHC.addToplevelNamespace = function(module){
+    assert.ok(module !== undefined, "addToplevelNamespace: input is not a module")
     var ns,i,j;
     ns = {};
 
@@ -40,7 +41,7 @@ JSHC.addToplevelNamespace = function(module){
             ns[tycon.toString(false)] = tycon;
             // add all data constructors
             for(j=0;j<ts[i].constrs.length;j++){
-                const dacon = ts[i].constrs[j].dacon;
+                const dacon = ts[i].constrs[j].dacon;  
                 assert.ok( dacon.loc === undefined );
                 dacon.loc = module.modid.id;
                 dacon.memberOf = tycon;
@@ -51,6 +52,32 @@ JSHC.addToplevelNamespace = function(module){
         }
     }
     module.body.tspace = ns;
+    module.body.fspace = JSHC.addFixitySpace(module);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
+
+/*
+  produces a map from operator name (both id and symbol possible) to
+  {fix,prec} object.
+*/
+JSHC.addFixitySpace = function(module_ast) {
+    // TODO: find operator precedences by filtering out all top-level fixity
+    //       declarations and producing a map from operators to fixity.
+    //       Q:is this affected by built-in syntax and if the Prelude was
+    //         imported ?
+    // TODO: fix to work with expressions as well. need fixity info of modules.
+    assert.ok(module_ast.name === "module", "argument to Fixity.findInfo must be a module AST!");
+    var map = {};
+    for (var decl in module_ast.body.topdecls) {
+        if (decl.name === "topdecl-decl") {
+            if (decl.decl.name === "fixity") {
+                for (var nam in decl.decl.ops) {
+                    map[nam.id] = {fix: decl.decl.fix, prec: decl.decl.num};
+                }
+            }
+        }
+    }
+
+    return map;
+};

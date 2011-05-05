@@ -150,6 +150,7 @@ JSHC.Parser.tokenize = (function(){
         }
         
         
+        var result0 = [];
         var result3 = parse_whitespace();
         if (result3 !== null) {
           var result1 = result3;
@@ -161,24 +162,19 @@ JSHC.Parser.tokenize = (function(){
             var result1 = null;;
           };
         }
-        if (result1 !== null) {
-          var result0 = [];
-          while (result1 !== null) {
-            result0.push(result1);
-            var result3 = parse_whitespace();
-            if (result3 !== null) {
-              var result1 = result3;
+        while (result1 !== null) {
+          result0.push(result1);
+          var result3 = parse_whitespace();
+          if (result3 !== null) {
+            var result1 = result3;
+          } else {
+            var result2 = parse_lexeme();
+            if (result2 !== null) {
+              var result1 = result2;
             } else {
-              var result2 = parse_lexeme();
-              if (result2 !== null) {
-                var result1 = result2;
-              } else {
-                var result1 = null;;
-              };
-            }
+              var result1 = null;;
+            };
           }
-        } else {
-          var result0 = null;
         }
         
         
@@ -2950,7 +2946,7 @@ JSHC.Parser.tokenize = (function(){
           pos = savedPos0;
         }
         var result0 = result1 !== null
-          ? (function(qs, ref) {return {val: flatten([qs, ref[0]]).join(""), typ: "qvarid", qual: flatten(qs).join("")}})(result1[0], result1[1])
+          ? (function(qs, ref) {qs = flatten(qs).join(""); return {val: flatten([qs, ref[0]]).join(""), typ: "qvarid", qual: qs.substr(0,qs.length-1)}})(result1[0], result1[1])
           : null;
         
         
@@ -3099,7 +3095,7 @@ JSHC.Parser.tokenize = (function(){
           pos = savedPos0;
         }
         var result0 = result1 !== null
-          ? (function(qs, ref) {return {val: flatten([qs, ref[0]]).join(""), typ: "qconid", qual: flatten(qs).join("")}})(result1[0], result1[1])
+          ? (function(qs, ref) {qs = flatten(qs).join(""); return {val: flatten([qs, ref[0]]).join(""), typ: "qconid", qual: qs.substr(0,qs.length-1)}})(result1[0], result1[1])
           : null;
         
         
@@ -3217,7 +3213,7 @@ JSHC.Parser.tokenize = (function(){
           pos = savedPos0;
         }
         var result0 = result1 !== null
-          ? (function(qs, ref) {return {val: flatten([qs, ref[0]]).join(""), typ: "qvarsym", qual: flatten(qs).join("")}})(result1[0], result1[1])
+          ? (function(qs, ref) {qs = flatten(qs).join(""); return {val: flatten([qs, ref[0]]).join(""), typ: "qvarsym", qual: qs.substr(0,qs.length-1)}})(result1[0], result1[1])
           : null;
         
         
@@ -3366,7 +3362,7 @@ JSHC.Parser.tokenize = (function(){
           pos = savedPos0;
         }
         var result0 = result1 !== null
-          ? (function(qs, ref) {return {val: flatten([qs, ref[0]]).join(""), typ: "qconsym", qual: flatten(qs).join("")}})(result1[0], result1[1])
+          ? (function(qs, ref) {qs = flatten(qs).join(""); return {val: flatten([qs, ref[0]]).join(""), typ: "qconsym", qual: qs.substr(0,qs.length-1)}})(result1[0], result1[1])
           : null;
         
         

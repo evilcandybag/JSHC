@@ -11,6 +11,11 @@
 //    f.call(this,ast);
 //};
 
+JSHC.Simplify.runSimplify = function(ast) {
+    JSHC.Simplify.patSimplify(ast);
+    JSHC.Simplify.simplify(ast);
+}
+
 JSHC.Simplify.simplify = function(ast){
     assert.ok( ast !== undefined && ast.name !== undefined, "param 'ast' must be an AST");
     var f = this.simplify[ast.name];
@@ -130,5 +135,75 @@ JSHC.Simplify.reduceWhere = function (e) {
 
     return {name: "infixexp", exps: [new_case], pos: e.pos}
 };
+
+JSHC.Simplify.patSimplify = function (ast) {
+    var old = ast.body.topdecls;
+    var newbody = [];
+    var currentName = ""; 
+    var temp = [];
+
+    var merge = function(funs) {
+    
+      assert.ok(funs.length > 0, "patSimplify.merge() shouldn't be called with a list of 0 length")
+      
+      if (funs.length > 1) {
+          var newArgs = [];
+          var newAlts = [];
+          //calculate the new argument list
+          for (var j = 0; j < funs[0].lhs.args.length; j++) {
+              newArgs.push(new JSHC.VarName("a" + j, funs[0].lhs.pos, false));
+          }
+          newArgsT = {name: "application", exps: [{name: "tuple", members: newArgs}]};
+          
+          //calculate the alts for the case-expression
+          for (var j = 0; j < funs.length; j++) {
+              var argsT = {name: "tuple_pat", members: fun.lhs.args}
+              newAlts.push( {name: "alt", pat: argsT, exp: funs[j].rhs} );
+          }
+          
+          //merge the different functions into one with a case-expression                  
+          var newRhs = {name: "case", exp: newArgsT, alts: newAlts};
+          var newLhs = {name: "fun-lhs", ident: funs[0].lhs.ident, args: newArgs};
+          var res = {name: "decl-fun", lhs: newLhs, rhs: newRhs};
+          res = {name: "topdecl-decl", decl: res}
+          
+          //push the merged function into the new body
+          newbody.push(res);
+      } else if (funs.length === 1){
+          newbody.push({name: "topdecl-decl", decl: funs[0] });
+      }
+    }    
+    
+    for (var i = 0; i < old.length; i++) {
+        if (old[i].name === "topdecl-decl" && old[i].decl.name === "decl-fun") {
+            var fun = old[i].decl;
+            
+            if ((fun.lhs.ident.id !== currentName) || i === old.length-1) {
+
+
+                
+                if (temp.length > 1) {
+                  merge(temp);
+                } else if (temp.length === 1) {
+                  merge(temp);
+                }
+                
+                temp = [];
+                temp.push(fun);
+                currentName = fun.lhs.ident.id;
+            
+                
+            } else {
+                temp.push(fun);
+            }
+            
+        } else {
+            newbody.push(old[i]);
+        }
+    }
+    if (temp.length > 0)
+        merge(temp);
+    ast.body.topdecls = newbody;
+}
 
 ////////////////////////////////////////////////////////////////////////////////

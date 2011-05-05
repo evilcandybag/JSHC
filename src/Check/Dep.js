@@ -150,6 +150,7 @@ JSHC.Dep.traverse.prototype.remaining = function(){
 	remaining++;
     }
     return remaining;
+	    alert("EDGES: " + JSHC.showAST(edges));
 };
 
 
