@@ -92,12 +92,9 @@ JSHC.Check.prototype.lookupName = function(lspace, nameobj){
 	// error: name not in scope
 	//make sure our internal functions pass the checks
 	var internal = "JSHC.Internal"
-	if( internal == loc ){
+	if( loc.length !== 0 && loc.substr(0,internal.length) === internal ){
 	    return;
 	}
-	//if (name.toString().substr(0,internal.length) === internal)
-	   // return;
-	
 	this.errors.push(new JSHC.SourceError(this.module.modid,name.pos,name+" not in scope"));
     } else if( amount === 1 ){
         // declared in one location (topdecl or import)
@@ -365,10 +362,28 @@ JSHC.Check.lookupDatatype = function(module,tycon){
 
 JSHC.Check.prototype.checkNames["body"] = function(ls,ast){
     var i;
-    for(i=0;i<ast.impdecls.length;i++){
+
+    for(i=0 ; i<ast.impdecls.length ;){
+        var id = ast.impdecls[i].modid.id;
+        if( id == this.module.modid.id ){
+            // self import
+            if( id !== "Prelude" ){
+                //this.onWarning(new SourceError(imp.modid.id, imp.pos, "self imports have no effect");
+            }
+            // delete self import
+            ast.impdecls.splice(i,1);
+        } else {
+            i++;
+        }
+    }
+
+    // check impdecls
+    for(i=0 ; i<ast.impdecls.length ; i++){
 	this.checkNames({}, ast.impdecls[i]);
     }
-    for(i=0;i<ast.topdecls.length;i++){
+
+    // check topdecls
+    for(i=0 ; i<ast.topdecls.length ; i++){
 	this.checkNames({}, ast.topdecls[i]);
     }
 };

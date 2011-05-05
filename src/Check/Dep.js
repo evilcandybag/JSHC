@@ -20,6 +20,8 @@ JSHC.Dep.check = function(entrylist, action){
 
     entrylist = JSHC.Dep.condense(entrymap);
 
+    JSHC.Dep.removeSelfDeps(entrymap);
+
     JSHC.Dep.transpose(entrymap);
 
     var t = new JSHC.Dep.traverse(entrymap, entrylist);
@@ -48,6 +50,15 @@ JSHC.Dep.Graph.condense = function(){
     //       in the entries list.
 };
 */
+
+JSHC.Dep.removeSelfDeps = function(entries){
+    for(name in entries){
+	var entry = entries[name];
+        if( entry.ins[name] !== undefined ){
+             delete entry.ins[name];
+        }
+    }
+};
 
 /*
   for each incoming edge (dependency), add an outgoing edge on the opposite
@@ -156,7 +167,6 @@ JSHC.Dep.traverse.prototype.remaining = function(){
 	remaining++;
     }
     return remaining;
-	    alert("EDGES: " + JSHC.showAST(edges));
 };
 
 

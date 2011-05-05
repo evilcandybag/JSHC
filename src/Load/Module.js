@@ -109,6 +109,7 @@ JSHC.Load.Module.missing = function(name, err){
 };
 
 JSHC.Load.Module.unread = function(name){
+    assert.ok( typeof name == "string" );
     var m = new JSHC.Load.Module();
     m.status = "unread";
     m.name = name;

@@ -80,6 +80,18 @@ body // : object
             }
         }
         
+        // add Prelude as an import if not explicitly imported
+        var prelude_imported = false;
+        for(i=0 ; i<imps.length ; i++){
+	    if( imps[i].modid == "Prelude" ){
+	        prelude_imported = true;
+	        break;
+            }
+        }
+        if( ! prelude_imported ){
+            imps.push({name: "impdecl", modid: new JSHC.ModName("Prelude")});
+        }
+
         $$ = {name: "body", impdecls: imps, topdecls: decs, pos:@$}; }}
   |   {{$$ = {name: "body", impdecls: [], topdecls: [], pos:@$}; }}
   ;
