@@ -9,6 +9,7 @@ JSHC.Ymacs.Interpreter = function(buf, modulePrefix){
     this.compiler = new JSHC.Compiler(modulePrefix);
     this.buf = buf;
     this.prompt = JSHC.Ymacs.Interpreter.prompt;
+    this.prefix = modulePrefix;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -176,7 +177,7 @@ JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
 	// * import modulename
 	//   equivalent to ":module +modulename"
         try {
-            var expr = JSHC.Compiler.compileExp(line);
+            var expr = JSHC.Compiler.compileExp(line,this.prefix);
         	msg.push(eval(expr));
         } catch (err) {
             alert("expression:\n" + line + "\ngenerated code:\n" + expr + "\nwith error:\n\n" + JSHC.showError(err));
