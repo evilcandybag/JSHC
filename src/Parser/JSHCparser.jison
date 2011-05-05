@@ -26,8 +26,10 @@
 //%left decl
 //%left fexp
 //%left aexp
-%nonassoc  ITE NOSIG INFIXEXP
-%nonassoc  OP "::"
+%nonassoc   NOSIGNATURE
+%nonassoc   SIGNATURE
+%nonassoc  INFIXEXP
+%nonassoc  "::"
 
 %start start_
 %error-verbose
@@ -143,13 +145,13 @@ constrs // : [constr]
 constr // : object
     : con
         {{$$ = {name: "constr", dacon: $1, types: [], pos: @$};}}
-    | con constr_atypes
+    | con atypes
         {{$$ = {name: "constr", dacon: $1, types: $2, pos: @$};}}
     ;
 
-constr_atypes // : [atype]
-    : constr_atypes atype      {{$1.push($2); $$ = $1;}}
-    | atype                    {{$$ = [$1];}}
+atypes // : [atype]
+    : atypes atype      {{$1.push($2); $$ = $1;}}
+    | atype             {{$$ = [$1];}}
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -209,7 +211,6 @@ list_import_1_comma // : [import]
     | import_a                           {{$$ = [$1];}}
     ;
 
-// Q:why can this not be called 'import' without getting strange conflicts ?
 import_a // : object
     : var                              {{$$ = {name: "import-var", varname: $1, pos: @$};}}
     | tycon                            {{$$ = {name: "import-tycon", tycon: $1, all: false, pos: @$};}}
@@ -221,12 +222,12 @@ import_a // : object
 // 3 Expressions
 
 exp // : object
-  : infixexp "::" "int"  {{$$ = {name:"constrained-exp",exp:$1,sig:"int",pos:@$};}}
-  | infixexp %prec NOSIG {{$$ = $1;}}
+  : infixexp "::" type %prec SIGNATURE    {{$$ = {name:"type-signature",exp:$1,sig:$3,pos:@$};}}
+  | infixexp           %prec NOSIGNATURE  {{$$ = $1;}}
   ;
 
 infixexp // : [lexp | qop | '-']
-  : infixexpLR lexp %prec INFIXEXP {{($1).push($2); $$ = {name:"infixexp",exps:$1,pos:@$};}}
+  : infixexpLR lexp               {{($1).push($2); $$ = {name:"infixexp",exps:$1,pos:@$};}}
   ;
 
 infixexpLR // : [lexp | qop | '-']. re-written to be left recursive.
@@ -239,12 +240,11 @@ infixexpLR // : [lexp | qop | '-']. re-written to be left recursive.
 //  lexp                        {{ $$ = [$1]; }}
 
 lexp // : object
-  : "if" exp "then" exp "else" exp %prec ITE {{$$ = {name:"ite",e1:$2,e2:$4,e3:$6,pos:@$}; }}
-  | fexp                                     {{$$ = {name:"application", exps:$1,pos:@$}; }}
-  | '\' apats "->" exp                       {{$$ = {name:"lambda", args: $2, rhs: $4, pos: @$}; }}
-  | "case" exp "of" "{" alts "}"             {{$$ = {name:"case", exp: $2, alts: $5, pos: @$}; }}
-//  | "let" decls "in" exp                     {{$$ = {name:"let", decls: $2, exp: $4, pos: @$}; }}
-  | "let" decls "in" exp               {{$$ = {name:"let", decls: $2, exp: $4, pos: @$}; }}
+  : "if" exp "then" exp "else" exp  {{$$ = {name:"ite",e1:$2,e2:$4,e3:$6,pos:@$}; }}
+  | fexp                            {{$$ = {name:"application", exps:$1,pos:@$}; }}
+  | '\' apats "->" exp              {{$$ = {name:"lambda", args: $2, rhs: $4, pos: @$}; }}
+  | "case" exp "of" "{" alts "}"    {{$$ = {name:"case", exp: $2, alts: $5, pos: @$}; }}
+  | "let" decls "in" exp            {{$$ = {name:"let", decls: $2, exp: $4, pos: @$}; }}
   ;
 
 // list of 1 or more 'aexp' without separator
@@ -320,7 +320,6 @@ modid // : object # {conid .} conid
 qop // : object
     : qvarop            {{$$ = {name: "qop", id: $1, pos: @$};}}
     | qconop            {{$$ = {name: "qop", id: $1, pos: @$};}}
-      // Q: is 'qconop' in lexer ?
     ;
 
 op_list_1_comma // : [op]
@@ -414,9 +413,22 @@ gconsym // : object
 // 4.1.2 Syntax of Types
 
 atype // : object
-    : gtycon            {{$$ = $1;}}
-    | tyvar             {{$$ = $1;}}
+    : gtycon                {{$$ = $1;}}
+    | tyvar                 {{$$ = $1;}}
+    | "(" type ")"          {{$$ = $2;}}
     // TODO: incomplete
+    ;
+
+type // : object
+    : apptype               {{$$ = $1;}}
+    | apptype "->" type     {{$$ = new JSHC.FunType([$1,$3],@$);}}
+    ;
+
+apptype // : object
+    : apptype atype     {{$$ = new JSHC.AppType($1,$2,@$);}}
+                        //{{$1.push($2); $$ = $1;}}
+    | atype             {{$$ = $1;}}
+                        //{{$$ = [$1];}}
     ;
 
 // optionally qualified type constructor, or a built-in type constructor
