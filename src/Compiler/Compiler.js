@@ -16,7 +16,7 @@ JSHC.Compiler = function(modulePrefix){
 
     this.warnings = [];
     this.errors = [];
-    this.onError = function(err){eval(this.getAllJSCode());
+    this.onError = function(err){
         this.errors.push(err);
     };
     this.onWarning = function(warn){
@@ -41,6 +41,10 @@ JSHC.Compiler.prototype.setTargets = function(targets){
     } else {
 	this.targets = targets;
     }
+};
+
+JSHC.Compiler.prototype.getTargets = function(){
+    return this.targets;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -149,22 +153,36 @@ JSHC.Compiler.prototype.recompile = function(){
     eval(this.getAllJSCode());
 };
 
-
-JSHC.Compiler.compileExp = function (exp,prefix){
+JSHC.Compiler.prototype.checkExp = function (exp){
     var res = JSHC.parseExp(exp);
     fake_lhs = {name: "fun-lhs", ident: {name: "varname", id: "Interact+", isSymbol: false}, args: []};
     res = {name: "decl-fun", lhs: fake_lhs, rhs: res};
     res = {name: "topdecl-decl", decl: res};
-    res = {name: "body", impdecls: [], topdecls: [res]};
+
+    var impdecls = [];
+    for(var modid in this.modules ){
+        impdecls.push({name: "impdecl", modid: modid});
+    }
+
+    res = {name: "body", impdecls: impdecls, topdecls: [res]};
+
     res = {name: "module", modid: {name: "modname", id: "interact+"}, body: res};
     
     JSHC.addToplevelNamespace(res);
     JSHC.Fixity.fixityResolution(res);
-    JSHC.Check.nameCheck(this.modules,res);    
+    var errors = JSHC.Check.nameCheck(this.modules,res);
+    for(var ix=0 ; ix<errors.length ; ix++ ){
+      this.onError(errors[ix]);
+    }
     JSHC.Simplify.runSimplify(res);
-    return JSHC.Codegen.codegen(res.body.topdecls[0].decl.rhs, prefix);
+    return res.body.topdecls[0].decl;
 };
 
+JSHC.Compiler.compileExp = function (exp,prefix){
+    var compiler = new JSHC.Compiler(prefix);
+    var decl = compiler.checkExp(exp);
+    return JSHC.Codegen.codegen(decl.rhs, prefix);
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
