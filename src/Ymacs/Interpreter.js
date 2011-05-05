@@ -7,15 +7,27 @@ JSHC.Ymacs.Interpreter = function(buf, modulePrefix){
     assert.ok( modulePrefix !== undefined );
     this.history = [];    // command history
     this.compiler = new JSHC.Compiler(modulePrefix);
+
+    // make compiler messages be added to the interpreter messages
+    var interpreter = this;
+    var onError = function(err){
+        interpreter.addError(err);
+    };
+    var onWarning = function(warn){
+        interpreter.addWarning(warn);
+    };
+    this.compiler.onError = onError;
+    this.compiler.onWarning = onWarning;
+
     this.buf = buf;
     this.prompt = JSHC.Ymacs.Interpreter.prompt;
     this.prefix = modulePrefix;
+    this.msgs;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 
 JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
-    var msg = [];
     var command;
     const commands = ["?", "help", "show-path",
 		      "show-code"];
@@ -28,17 +40,20 @@ JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
 	command = "";
     }
 
+    this.errors = 0;
+    this.msgs = [];  // clear old messages
+
     switch( command ){
     case ":":
 	// repeat previous command
 
-	msg.push("error: \""+words[0]+"\" not implemented");
+	this.addError("\""+words[0]+"\" not implemented");
 	break;
 
     case ":add":
 	// add modules to target set
 
-	msg.push("error: \""+words[0]+"\" not implemented");
+	this.addError("\""+words[0]+"\" not implemented");
 	break;
 
     case ":browse":
@@ -48,34 +63,32 @@ JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
 	//      i.e union up all ispaces and the tspace, then resolve each
 	//      name so that it will be qualified if ambiguous, otherwise not.
 
-	msg.push("error: \""+words[0]+"\" not implemented");
+	this.addError("\""+words[0]+"\" not implemented");
 	break;
 
     case ":edit":
 	// :edit modulename/URL
 	// open a module (creates new buffer) from the file system or URL
 
-	msg.push("error: \""+words[0]+"\" not implemented");
+	this.addError("\""+words[0]+"\" not implemented");
 	break;
 
     case ":help": case ":?":
-	msg.push(commands.join("\n"));
+	this.addMessage(commands.join("\n"));
 	break;
 
     case ":info":
 	// :info name     // give location of any name. members of tycon/tycls.
 	//    tab-completion on names.
 
-	msg.push("error: \""+words[0]+"\" not implemented");
+	this.addError("\""+words[0]+"\" not implemented");
 	break;
 
     case ":kind":
         // :kind name     // must be a type constructor
         for(var w=1 ; w<words.length ; w++ ){
-            //alert(JSHC.showAST(JSHC.parseExp(words[w])));
+            this.commandKind(words[w]);
         }
-
-	msg.push("error: \""+words[0]+"\" not implemented");
 	break;
 
     case ":load":
@@ -90,10 +103,10 @@ JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
             this.compiler.recompile();
         } catch (err) {
                 alert(JSHC.showError(err));
-                msg.push(err);
+                this.addError(err);
         }
         this.compiler.errors.forEach(function(err){
-		msg.push("error: "+err);
+		this.addError(err);
 	    });
 
         break;
@@ -103,25 +116,25 @@ JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
 	//   '*'      access to tspace + ispaces.
 	//   non-'*'  access to espace.
 
-	msg.push("error: \""+words[0]+"\" not implemented");
+	this.addError("\""+words[0]+"\" not implemented");
 	break;
 
     case ":quit":
 	// :quit     // remove buffer (and frame if >1) "kill_frame" ?
 
-	msg.push("error: \""+words[0]+"\" not implemented");
+	this.addError("\""+words[0]+"\" not implemented");
 	break;
 
     case ":reload":
 	// :reload   // reload the targets. get a new set of loaded modules.
 
-	msg.push("error: \""+words[0]+"\" not implemented");
+	this.addError("\""+words[0]+"\" not implemented");
 	break;
 
     case ":set":
 	// :set       // set an interpreter variable
 
-	msg.push("error: \""+words[0]+"\" not implemented");
+	this.addError("\""+words[0]+"\" not implemented");
 	break;
 
     case ":show":
@@ -134,33 +147,45 @@ JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
 	//                // should have a command to open code in a buffer ?
 
 	if( words.length !== 2 ){
-	    msg.push("error: invalid number of arguments for :show");
+	    this.addError("invalid number of arguments for :show");
 	    break;
 	}
 	switch( words[1] ){
 	case "path":
-	    msg.push(this.compiler.path.join("\n"));
+	    this.addMessage(this.compiler.path.join("\n"));
 	    break;
 	case "code":
-	    msg.push(this.compiler.getAllJSCode());
+	    this.addMessage(this.compiler.getAllJSCode());
+	    break;
+	case "modules":
+	    for(var loaded_module in this.compiler.modules){
+	        this.addMessage(loaded_module);
+	    }
 	    break;
 	default:
-	    msg.push("error: invalid interpreter variable");
+	    this.addError("invalid interpreter variable");
 	}
 	break;
 
     case ":type":
 	// :type          // parse and type expression. then show type.
-
-	msg.push("error: \""+words[0]+"\" not implemented");
+	var expression = line.substr(words[0].length+1);
+	var decl = this.compiler.checkExp(expression);
+	if( this.errors === 0 ){
+            if( decl.type === undefined ){
+                this.addError("type is missing");
+            } else {
+                this.addError(decl);
+            }
+        }
 	break;
 
     case ":!":
     case ":js":
         try {
-        	msg.push(eval(line.substr(3)));
+            this.addMessage(eval(line.substr(3)));
         } catch (err) {
-            msg.push(err);
+            this.addError(err);
         }
         break;
     
@@ -180,18 +205,21 @@ JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
 	// * import modulename
 	//   equivalent to ":module +modulename"
         try {
-            var expr = JSHC.Compiler.compileExp(line,this.prefix);
-        	msg.push(eval(expr));
+            var decl = this.compiler.checkExp(line);
+            if( this.errors === 0 ){
+                var expr = JSHC.Codegen.codegen(decl.rhs, this.prefix);
+                this.addMessage(eval(expr));
+            }
         } catch (err) {
             alert("expression:\n" + line + "\ngenerated code:\n" + expr + "\nwith error:\n\n" + JSHC.showError(err));
-            msg.push(err);
+            this.addError(err);
         }
 	break;
 
-    default: msg.push("error: unknown command: "+command);
+    default: this.addError("unknown command: "+command);
     }
 
-    return msg.join("");
+    return this.msgs.join("");
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -245,8 +273,7 @@ JSHC.Ymacs.Interpreter.prototype.runCommand = function(opt_text){
 	this.buf.__insertText("\n");
 	this.buf.__insertText(output);
 	    
-	// insert new line + prompt
-	this.buf.__insertText("\n");
+	// insert prompt
 	this.buf.__insertText(this.prompt);
 	    
 	// clear undo information
@@ -257,11 +284,108 @@ JSHC.Ymacs.Interpreter.prototype.runCommand = function(opt_text){
 
 ////////////////////////////////////////////////////////////////////////////////
 
+JSHC.Ymacs.Interpreter.prototype.addError = function(msg){
+    this.errors++;
+    this.msgs.push("Error: "+msg+"\n");
+};
+
+JSHC.Ymacs.Interpreter.prototype.addWarning = function(msg){
+    this.msgs.push("Warning: "+msg+"\n");
+};
+
+JSHC.Ymacs.Interpreter.prototype.addMessage = function(msg){
+    this.msgs.push(msg+"\n");
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
 // FIXME:
 // need to currently exist as a constant outside the created interpreter object
 // since the interpreter-mode needs to know the prompt to color it, which
 // seemingly must be written to be applied on an arbitrary buffer, not just a
 // buffer that has a prompt ?
 JSHC.Ymacs.Interpreter.prompt = "> ";
+
+////////////////////////////////////////////////////////////////////////////////
+// functions to handle commands
+
+JSHC.Ymacs.Interpreter.prototype.commandKind = function(qname){
+
+    var ast = this.lookupName(qname);
+    if( ast !== undefined ){
+        if( ast.kind === undefined ){
+            this.addError("kind is missing for \""+ast+"\"");
+        } else {
+            this.addMessage(ast.kind);
+        }
+    }
+};
+
+JSHC.Ymacs.Interpreter.prototype.commandType = function(qname){
+
+    var ast = this.lookupName(qname);
+    if( ast !== undefined ){
+        if( ast.type === undefined ){
+            this.addError("type is missing for \""+ast+"\"");
+        } else {
+            this.addMessage(ast.type);
+        }
+    }
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+/*
+  takes a name that may be qualified and resolves it.
+  if qualified, it will be searched for in the exports of that module.
+  if unqualified, it will be searched for among the target modules.
+  
+  if not found, an error is added and 'undefined' is returned.
+*/
+JSHC.Ymacs.Interpreter.prototype.lookupName = function(qname){
+    var dotix = qname.lastIndexOf(".");
+    var name;
+
+    if( dotix == -1 ){
+       name = qname;  // not qualified
+       var asts = [];
+       var roots = this.compiler.getTargets();
+       for(var ix=0 ; ix<roots.length ; ix++){
+           var ast = this.compiler.modules[roots[ix]].ast.espace[name];
+           if( ast === undefined )continue;
+           asts.push(ast);
+       }
+       switch( asts.length ){
+       case 0:
+           this.addError("\""+qname+"\" not in scope");
+           break;
+       case 1:
+           return asts[0];
+           break;
+       default:
+           var msg = ["\""+qname+"\" is ambiguous, and may refer to "];
+           for(var ix=0 ; ix<asts.length ; ix++){
+               msg.push(asts[ix].toStringQ());
+               msg.push(", ");
+           }
+           msg.pop();
+           this.addError(msg.join(""));
+       }
+    } else {
+        var name = qname.substr(dotix+1);
+        var loc = qname.substr(0,dotix);
+        var module = this.compiler.modules[loc];
+        if( module === undefined ){
+           this.addError("module "+loc+" is not loaded");
+        } else {
+            var ast = module.ast.espace[name];
+            if( ast === undefined ){
+               this.addError(loc+" does not export "+name);
+            } else {
+                return ast;
+            }
+        }
+    }
+};
 
 ////////////////////////////////////////////////////////////////////////////////
