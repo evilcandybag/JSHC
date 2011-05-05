@@ -1,5 +1,9 @@
+
 ////////////////////////////////////////////////////////////////////////////////
 
+/*
+  function type
+*/
 JSHC.FunType = function(types,pos){
     assert.ok( types.length !== undefined );
     assert.ok( types.length !== 1 );
@@ -21,6 +25,9 @@ JSHC.FunType.prototype.toString = function(){
     return m.join("");
 };
 
+/*
+  application type
+*/
 JSHC.AppType = function(fun,arg,pos){
     assert.ok( fun !== undefined );
     assert.ok( arg !== undefined );
@@ -33,6 +40,26 @@ JSHC.AppType = function(fun,arg,pos){
 };
 JSHC.AppType.prototype.toString = function(){
     return "("+this.lhs+" "+this.rhs+")";
+};
+
+/*
+  forall type
+*/
+JSHC.ForallType = function(binds,type){
+    this.name = "forall";
+    this.binds = binds;  // set of bound type variables
+    this.type = type;    // the inner type
+};
+JSHC.ForallType.prototype.toString = function(){
+    var m = [];
+    m.push("forall");
+    for(var tv in this.binds){
+	m.push(" ");
+	m.push(tv.toString());
+    };
+    m.push(". ");
+    m.push(this.type.toString());
+    return m.join("");
 };
 
 ////////////////////////////////////////////////////////////////////////////////
