@@ -13,7 +13,9 @@
 
 JSHC.Simplify.runSimplify = function(ast) {
     JSHC.Simplify.patSimplify(ast);
+//    alert("AFTER patsimplify:\n\n" + JSHC.showAST(ast))
     JSHC.Simplify.simplify(ast);
+//    alert("AFTER simplify:\n\n" + JSHC.showAST(ast))
 }
 
 JSHC.Simplify.simplify = function(ast){
@@ -137,10 +139,12 @@ JSHC.Simplify.reduceWhere = function (e) {
 };
 
 JSHC.Simplify.patSimplify = function (ast) {
+//    alert("RUNNING PATSIMPLIFY on: " + ast.modid)
     var old = ast.body.topdecls;
     var newbody = [];
     var currentName = ""; 
     var temp = [];
+    var toMerge = {};
 
     var merge = function(funs) {
     
@@ -149,15 +153,19 @@ JSHC.Simplify.patSimplify = function (ast) {
       if (funs.length > 1) {
           var newArgs = [];
           var newAlts = [];
+          var newArgsT = [];
           //calculate the new argument list
           for (var j = 0; j < funs[0].lhs.args.length; j++) {
-              newArgs.push(new JSHC.VarName("a" + j, funs[0].lhs.pos, false));
+              var vrnm = new JSHC.VarName("a" + j, funs[0].lhs.pos, false);
+              newArgs.push(vrnm);
+              newArgsT.push({name: "application", exps: [vrnm]});
           }
-          newArgsT = {name: "application", exps: [{name: "tuple", members: newArgs}]};
           
+          newArgsT = {name: "application", exps: [{name: "tuple", members: newArgsT}]};
+//          alert("newargst:\n" + JSHC.showAST(newArgsT) + "\nnewargs:\n" + JSHC.showAST(newArgs))
           //calculate the alts for the case-expression
           for (var j = 0; j < funs.length; j++) {
-              var argsT = {name: "tuple_pat", members: fun.lhs.args}
+              var argsT = {name: "tuple_pat", members: funs[j].lhs.args}
               newAlts.push( {name: "alt", pat: argsT, exp: funs[j].rhs} );
           }
           
@@ -168,8 +176,10 @@ JSHC.Simplify.patSimplify = function (ast) {
           res = {name: "topdecl-decl", decl: res}
           
           //push the merged function into the new body
+//          alert("pushed a merged function: " + JSHC.showAST(res))
           newbody.push(res);
       } else if (funs.length === 1){
+//          alert("pushed a non-merged function: " + JSHC.showAST(funs[0]))
           newbody.push({name: "topdecl-decl", decl: funs[0] });
       }
     }    
@@ -177,32 +187,22 @@ JSHC.Simplify.patSimplify = function (ast) {
     for (var i = 0; i < old.length; i++) {
         if (old[i].name === "topdecl-decl" && old[i].decl.name === "decl-fun") {
             var fun = old[i].decl;
-            
-            if ((fun.lhs.ident.id !== currentName) || i === old.length-1) {
 
-
-                
-                if (temp.length > 1) {
-                  merge(temp);
-                } else if (temp.length === 1) {
-                  merge(temp);
-                }
-                
-                temp = [];
-                temp.push(fun);
-                currentName = fun.lhs.ident.id;
-            
-                
-            } else {
-                temp.push(fun);
-            }
-            
+            if (toMerge[fun.lhs.ident.id] === undefined)
+                toMerge[fun.lhs.ident.id] = [];
+               
+            toMerge[fun.lhs.ident.id].push(fun);   
         } else {
             newbody.push(old[i]);
         }
+
     }
-    if (temp.length > 0)
-        merge(temp);
+    for (var k in toMerge) {
+        merge(toMerge[k]);
+    }
+//    if (temp.length > 0)
+//        merge(temp);
+//    alert("NEW BODY\n\n" + JSHC.showAST(newbody));
     ast.body.topdecls = newbody;
 }
 

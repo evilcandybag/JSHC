@@ -11,8 +11,8 @@
 (/) = JSHC.int32div
 
 */
-
-JSHC.Internal = {};
+if (JSHC.Internal === undefined)
+        JSHC.Internal = {};
 
 JSHC.Internal.Prelude = {
   // makes thunk computations of javascript operations.

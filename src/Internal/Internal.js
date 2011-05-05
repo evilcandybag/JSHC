@@ -42,7 +42,7 @@ JSHC.int32read = function(s){
 //match evaluated exp against pat
 //returns: an array with any bound variables if successful, Boolean false if failed
 JSHC.Internal.match = function(exp, alts) {
-
+//    alert("match called with exp:\n\n" + JSHC.showAST(exp) + "\n\nand alts\n\n" + JSHC.showAST(alts))
     var binds = [];
     
     var match_ = function (exp, pat) {
@@ -87,12 +87,12 @@ JSHC.Internal.match = function(exp, alts) {
         var x = (exp instanceof JSHC.Thunk);
         if (x && match_(exp.v, alts[i].p)) {
             assert.ok(alts[i].f instanceof Function, "rhs of pattern is not a function!");
-            alert("<br>matched something: " + alts[i].f);
-            alert("<br>with binds: " + binds);
+//            alert("<br>matched something: " + alts[i].f);
+//            alert("<br>with binds: " + binds);
             return alts[i].f.apply(undefined,binds);
         } else if (match_(exp, alts[i].p)) {
-            alert("<br>matched something: " + alts[i].f);
-            alert("<br>with binds: " + binds);
+//            alert("<br>matched something: " + alts[i].f);
+//            alert("<br>with binds: " + binds);
             
             return alts[i].f.apply(undefined,binds);
         } else        

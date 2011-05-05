@@ -138,7 +138,10 @@ JSHC.Compiler.prototype.recompile = function(){
 
     // for each graph entry in arbitrary order, simplify and generate code.
     for(k in this.modules) {
+//        alert(JSHC.showAST(modules[k].ast.body))
         JSHC.Simplify.runSimplify(this.modules[k].ast);
+//        alert(JSHC.showAST(modules[k].ast.body))
+        
     	this.modules[k].jscode = JSHC.Codegen.codegen(this.modules[k].ast, this.modulePrefix);
     }
 
