@@ -5,9 +5,13 @@ JSHC.showAST = (function(){
 	var showAST = function(ast){
 	    var sb = [];  // a list as a string buffer/builder
 	    try {
-	    showAST2(sb,ast);
+	        showAST2(sb,ast);
 	    } catch (err) {
-                sb.unshift("too much recursion");
+	        if( err.message == "too much recursion" && err.name == "InternalError" ){
+	            sb.unshift("too much recursion while showing: ");
+	        } else {
+	            alert(err);
+	        }
 	    }
 	    return sb.join("");
 	};
@@ -39,7 +43,7 @@ JSHC.showAST = (function(){
 	                empty = false;
 	            } 
 	        }
-	        if( !empty )emptysb.pop();
+	        if( !empty )sb.pop();
 	        sb.push("}");
 		//	    }
 	    } else if( ast === null ){ // typeof null === "object"
