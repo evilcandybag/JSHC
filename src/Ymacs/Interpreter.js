@@ -205,11 +205,17 @@ JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
 	// * import modulename
 	//   equivalent to ":module +modulename"
         try {
-            var decl = this.compiler.checkExp(line);
-            if( this.errors === 0 ){
-                var expr = JSHC.Codegen.codegen(decl.rhs, this.prefix);
-                this.addMessage(eval(expr));
+            if( line.length === 0 ){
+                break;
             }
+
+            var decl = this.compiler.checkExp(line);
+            if( this.errors !== 0 ){
+                break;
+            }
+
+            var expr = JSHC.Codegen.codegen(decl.rhs, this.prefix);
+            this.addMessage(eval(expr));
         } catch (err) {
             alert("expression:\n" + line + "\ngenerated code:\n" + expr + "\nwith error:\n\n" + JSHC.showError(err));
             this.addError(err);
