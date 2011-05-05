@@ -9,6 +9,7 @@ JSHC.Compiler = function(modulePrefix){
     this.path = [];
     if( location !== undefined && location.href !== undefined ){
 	this.path.push(location.href.substr(0, location.href.lastIndexOf("/") + 1) + "hslib/");
+	this.path.push(location.href.substr(0, location.href.lastIndexOf("/") + 1) + "hsusr/");
     }
     this.modulePrefix = modulePrefix;
     this.modules = {};   // mapping from module names to modules
