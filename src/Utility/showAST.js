@@ -4,7 +4,11 @@
 JSHC.showAST = (function(){
 	var showAST = function(ast){
 	    var sb = [];  // a list as a string buffer/builder
+	    try {
 	    showAST2(sb,ast);
+	    } catch (err) {
+                sb.unshift("too much recursion");
+	    }
 	    return sb.join("");
 	};
 
@@ -25,11 +29,13 @@ JSHC.showAST = (function(){
 		//        } else {
 		sb.push("{");
 	        for(k in ast){
+	            if (typeof ast[k] !== "function") {
 	            sb.push(k+": ");
 	            //if( k==="rhs" )document.write("yy"+ast[k] +"<br>");
 	            showAST2(sb,ast[k]);
 	            //document.write(s +"<br>");
 	            sb.push(", ");
+	            } 
 	        }
 	        sb.pop();
 	        sb.push("}");

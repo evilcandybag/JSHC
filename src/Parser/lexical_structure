@@ -55,10 +55,10 @@ varsym = !(reservedop / dashes / escape / ":") s:(symbol)+ {return s.join("")}
 consym = !reservedop s:(":"symbol*) {return flatten(s).join("")}
 reservedop = op:( ".." / "::" / ":" / "=>" / "=" !"="  / "\\" !escapestuff / "|" / "<-" / "->" / "@" / "~" ) !(varsym / consym) {return {val: (op instanceof Array)? op.join(""): op, typ: (op instanceof Array)? op.join(""): op}}
 
-qvarid = qs:(conid ".")+ ref:((!"." varid) !".") {return {val: flatten([qs, ref[0]]).join(""), typ: "qvarid", qual: flatten(qs).join("")}}
-qconid = qs:(conid ".")+ ref:((!"." conid) !".") {return {val: flatten([qs, ref[0]]).join(""), typ: "qconid", qual: flatten(qs).join("")}}
-qvarsym = qs:(conid ".")+ ref:(varsym !".") {return {val: flatten([qs, ref[0]]).join(""), typ: "qvarsym", qual: flatten(qs).join("")}}
-qconsym = qs:(conid ".")+ ref:((!"." consym) !".") {return {val: flatten([qs, ref[0]]).join(""), typ: "qconsym", qual: flatten(qs).join("")}}
+qvarid = qs:(conid ".")+ ref:((!"." varid) !".") {qs = flatten(qs).join(""); return {val: flatten([qs, ref[0]]).join(""), typ: "qvarid", qual: qs.substr(0,qs.length-1)}}
+qconid = qs:(conid ".")+ ref:((!"." conid) !".") {qs = flatten(qs).join(""); return {val: flatten([qs, ref[0]]).join(""), typ: "qconid", qual: qs.substr(0,qs.length-1)}}
+qvarsym = qs:(conid ".")+ ref:(varsym !".") {qs = flatten(qs).join(""); return {val: flatten([qs, ref[0]]).join(""), typ: "qvarsym", qual: qs.substr(0,qs.length-1)}}
+qconsym = qs:(conid ".")+ ref:((!"." consym) !".") {qs = flatten(qs).join(""); return {val: flatten([qs, ref[0]]).join(""), typ: "qconsym", qual: qs.substr(0,qs.length-1)}}
 
 varid_e = !"." v:varid !"." {return {val: v, typ: "varid"}}
 conid_e = !"." c:conid !"." {return {val: c, typ: "conid"}}
