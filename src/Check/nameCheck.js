@@ -177,7 +177,8 @@ this function can be used to check every use of a name in any expression.
 ////////////////////////////////////////////////////////////////////////////////
 
 JSHC.Check.prototype.checkNames = function(ls,ast){
-    assert.ok( ast !== undefined && ast.name !== undefined, "param 'ast' must be an AST");
+    assert.ok( ast !== undefined, "ast must not be undefined" );
+    assert.ok( ast.name !== undefined, "param 'ast' must be an AST");
     var f = this.checkNames[ast.name];
     if( f === undefined ){
 	throw new Error("no definition for "+ast.name);
@@ -454,21 +455,31 @@ JSHC.Check.prototype.checkNames["decl-fun"] = function(ls,ast){
 
 JSHC.Check.prototype.checkNames["case"] = function(ls,ast){
     //TODO: definition for case
-    
+};
+
+JSHC.Check.prototype.checkNames["varname"] = function(ls,ast){
+    this.lookupName(ls,ast);
+};
+
+JSHC.Check.prototype.checkNames["dacon"] = function(ls,ast){
+    this.lookupName(ls,ast);
+};
+
+JSHC.Check.prototype.checkNames["integer-lit"] = function(ls,ast){
+    // nothing to check
 };
 
 JSHC.Check.prototype.checkNames["application"] = function(ls,ast){
-    var i;
-
     const exps = ast.exps;
-    for(i=0;i<exps.length;i++){
+    for(var i=0 ; i<exps.length ; i++){
         switch (exps[i].name) {
-        case "varname":
-	    this.lookupName(ls,exps[i]);
-	default:
-	}
+        case "varname": case "dacon": case "integer-lit":
+            this.checkNames(ls,exps[i]);
+            break;
+        default:
+            throw new Error("missing case for "+exps[i].name);
+        }
     }
-    
 };
 
 ////////////////////////////////////////////////////////////////////////////////
