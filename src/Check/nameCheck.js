@@ -37,30 +37,47 @@ JSHC.Check.nameCheck = function(modules,module) {
     return check.errors;
 };
 
-JSHC.Check.prototype.lookupName = function(lspace, name){
+JSHC.Check.prototype.lookupName = function(lspace, nameobj){
     assert.ok( lspace !== undefined );
-    assert.ok( name !== undefined );
+    assert.ok( nameobj !== undefined );
     var i;
     var ns = {};  // namespace to put all referenced names into
+    var loc = "";
 
-    // TODO: if name is qualified, must check the qualification.
-    //       assumes NOT qualified below.
-    //       could just filter the list of possible matches at the end.
+    // if name is qualified, must check the qualification.
+    var dotix = nameobj.id.lastIndexOf(".");
+    if( dotix !== -1 ){
+        // handle qualified name
+        name = nameobj.id.substr(dotix+1);
+        loc = nameobj.id.substr(0,dotix);
+    } else {
+        // handle unqualified name
+        name = nameobj.id;
 
-    if( lspace[name] !== undefined ) {
-        return;  // local (always non-qualified) name
+        // check if in lspace
+        if( lspace[name] !== undefined ) {
+            return;  // local (always non-qualified) name
+        }
+	
+        // check if in tspace
+        if( this.module.body.tspace[name] !== undefined ){
+            // add top-level (currently non-qualified) name
+            //ns[name] = {name: module.body.tspace[name], src: module.modid};
+	    ns[this.module.body.tspace[name]] = this.module.body.tspace[name];
+        }
     }
-
-    if( this.module.body.tspace[name] !== undefined ){
-        // add top-level (currently non-qualified) name
-        //ns[name] = {name: module.body.tspace[name], src: module.modid};
-	ns[this.module.body.tspace[name]] = this.module.body.tspace[name];
-    }
-
+    
     const impdecls = this.module.body.impdecls;
     for(i=0;i<impdecls.length;i++){
         const impdecl = impdecls[i];
         const exports = this.modules[impdecl.modid].ast.espace;
+
+        // if the name was qualified and the qualification does not match the
+        // import declaration, then skip it.
+        if( loc.length !== 0 && impdecl.modid !== loc ){
+            continue;
+        }
+
         const inames = impdecl.imports;
 	const exp = exports[name];
 
@@ -69,22 +86,29 @@ JSHC.Check.prototype.lookupName = function(lspace, name){
 	    ns[exp] = exp;
 	}
     }
-
+    
     amount = JSHC.numberOfKeys(ns);
     if( amount === 0 ){
 	// error: name not in scope
 	//make sure our internal functions pass the checks
 	var internal = "JSHC.Internal"
-	if (name.toString().substr(0,internal.length) === internal)
+	if( internal == loc ){
 	    return;
+	}
+	//if (name.toString().substr(0,internal.length) === internal)
+	   // return;
 	
 	this.errors.push(new JSHC.SourceError(this.module.modid,name.pos,name+" not in scope"));
     } else if( amount === 1 ){
-        for (var temp in ns) {
-	    // declared in one location (topdecl or import)
-	    assert.ok( name.loc === undefined );
-	    assert.ok( ns[temp].loc !== undefined );
-	    name.loc = ns[temp].loc;
+        // declared in one location (topdecl or import)
+        if( loc.length === 0 ){
+	    // not a qualified name, so qualify
+
+            for (var temp in ns) {
+	        assert.ok( nameobj.loc === undefined );
+	        assert.ok( ns[temp].loc !== undefined );
+	        nameobj.loc = ns[temp].loc;
+	    }
 	}
     } else { // amount.length >= 2
 	// error: ambiguity since more than one declaration in scope
@@ -96,12 +120,12 @@ JSHC.Check.prototype.lookupName = function(lspace, name){
 	}
 	msg.pop(); // remove last ", "
 
-	this.errors.push(new JSHC.SourceError(this.module.modid,name.pos,msg.join("")));
+	this.errors.push(new JSHC.SourceError(this.module.modid,nameobj.pos,msg.join("")));
     }
 };
-
+    
 ////////////////////////////////////////////////////////////////////////////////
-
+    
 JSHC.Check.isImported = function(exp,impdecl,name){
     if( impdecl.imports === undefined ){   // importing everything
 	return true;

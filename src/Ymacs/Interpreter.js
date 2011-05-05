@@ -352,7 +352,7 @@ JSHC.Ymacs.Interpreter.prototype.lookupName = function(qname){
     var dotix = qname.lastIndexOf(".");
     var name;
 
-    if( dotix == -1 ){
+    if( dotix === -1 ){
        name = qname;  // not qualified
        var asts = [];
        var roots = this.compiler.getTargets();
