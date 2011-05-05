@@ -157,6 +157,7 @@ JSHC.Codegen.codegen = function (input,namespace) {
                 res += comLambda(exp[i]);
                 break;
              case "case":
+//                alert("comCase:\n\n" + JSHC.showAST(exp[i]))
                 res += comCase(exp[i]);
                 break;
              default:
@@ -190,10 +191,16 @@ JSHC.Codegen.codegen = function (input,namespace) {
     }
 
     var comLambda = function(lamb){
-
+        
+        if (lamb.atArg === undefined) {
+            lamb.atArg = 0;
+            lamb.arglen = lamb.args.length
+        }
+        
         var res = "";
-        if (lamb.args.length > 0) {
-            var arg = lamb.args.shift();
+        if (lamb.atArg < lamb.arglen) {
+            var arg = lamb.args[lamb.atArg];
+            lamb.atArg++;
             res += "function(" + comApat(arg) + "){ return " + comLambda(lamb) + "}"
         } else {
             res +=  comExp(lamb.rhs);
@@ -204,6 +211,7 @@ JSHC.Codegen.codegen = function (input,namespace) {
     var comCase = function(cas) {
 
         var ex = comExp(cas.exp)
+//        alert("COMPILED: \n" + JSHC.showAST(cas.exp) + "to:\n" + JSHC.showAST(ex))
         var res = "JSHC.Internal.match(" + ex + ", [\n";
         for (var i = 0; i < cas.alts.length; i++) {
             var binds = JSHC.comUtils.getBinds(ex, cas.alts[i].pat);
@@ -309,6 +317,7 @@ JSHC.Codegen.codegen = function (input,namespace) {
                 break;
             case "tuple":
                 res += "[";
+//                alert("TUPLE MEMBERS: " + JSHC.showAST(exp.members))
                 for (var i = 0; i < exp.members.length; i++) {
                     res += comExp(exp.members[i])
                     if (i !== exp.members.length-1)

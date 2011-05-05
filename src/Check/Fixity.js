@@ -119,7 +119,7 @@ JSHC.Fixity.translateInfixMember = function(info, ast, member){
 */
 JSHC.Fixity.translateInfixExp = function(info, ast){
     if( ast.name === "infixexp" ){
-	return JSHC.Fixity.resolve(info, ast[member].exps);
+	return JSHC.Fixity.resolve(info, ast.exps);
     } else {
 	return ast;
     }
