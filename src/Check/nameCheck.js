@@ -194,11 +194,17 @@ JSHC.Check.prototype.checkNames["module"] = function(ls,ast){
     this.checkNames({}, ast.body);
 
     // check exports
-    this.module.espace = {};  // new empty namespace for all exports
+    ast.espace = {};  // new empty namespace for all exports
 
-    if( ast.exports === undefined )return;
-    for(i=0;i<ast.exports.length;i++){
-	this.checkNames({}, ast.exports[i]);
+    // no export specification, so export all top-level declarations
+    if( ast.exports === undefined ){
+        for(var name in ast.body.tspace){
+            ast.espace[name] = ast.body.tspace[name];
+        }
+    } else {
+        for(i=0;i<ast.exports.length;i++){
+	    this.checkNames({}, ast.exports[i]);
+        }
     }
 };
 
