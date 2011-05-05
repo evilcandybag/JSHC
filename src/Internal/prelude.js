@@ -11,11 +11,10 @@
 (/) = JSHC.int32div
 
 */
-modules.JSHC = {};
 
-modules.JSHC.Internal = {};
+JSHC.Internal = {};
 
-modules.JSHC.Internal.Prelude = {
+JSHC.Internal.Prelude = {
   // makes thunk computations of javascript operations.
 //  "+": function(a,b){return JSHC.int32add(JSHC.TR(a),JSHC.TR(b))},
 //  "-": function(a,b){return JSHC.int32sub(JSHC.TR(a),JSHC.TR(b))},
@@ -35,7 +34,7 @@ modules.JSHC.Internal.Prelude = {
         return JSHC.int32div((a instanceof JSHC.Thunk)? a.v : a,(b instanceof JSHC.Thunk)? b.v : b)}}},
  }
 
-modules.Prelude["undefined"] = undefined;
+JSHC.Internal.Prelude["undefined"] = undefined;
 
 /*
 various type classes and instances

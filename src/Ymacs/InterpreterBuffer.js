@@ -127,10 +127,13 @@ JSHC.Ymacs.makeNewInterpreterBuffer = function(ymacs){
     // generated code can be the same.
     // if one allows several interpreter buffers, then one must create a
     // unique prefix for each buffer.
-    buf.interpreter = new JSHC.Ymacs.Interpreter(buf,"JSHC.modules.");
+    buf.interpreter = new JSHC.Ymacs.Interpreter(buf,"JSHC.modules");
 
     buf.cmd("JSHC_IB_mode");
     return buf;
 };
+
+// create the prefix used above
+if( JSHC.modules === undefined )JSHC.modules = {};
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -57,7 +57,7 @@ JSHC.Compiler.prototype.recompile = function(){
     // clear old errors
     this.errors = [];
 
-    for(k in mods){
+    for(k in mods){ // mods : map
 	mod = mods[k];
 	if( mod.status === "success" ){
 
@@ -86,7 +86,7 @@ JSHC.Compiler.prototype.recompile = function(){
 
     // condense the graph of modules.
 //    entries = JSHC.Dep.condense(entries);
-
+/*
     // temporary code to avoid handling module cycles. assumes there is
     // only a single module in each entry below.
     for(k=0 ; k<entries.length ; k++){
@@ -100,6 +100,7 @@ JSHC.Compiler.prototype.recompile = function(){
 	    this.onError("module cycle: "+modnames);
 	}
     }
+*/  
 
     // if there are any errors, then stop and return (errors,warnings) here.
     // errors could be: module cycles, duplicate top-level declarations,
@@ -107,32 +108,40 @@ JSHC.Compiler.prototype.recompile = function(){
     // there is no need to stop earlier than this because of errors.
     if( this.errors.length > 0 )return 0;
 
+    this.modules = {};  // start with empty set of checked modules
+    var modules = this.modules;
+    var onError = this.onError;
+
     //traverse the graph in dependency order, and for each module group:
-      //name check
-    for (k = 0; k<entries.length ; k++) {
-        this.modules[entries[k].values[0].name] = entries[k].values[0];
-    }
-    
-    for (k in this.modules) {
-        errs = JSHC.Check.nameCheck(this.modules, this.modules[k].ast);
+    var module_group_action = function(group){
+        alert("checking group "+group.name);
+        var module = group.values[0];
+
+        //name check
+        errs = JSHC.Check.nameCheck(modules, module.ast);
         for (var i = 0; i < errs.length; i++) {
             alert(JSHC.showError(errs[i]))
-            this.onError(errs[i]);
+            onError(errs[i]);
         }
-    } 
-      //if errors, return with (errors,warnings)
-      //type check
-      //if errors, return with (errors,warnings)
+        //if errors, return with (errors,warnings)
+        //type check
+        //if errors, return with (errors,warnings)
+
+        modules[module.name] = module;
+    }
+
+    JSHC.Dep.check(entries,module_group_action);
+
+    //alert(JSHC.showAST(this.modules));
 
     // for each graph entry in arbitrary order, simplify and generate code.
     for(k in this.modules) {
         JSHC.Simplify.runSimplify(this.modules[k].ast);
-    	this.modules[k].jscode = JSHC.Codegen.codegen(this.modules[k].ast);
+    	this.modules[k].jscode = JSHC.Codegen.codegen(this.modules[k].ast, this.modulePrefix);
     }
-    
+
 //    alert("GENERATED CODE: \n\n" + this.getAllJSCode())
     eval(this.getAllJSCode());
-    
 };
 
 

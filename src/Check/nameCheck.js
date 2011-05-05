@@ -38,6 +38,8 @@ JSHC.Check.nameCheck = function(modules,module) {
 };
 
 JSHC.Check.prototype.lookupName = function(lspace, name){
+    assert.ok( lspace !== undefined );
+    assert.ok( name !== undefined );
     var i;
     var ns = {};  // namespace to put all referenced names into
 
@@ -57,13 +59,13 @@ JSHC.Check.prototype.lookupName = function(lspace, name){
 
     const impdecls = this.module.body.impdecls;
     for(i=0;i<impdecls.length;i++){
-        const imp = impdecls[i];
-        const exports = modules[imp.modid];
-        const inames = imp.imports;
+        const impdecl = impdecls[i];
+        const exports = this.modules[impdecl.modid].ast.espace;
+        const inames = impdecl.imports;
 	const exp = exports[name];
 
 	// check if exported and imported accoring to the import list.
-        if( exp !== undefined && isImported(exp,imp,name) ){
+        if( exp !== undefined && JSHC.Check.isImported(exp,impdecl,name) ){
 	    ns[exp] = exp;
 	}
     }
@@ -100,14 +102,14 @@ JSHC.Check.prototype.lookupName = function(lspace, name){
 
 ////////////////////////////////////////////////////////////////////////////////
 
-JSHC.Check.isImported = function(exp,inames,name){
-    if( inames === undefined ){   // importing everything
+JSHC.Check.isImported = function(exp,impdecl,name){
+    if( impdecl.imports === undefined ){   // importing everything
 	return true;
     } else {
-	var inList = isInImportList(exp,inames,name);
-	if( inList && !imp.hiding ){
+	var inList = JSHC.Check.isInImportList(exp,impdecl.imports,name);
+	if( inList && !impdecl.hiding ){
 	    return true;
-	} else if( !inList && imp.hiding ){
+	} else if( !inList && impdecl.hiding ){
 	    return true;
 	}
 	return false;
@@ -203,11 +205,11 @@ JSHC.Check.prototype.checkNames["module"] = function(ls,ast){
 JSHC.Check.prototype.checkNames["export-qvar"] = function(ls,ast){
     var es = this.module.espace;
     
-    this.lookupName({},ast.varname);
-    if( es[ast.varname.toStringN()] !== undefined ){
-        this.errors.push(new SourceError(this.module.modid, ast.varname.pos, ast.varname + " already exported."));
+    this.lookupName({},ast.exp);
+    if( es[ast.exp.toStringN()] !== undefined ){
+        this.errors.push(new SourceError(this.module.modid, ast.exp.pos, ast.exp + " already exported."));
     }
-    es[ast.varname.toStringN()] = ast.varname;
+    es[ast.exp.toStringN()] = ast.exp;
 };
 
 //TODO:
@@ -220,7 +222,7 @@ JSHC.Check.prototype.checkNames["export-type-unspec"] = function(ls,ast){
     var es = this.module.espace;
     
     this.lookupName({},ast.tycon);
-    this.modules.espace[ast.tycon.toStringN()] = ast.tycon;
+    this.module.espace[ast.tycon.toStringN()] = ast.tycon;
 	
 };
 
@@ -244,7 +246,7 @@ JSHC.Check.prototype.checkNames["export-type-vars"] = function(ls,ast){
     var es = this.module.espace;
 
     this.lookupName({},ast.tycon);
-    this.modules.espace[ast.tycon.toStringN()] = ast.tycon;
+    this.module.espace[ast.tycon.toStringN()] = ast.tycon;
     // find the datatype declaration and add the listed members
     // produce error if not in datatype declaration.
     decl = JSHC.Check.lookupDatatype(this.module,ast.tycon);
@@ -284,7 +286,7 @@ JSHC.Check.prototype.checkNames["export"] = function(ls,ast){
 
     } else if( ast.tycon !== undefined ){
 	this.lookupName({},ast.tycon);
-	this.modules.espace[ast.tycon.toStringN()] = ast.tycon;
+	this.module.espace[ast.tycon.toStringN()] = ast.tycon;
 	if( ast.all ){
 	    decl = JSHC.Check.lookupDatatype(this.module,ast.tycon);
 	    for(i=0;i<decl.constrs.length;i++){

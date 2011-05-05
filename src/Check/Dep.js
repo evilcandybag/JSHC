@@ -12,6 +12,7 @@ JSHC.Dep.check = function(entrylist, action){
     var entrymap = {};
 
     entrylist.forEach(function(entry){
+            //alert(JSHC.showAST(entry.names));
 	    for(var name in entry.names){
 		entrymap[name] = entry;
 	    }
@@ -26,6 +27,7 @@ JSHC.Dep.check = function(entrylist, action){
     while( !t.isDone() ){
 	var e = t.takeOne();
 	assert.ok( e !== undefined, "takeOne must return non-undefined when isDone is false" );
+	//if( e == undefined )break;
 	action(e);
 	t.done(e);
     }
@@ -38,12 +40,14 @@ JSHC.Dep.Graph = function(){
     this.namemap = {}; // mapping from entry names to entries
 };
 
+/*
 JSHC.Dep.Graph.condense = function(){
     this.entries = JSHC.condenseEntries(this.entries);
 
     // TODO: need to add ".ix" for each entry with the index of the entry
     //       in the entries list.
 };
+*/
 
 /*
   for each incoming edge (dependency), add an outgoing edge on the opposite
@@ -59,7 +63,7 @@ JSHC.Dep.transpose = function(entries){
 	    continue;
 	}
 	entry.deps = JSHC.numberOfKeys(entry.ins);
-	//document.write(entry.deps+" ");
+	//alert(JSHC.showAST(entry.ins));
 
 	// create outgoing edges for all incoming edges
 	for(var inEdge in entry.ins){
@@ -82,6 +86,7 @@ JSHC.Dep.traverse = function(entrymap, entrylist){
 
     for(var i=0 ; i<entrylist.length ; i++){
 	var key = entrylist[i].name;
+	//alert(key+" has "+entrylist[i].deps+" deps");
 	if( entrylist[i].deps === 0 ){
 	    this.ready[key] = entrylist[i];
 	} else {
@@ -107,7 +112,8 @@ JSHC.Dep.traverse.prototype.takeOne = function(){
     // if ready list is empty, return undefined
     // if ready list is non-empty, return any element
     var k = undefined;
-    for(k in this.ready){
+
+    for(k in this.ready){ // ready : map
 	break;
     }
     if( k === undefined )return undefined;
@@ -184,12 +190,13 @@ JSHC.Dep.Entry = function(values,names,edges){
 
     this.name = names[0];
     this.names = {};
-    for(var k in names){
+    for(var k=0; k<names.length; k++){
 	this.names[names[k]] = null;
     }
 
     this.ins = {};
-    for(var k in edges){
+
+    for(var k=0; k<edges.length; k++){
 	this.ins[edges[k]] = null;
     }
 
