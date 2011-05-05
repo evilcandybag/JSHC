@@ -146,7 +146,7 @@ JSHC.Compiler.prototype.recompile = function(){
 };
 
 
-JSHC.Compiler.compileExp = function (exp){
+JSHC.Compiler.compileExp = function (exp,prefix){
     var res = JSHC.parseExp(exp);
     fake_lhs = {name: "fun-lhs", ident: {name: "varname", id: "Interact+", isSymbol: false}, args: []};
     res = {name: "decl-fun", lhs: fake_lhs, rhs: res};
@@ -158,7 +158,7 @@ JSHC.Compiler.compileExp = function (exp){
     JSHC.Fixity.fixityResolution(res);
     JSHC.Check.nameCheck(this.modules,res);    
     JSHC.Simplify.runSimplify(res);
-    return JSHC.Codegen.codegen(res.body.topdecls[0].decl.rhs);
+    return JSHC.Codegen.codegen(res.body.topdecls[0].decl.rhs, prefix);
 };
 
 
