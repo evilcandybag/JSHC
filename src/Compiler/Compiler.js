@@ -123,9 +123,10 @@ JSHC.Compiler.prototype.recompile = function(){
             alert(JSHC.showError(errs[i]))
             onError(errs[i]);
         }
-        //if errors, return with (errors,warnings)
-        //type check
-        //if errors, return with (errors,warnings)
+        //if errors, return
+
+        //JSHC.Check.typeCheck(module.ast);
+        //if errors, return
 
         modules[module.name] = module;
     }
