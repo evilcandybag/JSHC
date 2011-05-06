@@ -57,24 +57,13 @@ JSHC.Codegen.codegen = function (input,namespace) {
         var res = ""
         switch (decl.name) {
             case "decl-fun":
-                res = (comFunlhs(decl.lhs) + comRhs(decl.rhs));
+                
+                res = (modid + "[\"" + decl.ident.id + "\"]" + " = "  + comRhs(decl.rhs));
                 break;
             default:
                 throw new Error("comDecl not defined for name " + decl.name);
         }
         return res;
-        
-    }
-
-    var comFunlhs = function(lhs) {
-        
-        var id = lhs.ident.id;
-        var args = "";
-        for (var i = 0; i < lhs.args.length-1; i++) {
-            args += comApat(lhs.args[i]) + ",";
-        }
-//        args += comApat(lhs.args[lhs.args.length-1]);
-        return modid + "[\"" + id + "\"]" + " = ";
         
     }
 
