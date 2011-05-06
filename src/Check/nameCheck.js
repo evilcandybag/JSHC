@@ -95,7 +95,7 @@ JSHC.Check.prototype.lookupName = function(lspace, nameobj){
 	if( loc.length !== 0 && loc.substr(0,internal.length) === internal ){
 	    return;
 	}
-	JSHC.alert(lspace, nameobj, ns, this.module.body.tspace)
+//	JSHC.alert(lspace, nameobj, ns, this.module.body.tspace)
 //	alert("LSPACE:\n\n"+JSHC.showAST(lspace))
 //	alert("nameobj:\n\n"+JSHC.showAST(nameobj))
 //	alert("ns:\n\n"+JSHC.showAST(ns))
@@ -478,9 +478,6 @@ JSHC.Check.prototype.checkNames["decl-fun"] = function(ls,ast){
     var i;
 
     ls = {};  // start with empty local namespace
-
-    // add function name.
-    ls[ast.ident] = ast.ident;
 
     // add parameter names.
     ps = {};  // namespace of the data constructors
