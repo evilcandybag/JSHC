@@ -128,27 +128,35 @@ list_decl_comma_1 // : [decl]
   | decl                              {{ $$ = [$1]; }}
   ;
 
-
-decl // : object
-  : funlhs rhs          {{$$ = {name: "decl-fun", lhs: $1, rhs: $2, pos:@$};}}
+//decl // : object
+//  : funlhs rhs          {{$$ = {name: "decl-fun", lhs: $1, rhs: $2, pos:@$};}}
     //| pat rhs
-  | gendecl
+//  | gendecl
+//  ;
+decl // : object
+  : decl_fixity           {{$$ = $1;}}
+  | var rhs           {{$$ = {name:"decl-fun", ident: $1, args: [], rhs: $2, pos: @$};}}
+  | var apats rhs     {{$$ = {name:"decl-fun", ident: $1, args: $2, rhs: $3, pos: @$};}}
+  | pat varop pat rhs {{$$ = {name:"decl-fun", ident: $2, args: [$1,$3], rhs: $4, pos: @$, orig: "infix"};}}
+  | '(' pat varop pat ')' apats rhs
+    {{$$ = {name:"decl-fun", ident: $3, args: [$2,$4].concat($6), rhs: $7, pos: @$, orig: "infix"};}}
+  | var "::" type           {{$$ = {name:"type-signature",vars:[$1],sig:$3,pos:@$};}}
+  | var "," vars "::" type  {{$$ = {name:"type-signature",vars:[$1].concat($3),sig:$5,pos:@$};}}
   ;
 
-funlhs // : object
-    : var apats       {{$$ = {name: "fun-lhs", ident: $1, args: $2, pos: @$};}}
-    | var             {{$$ = {name:"fun-lhs", ident: $1, args: [], pos: @$};}}
+//funlhs // : object
+//    : var apats       {{$$ = {name: "fun-lhs", ident: $1, args: $2, pos: @$};}}
+//    | var             {{$$ = {name:"fun-lhs", ident: $1, args: [], pos: @$};}}
 //  | pat varop pat
-    ;
+//    ;
 
 rhs // : object
     : '=' exp                  {{$$ = $2;}}
     | '=' exp "where" decls    {{$$ = {name: "fun-where", exp: $2, decls: $4, pos: @$}; }}
     ; //TODO
 
-gendecl // : type declaration | fixity
-    : //vars "::" type                    {{$$ = {name:"type-signature",vars:$1,sig:$3,pos:@$};}}
-      "infixl" literal op_list_1_comma  {{ $$ = {name: "fixity", fix: "leftfix", num: $2, ops: $3, pos: @$}; }}
+decl_fixity // : type declaration | fixity
+    : "infixl" literal op_list_1_comma  {{ $$ = {name: "fixity", fix: "leftfix", num: $2, ops: $3, pos: @$}; }}
     | "infixr" literal op_list_1_comma  {{ $$ = {name: "fixity", fix: "rightfix", num: $2, ops: $3, pos: @$}; }}
     | "infix" literal op_list_1_comma   {{ $$ = {name: "fixity",  fix: "nonfix",num: $2, ops: $3, pos: @$}; }}
     ;

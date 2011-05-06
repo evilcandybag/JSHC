@@ -177,6 +177,7 @@ JSHC.Fixity.translateInfixLists["constrained-exp"] = function(info, ast){
     JSHC.Fixity.translateInfixLists(info, ast.exp);
 };
 
+/*
 JSHC.Fixity.translateInfixLists["infix-app"] = function(info, ast){
     JSHC.Fixity.translateInfixMember(info, ast, "lhs");
     JSHC.Fixity.translateInfixMember(info, ast, "rhs");
@@ -184,6 +185,7 @@ JSHC.Fixity.translateInfixLists["infix-app"] = function(info, ast){
     JSHC.Fixity.translateInfixLists(info, ast.lhs);
     JSHC.Fixity.translateInfixLists(info, ast.rhs);
 };
+*/
 
 JSHC.Fixity.translateInfixLists["case"] = function(info, ast) {
     JSHC.Fixity.translateInfixMember(info, ast, "exp");

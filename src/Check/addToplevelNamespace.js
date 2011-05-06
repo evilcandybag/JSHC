@@ -29,7 +29,7 @@ JSHC.addToplevelNamespace = function(module){
     for(i=0;i<ts.length;i++){
         if( ts[i].name === "topdecl-decl" ){
             // qualify name and add to tspace
-            var varname = ts[i].decl.lhs.ident;
+            var varname = ts[i].decl.ident;
             assert.ok( varname.loc === undefined );
             varname.loc = module.modid.id;
             ns[varname.toString(false)] = varname;
