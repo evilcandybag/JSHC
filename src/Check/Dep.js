@@ -142,6 +142,7 @@ JSHC.Dep.Traverse.prototype.done = function(entry){
 	    assert.ok( this.waiting[out] !== undefined );
 	    this.ready[out] = this.waiting[out];
 	    delete this.waiting[out];
+	    delete this.entries[out].deps;
 	}
     }
 };
@@ -285,9 +286,11 @@ JSHC.Dep.condense = function(old_entries){
 	// the edges will be included into another entry if it is part of a
 	// cycle, and then the loop continues to add the rest of the edges to
 	// the merged entry.
-	for(var dep in ce.ins){
-	    // TODO: must not access an old entry here!
-	    dep = old_entries[dep];
+	for(var depname in ce.ins){
+	    dep = old_entries[depname];
+	    assert.ok( dep !== undefined, "missing dependency of an entry: "+depname);
+
+	    //JSHC.alert("depname: ",depname,"\nentry: ",dep,"\nnames: ",ce.names,"\ndeps: ",ce.ins);
 
 	    // skips edge if it is to itself, or if already checked.
 	    if( dep === ce || dep.status !== undefined ){
