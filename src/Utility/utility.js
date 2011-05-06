@@ -44,9 +44,14 @@ JSHC.numberOfKeys = function(obj){
 };
 
 JSHC.alert = function(){
+   var res = "";
    for(var arg=0 ; arg<arguments.length ; arg++){
-       alert(JSHC.showAST(arguments[arg]));
+       if (typeof arguments[arg] !== "string")
+          res += "\n" + JSHC.showAST(arguments[arg]) + "\n";
+       else
+          res += arguments[arg];
    };
+   alert(res);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
