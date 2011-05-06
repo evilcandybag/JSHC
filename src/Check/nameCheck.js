@@ -472,9 +472,16 @@ JSHC.Check.prototype.checkNames["constr"] = function(ls,ast){
 
     var types = ast.types;
     for(i=0;i<types.length;i++){
-	this.lookupName(ls,types[i]);
+	    this.checkNames(ls,types[i]);
     }
 };
+
+JSHC.Check.prototype.checkNames["apptype"] = function(ls,ast){
+
+    this.checkNames(ls,ast.lhs);
+    this.checkNames(ls,ast.rhs);
+};
+
 
 JSHC.Check.prototype.checkNames["decl-fun"] = function(ls,ast){
     var i;
@@ -509,9 +516,20 @@ JSHC.Check.prototype.checkNames["dacon"] = function(ls,ast){
     this.lookupName(ls,ast);
 };
 
+JSHC.Check.prototype.checkNames["tyvar"] = function(ls,ast){
+    this.lookupName(ls,ast);
+};
+
+JSHC.Check.prototype.checkNames["tycon"] = function(ls,ast){
+    this.lookupName(ls,ast);
+};
+
+
 JSHC.Check.prototype.checkNames["integer-lit"] = function(ls,ast){
     // nothing to check
 };
+
+
 
 JSHC.Check.prototype.checkNames["application"] = function(ls,ast){
     var exps = ast.exps;
