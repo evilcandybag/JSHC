@@ -352,21 +352,21 @@ op // : object
     ;
 
 conop // : object           TODO: something in Names instead?
-    : consym                {{ $$ = {name: "conop", id: $1, pos: @$}; }}
-    | '`' conid '`'         {{ $$ = {name: "conop-var", id: $1, pos: @$}; }}
+    : consym                {{ $$ = new JSHC.DaCon($1, @$, true); }}
+    | '`' conid '`'         {{ $$ = new JSHC.DaCon($1, @$, false); }}
     ;
     
 // optionally qualified variable symbol or variable id as a symbol
 qvarop // : object
-    : qvarsym           {{$$ = {name: "qvarop", id: $1, pos: @$};}}
+    : qvarsym           {{$$ = new JSHC.VarName($1, @$, true, yy.lexer.previous.qual);}}
     | varop             {{$$ = $1;}}
-    | '`' qvarid '`'    {{$$ = {name: "qvarop-var", id: $2, pos: @$};}}
+    | '`' qvarid '`'    {{$$ = new JSHC.VarName($1, @$, false, yy.lexer.previous.qual);}}
     ;
 
 // non-qualified variable symbol or variable id as a symbol
 varop // : object
-    : varsym            {{$$ = {name: "varop", id: $1, pos: @$};}}
-    | '`' varid '`'     {{$$ = {name: "varop-var", id: $2, pos: @$};}}
+    : varsym            {{$$ = new JSHC.VarName($1, @$, true);}}
+    | '`' varid '`'     {{$$ = new JSHC.VarName($1, @$, false)}}
     ;
 
 // list of 0 or more tyvars without separator
