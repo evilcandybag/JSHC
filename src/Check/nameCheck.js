@@ -86,7 +86,7 @@ JSHC.Check.prototype.lookupName = function(lspace, nameobj){
 	    ns[exp] = exp;
 	}
     }
-    
+
     amount = JSHC.numberOfKeys(ns);
     if( amount === 0 ){
 	// error: name not in scope
@@ -95,6 +95,12 @@ JSHC.Check.prototype.lookupName = function(lspace, nameobj){
 	if( loc.length !== 0 && loc.substr(0,internal.length) === internal ){
 	    return;
 	}
+	JSHC.alert(lspace, nameobj, ns, this.module.body.tspace)
+//	alert("LSPACE:\n\n"+JSHC.showAST(lspace))
+//	alert("nameobj:\n\n"+JSHC.showAST(nameobj))
+//	alert("ns:\n\n"+JSHC.showAST(ns))
+//	alert("tspace:\n\n"+JSHC.showAST(this.module.body.tspace))
+//	alert("LSPACE:\n\n"JSHC.showAST(lspace))
 	this.errors.push(new JSHC.SourceError(this.module.modid,name.pos,name+" not in scope"));
     } else if( amount === 1 ){
         // declared in one location (topdecl or import)
@@ -512,7 +518,7 @@ JSHC.Check.prototype.checkNames["application"] = function(ls,ast){
     const exps = ast.exps;
     for(var i=0 ; i<exps.length ; i++){
         switch (exps[i].name) {
-        case "varname": case "dacon": case "integer-lit":
+        case "varname": case "dacon": case "integer-lit": case "application":
             this.checkNames(ls,exps[i]);
             break;
         default:
