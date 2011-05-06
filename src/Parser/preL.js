@@ -31,7 +31,14 @@ JSHC.Parser.preL = function(input) {
 	    if (input[1].val !== "{" && input[1].val !== "module") {
 	        newBlock = true;
 	    } 
-	    column += howLongWS(input[0].val,column);
+	    try {
+	        column += howLongWS(input[0].val,column);
+	    }
+	    catch (err) {
+	        //err.message.concat
+	        alert("In program: \n\n" + JSHC.showAST(input));
+	        throw err;
+	    }
 	} else {
 	    result.push(new Ind(column, line, BLOCKIND()));
 	    column += input[0].val.length;
@@ -50,7 +57,13 @@ JSHC.Parser.preL = function(input) {
 			    column = 1; 
                 newLine = true;
 			} 
-			column += howLongWS(input[i].val,column);
+			try {
+			    column += howLongWS(input[i].val,column);
+			} catch (err) {
+			    //err.message.concat
+			    alert("In program: \n\n" + JSHC.showAST(input));
+	            throw err;
+			}
 		} else {
 		//input[i] is a lexeme
 		    if (newBlock) {
@@ -107,8 +120,10 @@ function howLongWS(ws, indent) {
 	    case '\n':
 	        sum = 0;
 	        break;
+	    case '\r'://ignore carriage return
+	        break;
 		default:
-		    document.writeln("WAT! ");
+		    throw new Error("Whitespace contained something that is not a newline or tab! Erroneous character code: " + ws.charCodeAt(i) + "in string: " + ws);
 		}
 	}
 	return sum;
