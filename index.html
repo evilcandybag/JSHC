@@ -1,48 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
-<body>
-<script src="src/Utility/stacktrace.js"></script>
-<script src="src/Utility/assert.js"></script>
-<script src="src/Utility/utility.js"></script>
-<script src="src/Utility/errors.js"></script>
-<script src="src/Utility/showError.js"></script>
-<script src="src/Utility/Names.js"></script>
-<script src="src/Utility/showAST.js"></script>
+  <head>
+    <title>Ymacs -- An Emacs-like editor for the Web</title>
+    <link rel="stylesheet" type="text/css" href="Ymacs/test/dl/new-theme/default.css" />
+    <link rel="stylesheet" type="text/css" href="Ymacs/src/css/ymacs.css" />
+    <link rel="stylesheet" type="text/css" href="Ymacs/test/test.css" />
+  </head>
+  <body>
+    <center style="margin-top: 10em" id="x-loading">
+      <h1><tt>.oO[ loading ]Oo.</tt></h1>
+    </center>
+    <script>
+      window.Dynarch_Base_Url = "./Ymacs/test/dl";
+      window.YMACS_SRC_PATH = "./Ymacs/src/js/";
+    </script>
+    <script src="Ymacs/test/dl/js/thelib.js"></script>
+    <!-- <script src="http://www.jstoolkit.com.d:8090/src/js/all-scripts.jsx?crunch=0;path=http://www.jstoolkit.com.d:8090/src/js"></script> -->
+    <script src="Ymacs/src/js/ymacs.js"></script>
+    <script src="Ymacs/src/js/ymacs-keyboard.js"></script>
+    <script src="Ymacs/src/js/ymacs-regexp.js"></script>
+    <script src="Ymacs/src/js/ymacs-frame.js"></script>
+    <script src="Ymacs/src/js/ymacs-textprop.js"></script>
+    <script src="Ymacs/src/js/ymacs-exception.js"></script>
+    <script src="Ymacs/src/js/ymacs-interactive.js"></script>
+    <script src="Ymacs/src/js/ymacs-buffer.js"></script>
+    <script src="Ymacs/src/js/ymacs-marker.js"></script>
+    <script src="Ymacs/src/js/ymacs-commands.js"></script>
+    <script src="Ymacs/src/js/ymacs-commands-utils.js"></script>
+    <script src="Ymacs/src/js/ymacs-keymap.js"></script>
+    <script src="Ymacs/src/js/ymacs-keymap-emacs.js"></script>
+    <script src="Ymacs/src/js/ymacs-keymap-isearch.js"></script>
+    <script src="Ymacs/src/js/ymacs-minibuffer.js"></script>
+    <script src="Ymacs/src/js/ymacs-tokenizer.js"></script>
+    <script src="Ymacs/src/js/ymacs-mode-paren-match.js"></script>
+    <script src="Ymacs/src/js/ymacs-mode-lisp.js"></script>
+    <script src="Ymacs/src/js/ymacs-mode-js.js"></script>
+    <script src="Ymacs/src/js/ymacs-mode-xml.js"></script>
+    <script src="Ymacs/src/js/ymacs-mode-css.js"></script>
+    <script src="Ymacs/src/js/ymacs-mode-markdown.js"></script>
 
-<script src="src/Internal/Internal.js"></script>
-<script src="src/Internal/lazy.js"></script>
-<script src="src/Internal/prelude.js"></script>
+    <!-- add JSHC files -->
+    <script src="src/Utility/stacktrace.js"></script>
+    <script src="src/Utility/assert.js"></script>
+    <script src="src/Utility/utility.js"></script>
+    <script src="src/Utility/errors.js"></script>
+    <script src="src/Utility/showError.js"></script>
+    <script src="src/Utility/Names.js"></script>
+    <script src="src/Utility/Types.js"></script>
+    <script src="src/Utility/showAST.js"></script>
 
-<script src="src/Parser/Lexeme.js"></script>
-<script src="src/Parser/tokenize.js"></script>
-<script src="src/Parser/preL.js"></script>
-<script src="src/Parser/iterL.js"></script>
-<script src="src/Parser/parser.js"></script>
-<script src="src/Parser/parse.js"></script>
+    <script src="src/Internal/Internal.js"></script>
+    <script src="src/Internal/lazy.js"></script>
+    <script src="src/Internal/prelude.js"></script>
 
-<script src="src/Check/Fixity.js"></script>
-<script src="src/Check/addToplevelNamespace.js"></script>
+    <script src="src/Parser/Lexeme.js"></script>
+    <script src="src/Parser/tokenize.js"></script>
+    <script src="src/Parser/preL.js"></script>
+    <script src="src/Parser/iterL.js"></script>
+    <script src="src/Parser/JSHCparser.js"></script>
+    <script src="src/Parser/JSHCparserExp.js"></script>
+    <script src="src/Parser/parse.js"></script>
+    <script src="src/Parser/parseExp.js"></script>
 
-<script src="src/Compile/comUtils.js"></script>
-<script src="src/Compile/compile.js"></script>
-<!--stuff for testing:-->
-<script src="test/tests.js"></script>
-<script src="test/testing.js"></script>
+    <script src="src/Check/nameCheck.js"></script>
+    <script src="src/Check/Fixity.js"></script>
+    <script src="src/Check/addToplevelNamespace.js"></script>
 
-<script>
+    <script src="src/Simplify/Simplify.js"></script>
 
-try{
+    <script src="src/Codegen/comUtils.js"></script>
+    <script src="src/Codegen/codegen.js"></script>
+    
+    <script src="src/Load/load.js"></script>
+    <script src="src/Load/Module.js"></script>
 
-var tst = new tests();
+    <script src="src/Check/Dep.js"></script>
 
+    <script src="src/Compile/compile.js"></script>
+    <script src="src/Compiler/Compiler.js"></script>
 
+    <script src="src/Ymacs/Ymacs.js"></script>
+    <script src="src/Ymacs/Interpreter.js"></script>
+    <script src="src/Ymacs/InterpreterBuffer.js"></script>
+    <script src="src/Ymacs/haskell-mode.js"></script>
+    <script src="src/Ymacs/interpreter-mode.js"></script>
+    <script src="src/Ymacs/auto-mode-command.js"></script>
 
-JSHC.testParse(tst.ite);
-
-
-}catch(err){
-  alert(JSHC.showError(err));
-}
-
-</script>
-        </body>
-        </html>
+    <div style="display: none">
+      <div id="browser-warning" style="padding: 1em; width: 20em;">
+        <b>Note that Ymacs is only tested with Firefox for now.</b><br /><br />
+        This is mentioned on the <a href="http://www.ymacs.org/"
+				    target="_blank">project page</a>,
+        but I just thought I'd say it again.
+      </div>
+    </div>
+    <script src="src/Ymacs/interface.js"></script>
+  </body>
+</html>
