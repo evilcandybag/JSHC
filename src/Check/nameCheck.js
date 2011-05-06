@@ -37,54 +37,57 @@ JSHC.Check.nameCheck = function(modules,module) {
     return check.errors;
 };
 
-JSHC.Check.prototype.lookupName = function(lspace, nameobj){
+JSHC.Check.prototype.lookupName = function(lspace, name){
     assert.ok( lspace !== undefined );
-    assert.ok( nameobj !== undefined );
+    assert.ok( name !== undefined );
     var i;
     var ns = {};  // namespace to put all referenced names into
     var loc = "";
 
-    // if name is qualified, must check the qualification.
-    var dotix = nameobj.id.lastIndexOf(".");
-    if( dotix !== -1 ){
-        // handle qualified name
-        name = nameobj.id.substr(dotix+1);
-        loc = nameobj.id.substr(0,dotix);
-    } else {
+    // check if in lspace
+    if( name.loc === undefined ){
         // handle unqualified name
-        name = nameobj.toString();
 
-        // check if in lspace
         if( lspace[name] !== undefined ) {
             return;  // local (always non-qualified) name
         }
-	
-        // check if in tspace
-        if( this.module.body.tspace[name] !== undefined ){
+    }	
+
+    // check if in tspace
+    if( name.loc === undefined || name.loc === this.module.modid.id ){
+        // handle unqualified name or qualified with the module it is within
+
+        var name_in_tspace = this.module.body.tspace[name];
+        if( name_in_tspace !== undefined ){
             // add top-level (currently non-qualified) name
             //ns[name] = {name: module.body.tspace[name], src: module.modid};
-	    ns[this.module.body.tspace[name]] = this.module.body.tspace[name];
+	    ns[name_in_tspace.toStringQ()] = name_in_tspace;
         }
     }
     
-    var impdecls = this.module.body.impdecls;
-    for(i=0;i<impdecls.length;i++){
-        var impdecl = impdecls[i];
-        var exports = this.modules[impdecl.modid].ast.espace;
+    // check impdecls
+    if( name.loc === undefined || name.loc !== this.module ){
+        // handle unqualified name or qualified with import module name
 
-        // if the name was qualified and the qualification does not match the
-        // import declaration, then skip it.
-        if( loc.length !== 0 && impdecl.modid !== loc ){
-            continue;
+        var impdecls = this.module.body.impdecls;
+        for(i=0;i<impdecls.length;i++){
+            var impdecl = impdecls[i];
+            var exports = this.modules[impdecl.modid].ast.espace;
+
+            // if the name was qualified and the qualification does not match the
+            // import declaration, then skip it.
+            if( name.loc !== undefined && impdecl.modid !== name.loc ){
+                continue;
+            }
+
+	    var inames = impdecl.imports;
+	    var exp = exports[name];
+
+	    // check if exported and imported accoring to the import list.
+            if( exp !== undefined && JSHC.Check.isImported(exp,impdecl,name) ){
+	        ns[exp] = exp;
+	    }
         }
-
-	var inames = impdecl.imports;
-	var exp = exports[name];
-
-	// check if exported and imported accoring to the import list.
-        if( exp !== undefined && JSHC.Check.isImported(exp,impdecl,name) ){
-	    ns[exp] = exp;
-	}
     }
 
     amount = JSHC.numberOfKeys(ns);
@@ -92,7 +95,7 @@ JSHC.Check.prototype.lookupName = function(lspace, nameobj){
 	// error: name not in scope
 	//make sure our internal functions pass the checks
 	var internal = "JSHC.Internal"
-	if( loc.length !== 0 && loc.substr(0,internal.length) === internal ){
+	if( name.loc !== undefined && name.loc.substr(0,internal.length) === internal ){
 	    return;
 	}
 //	JSHC.alert(lspace, nameobj, ns, this.module.body.tspace)
@@ -104,13 +107,12 @@ JSHC.Check.prototype.lookupName = function(lspace, nameobj){
 	this.errors.push(new JSHC.SourceError(this.module.modid,name.pos,name+" not in scope"));
     } else if( amount === 1 ){
         // declared in one location (topdecl or import)
-        if( loc.length === 0 ){
+        if( name.loc === undefined ){
 	    // not a qualified name, so qualify
 
             for (var temp in ns) {
-	        assert.ok( nameobj.loc === undefined );
 	        assert.ok( ns[temp].loc !== undefined );
-	        nameobj.loc = ns[temp].loc;
+	        name.loc = ns[temp].loc;
 	    }
 	}
     } else { // amount.length >= 2
