@@ -54,11 +54,12 @@ JSHC.Simplify.simplify["decl-fun"] = function(ast){
                         JSHC.Simplify.reduceWhere(ast.rhs) :
                             ast.rhs;
     
-    // TODO: should remove position information recursively from ast.lhs.args.
-    if(ast.lhs.args.length > 0) {
-        old_rhs = {name:"lambda", args: ast.lhs.args, rhs: old_rhs, pos: ast.pos};
+    // TODO: should remove position information recursively from ast.args.
+    JSHC.alert(ast);
+    if(ast.args.length > 0) {
+        old_rhs = {name:"lambda", args: ast.args, rhs: old_rhs, pos: ast.pos};
         ast.rhs = {name: "infixexp", exps: [old_rhs], pos: ast.pos};
-        ast.lhs.args = [];
+        ast.args = [];
     } else {
         ast.rhs = old_rhs;
     }
@@ -97,7 +98,7 @@ JSHC.Simplify.reduceExp = function (e) {
                     switch (exp.decls[i].name) {
                         case "decl-fun":
                             new_exp.members.push(exp.decls[i].rhs);
-                            new_pat.members.push(exp.decls[i].lhs.ident);
+                            new_pat.members.push(exp.decls[i].ident);
                             break;
                         default:
                             throw new Error("Simplify.reduceExp not defined for " + exp.decls[i].name);
@@ -123,7 +124,7 @@ JSHC.Simplify.reduceWhere = function (e) {
         switch (temp.name) {
             case "decl-fun":
                 new_exp.members.push(temp.rhs);
-                new_pat.members.push(temp.lhs.ident);
+                new_pat.members.push(temp.ident);
                 break;
             default:
                 throw new Error("Simplify.reduceExp not defined for " + exp.decls[i].name);
@@ -155,8 +156,8 @@ JSHC.Simplify.patSimplify = function (ast) {
           var newAlts = [];
           var newArgsT = [];
           //calculate the new argument list
-          for (var j = 0; j < funs[0].lhs.args.length; j++) {
-              var vrnm = new JSHC.VarName("a" + j, funs[0].lhs.pos, false);
+          for (var j = 0; j < funs[0].args.length; j++) {
+              var vrnm = new JSHC.VarName("a" + j, funs[0].pos, false);
               newArgs.push(vrnm);
               newArgsT.push({name: "application", exps: [vrnm]});
           }
@@ -165,14 +166,13 @@ JSHC.Simplify.patSimplify = function (ast) {
 //          alert("newargst:\n" + JSHC.showAST(newArgsT) + "\nnewargs:\n" + JSHC.showAST(newArgs))
           //calculate the alts for the case-expression
           for (var j = 0; j < funs.length; j++) {
-              var argsT = {name: "tuple_pat", members: funs[j].lhs.args}
+              var argsT = {name: "tuple_pat", members: funs[j].args}
               newAlts.push( {name: "alt", pat: argsT, exp: funs[j].rhs} );
           }
           
           //merge the different functions into one with a case-expression                  
           var newRhs = {name: "case", exp: newArgsT, alts: newAlts};
-          var newLhs = {name: "fun-lhs", ident: funs[0].lhs.ident, args: newArgs};
-          var res = {name: "decl-fun", lhs: newLhs, rhs: newRhs};
+          var res = {name: "decl-fun", ident: funs[0].ident, args: newArgs, rhs: newRhs};
           res = {name: "topdecl-decl", decl: res}
           
           //push the merged function into the new body
@@ -188,10 +188,10 @@ JSHC.Simplify.patSimplify = function (ast) {
         if (old[i].name === "topdecl-decl" && old[i].decl.name === "decl-fun") {
             var fun = old[i].decl;
 
-            if (toMerge[fun.lhs.ident.id] === undefined)
-                toMerge[fun.lhs.ident.id] = [];
+            if (toMerge[fun.ident.id] === undefined)
+                toMerge[fun.ident.id] = [];
                
-            toMerge[fun.lhs.ident.id].push(fun);   
+            toMerge[fun.ident.id].push(fun);
         } else {
             newbody.push(old[i]);
         }

@@ -155,8 +155,10 @@ JSHC.Compiler.prototype.recompile = function(){
 
 JSHC.Compiler.prototype.checkExp = function (exp){
     var res = JSHC.parseExp(exp);
-    fake_lhs = {name: "fun-lhs", ident: {name: "varname", id: "Interact+", isSymbol: false}, args: []};
-    res = {name: "decl-fun", lhs: fake_lhs, rhs: res};
+    res = {name: "decl-fun",
+           ident: {name: "varname", id: "Interact+", isSymbol: false},
+           args: [],
+           rhs: res};
     res = {name: "topdecl-decl", decl: res};
 
     var impdecls = [];

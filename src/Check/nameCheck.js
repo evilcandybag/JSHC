@@ -480,11 +480,11 @@ JSHC.Check.prototype.checkNames["decl-fun"] = function(ls,ast){
     ls = {};  // start with empty local namespace
 
     // add function name.
-    ls[ast.lhs.ident] = ast.lhs.ident;
+    ls[ast.ident] = ast.ident;
 
     // add parameter names.
     ps = {};  // namespace of the data constructors
-    var args = ast.lhs.args;
+    var args = ast.args;
     for(i=0;i<args.length;i++){
 	// check that no parameter names are the same.
 	if( ps[args[i]] !== undefined ){
