@@ -52,7 +52,7 @@ JSHC.Check.prototype.lookupName = function(lspace, nameobj){
         loc = nameobj.id.substr(0,dotix);
     } else {
         // handle unqualified name
-        name = nameobj.id;
+        name = nameobj.toString();
 
         // check if in lspace
         if( lspace[name] !== undefined ) {
