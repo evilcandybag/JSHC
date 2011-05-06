@@ -38,6 +38,9 @@ JSHC.TyCls = function(id,pos,loc){
     this.name = "tycls";
     if( loc !== undefined ){
         this.loc = loc;
+        if( id.substr(0,loc.length) == loc ){
+            id = id.substr(loc.length+1);
+        }
     }
     this.id = id;
     this.pos = pos;
@@ -80,6 +83,9 @@ JSHC.TyCon = function(id,pos,loc){
     this.name = "tycon";
     if( loc !== undefined ){
         this.loc = loc;
+        if( id.substr(0,loc.length) == loc ){
+            id = id.substr(loc.length+1);
+        }
     }
     this.id = id;
     this.pos = pos;
@@ -103,6 +109,9 @@ JSHC.DaCon = function(id,pos,isSymbol,loc){
     this.name = "dacon";
     if( loc !== undefined ){
         this.loc = loc;
+        if( id.substr(0,loc.length) == loc ){
+            id = id.substr(loc.length+1);
+        }
     }
     this.id = id;
     this.isSymbol = isSymbol;
@@ -113,7 +122,8 @@ JSHC.DaCon.prototype.toStringN = function(){
     return (this.isSymbol ? "("+this.id+")" : this.id);
 };
 JSHC.DaCon.prototype.toStringQ = function(){
-    return (this.loc===undefined ? "" : this.loc+".") + this.toStringN();
+    var qid = this.loc===undefined ? "" : this.loc+".";
+    return (this.isSymbol ? "("+qid+")" : qid);
 };
 JSHC.DaCon.prototype.toStringV = function(){
     return "data constructor " + this.toStringQ();
@@ -127,6 +137,9 @@ JSHC.VarName = function(id,pos,isSymbol,loc){
     this.name = "varname";
     if( loc !== undefined ){
         this.loc = loc;
+        if( id.substr(0,loc.length) == loc ){
+            id = id.substr(loc.length+1);
+        }
     }
     this.id = id;
     this.isSymbol = isSymbol;
@@ -137,7 +150,8 @@ JSHC.VarName.prototype.toStringN = function(){
     return (this.isSymbol ? "("+this.id+")" : this.id);
 };
 JSHC.VarName.prototype.toStringQ = function(){
-    return (this.loc===undefined ? "" : this.loc+".") + this.toStringN();
+    var qid = this.loc===undefined ? "" : this.loc+".";
+    return (this.isSymbol ? "("+qid+")" : qid);
 };
 JSHC.VarName.prototype.toStringV = function(){
     return "variable " + this.toStringQ();
