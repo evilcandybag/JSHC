@@ -44,15 +44,16 @@ JSHC.int32read = function(s){
 JSHC.Internal.match = function(exp, alts) {
 //    alert("match called with exp:\n\n" + JSHC.showAST(exp) + "\n\nand alts\n\n" + JSHC.showAST(alts))
     var binds = [];
-    
-    var match_ = function (exp, pat) {
+//    JSHC.alert("matching:", exp, "\nto:", alts);
+    var match_ = function (exp, pat) {    
+//    JSHC.alert("checking exp:", exp, "\nagainst pat:", pat);
         switch (pat.name) {
             case "varname":
                 binds.push(exp);
                 return true;
                 break;
             case "integer-lit":
-                return exp === pat;
+                return exp === pat.p;
                 break;
             case "dacon":
                 return (pat.p[0] === exp[0] && pat.p.length === exp.length);
@@ -87,12 +88,12 @@ JSHC.Internal.match = function(exp, alts) {
         var x = (exp instanceof JSHC.Thunk);
         if (x && match_(exp.v, alts[i].p)) {
             assert.ok(alts[i].f instanceof Function, "rhs of pattern is not a function!");
-//            alert("<br>matched something: " + alts[i].f);
-//            alert("<br>with binds: " + binds);
+//            alert("matched something: " + alts[i].f);
+//            alert("with binds: " + binds);
             return alts[i].f.apply(undefined,binds);
         } else if (match_(exp, alts[i].p)) {
-//            alert("<br>matched something: " + alts[i].f);
-//            alert("<br>with binds: " + binds);
+//            alert("matched something: " + alts[i].f);
+//            alert("with binds: " + binds);
             
             return alts[i].f.apply(undefined,binds);
         } else        
