@@ -40,7 +40,7 @@ JSHC.showError = function(err){
     // if the browser has a stack trace available and not already in the text
     // from toString(), then show it.
     if( err.stack !== undefined ){
-        const trace = printStackTrace({e : err});
+        var trace = printStackTrace({e : err});
         error_text = error_text + "trace:\n\n" + trace.join('\n\n');
     }
   }

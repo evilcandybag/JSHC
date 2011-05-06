@@ -29,7 +29,7 @@ JSHC.Ymacs.Interpreter = function(buf, modulePrefix){
 
 JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
     var command;
-    const commands = ["?", "help", "show-path",
+    var commands = ["?", "help", "show-path",
 		      "show-code"];
     line = line.trim();
     var words = line.split(/\s/);

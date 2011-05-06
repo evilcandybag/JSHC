@@ -61,7 +61,7 @@ JSHC.Load.syncLoadName = function(fileSystem, urls, prev){
 	throw new Error("invalid parameter");
     }
 
-    const fileName = modName.replace(/\./g, "/") + ".hs";
+    var fileName = modName.replace(/\./g, "/") + ".hs";
 
     // try to find the module name in the file system
     if( fileSystem[modName] !== undefined ){
@@ -74,7 +74,7 @@ JSHC.Load.syncLoadName = function(fileSystem, urls, prev){
 
     // iterate over the search path with URL prefixes.
     for(i=0;i<urls.length;i++){
-	const prefix = urls[i];
+	var prefix = urls[i];
 	var url = prefix + fileName;
 
 	var params = [];

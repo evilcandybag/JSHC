@@ -83,7 +83,7 @@ JSHC.Test.Tester.prototype.runTC = function(tc){
     if( this.results[tc.name] !== undefined ){
 	throw new Error("test names overlap");
     }
-    const result = tc.action();
+    var result = tc.action();
     assert.ok( result instanceof JSHC.Test.TestResult );
     this.results[tc.name] = result;
     if( result.ok ){ this.passed++; }else{ this.failed++; }
@@ -98,7 +98,7 @@ JSHC.Test.Tester.prototype.toString = function(tc){
     msg.push("tests failed:" + this.failed + "\n");
     msg.push("\n");
     for(rn in this.results){
-	const r = this.results[rn];
+	var r = this.results[rn];
 	assert.ok( r instanceof JSHC.Test.TestResult );
 	
 	// ignore passed tests
@@ -121,7 +121,7 @@ JSHC.Test.Tester.prototype.toHTML = function(tc){
     msg.push("tests failed:" + this.failed + "<br>");
     msg.push("</p><hr>");
     for(rn in this.results){
-	const r = this.results[rn];
+	var r = this.results[rn];
 	assert.ok( r instanceof JSHC.Test.TestResult );
 
 	// ignore passed tests

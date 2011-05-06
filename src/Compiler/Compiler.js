@@ -95,7 +95,7 @@ JSHC.Compiler.prototype.recompile = function(){
     // temporary code to avoid handling module cycles. assumes there is
     // only a single module in each entry below.
     for(k=0 ; k<entries.length ; k++){
-	const entry = entries[k];
+	var entry = entries[k];
 	// if there is a cycle, add an error.
 	if( entry.values.length > 1 ){
 	    var modnames = [];

@@ -50,7 +50,7 @@ JSHC.Load.Module.prototype.deps = function(handler){
     assert.ok( this.status === "success" );
 
     var is;
-    const impdecls = this.ast.body.impdecls;
+    var impdecls = this.ast.body.impdecls;
     if( handler instanceof Function ){
 	impdecls.forEach(function(impdecl){
 	    handler(impdecl.modid.id);
@@ -74,7 +74,7 @@ JSHC.Load.Module.done = function(name, contents, source, date){
 	m.source = source;
 	m.date = date;
     } else {
-	const obj = name;
+	var obj = name;
 	m.name = obj.name;
 	m.contents = obj.contents;
 	m.source = obj.source;
