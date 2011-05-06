@@ -18,7 +18,7 @@ JSHC.Thunk = function (exp) {
 JSHC.Thunk.prototype = {
     get v(){
         if (this._v instanceof Function)
-            this._v = this._v();
+            this.v = this._v();
         return this._v;
     },
     set v(val){
@@ -28,14 +28,13 @@ JSHC.Thunk.prototype = {
 
 
 
-function thunk_create(t){
+
+JSHC.TC = function (t) {
   if (t instanceof JSHC.Thunk)
     return t;
   else 
     return new JSHC.Thunk(t);
 }
-JSHC.TC = thunk_create
-
 /*
 // TODO: need to have a way to handle functions of arbitrary arity.
 function thunk_computation_a1(f){
