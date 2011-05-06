@@ -16,8 +16,12 @@ JSHC.Ymacs.Interpreter = function(buf, modulePrefix){
     var onWarning = function(warn){
         interpreter.addWarning(warn);
     };
-    this.compiler.onError = onError;
-    this.compiler.onWarning = onWarning;
+    var onMessage = function(msg){
+        interpreter.addMessage(msg);
+    };
+    this.compiler.addErrorHandler(onError);
+    this.compiler.addWarningHandler(onWarning);
+    this.compiler.addMessageHandler(onMessage);
 
     this.buf = buf;
     this.prompt = JSHC.Ymacs.Interpreter.prompt;
@@ -102,13 +106,8 @@ JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
         try {
             this.compiler.recompile();
         } catch (err) {
-                alert(JSHC.showError(err));
-                this.addError(err);
+            alert(JSHC.showError(err));
         }
-        this.compiler.errors.forEach(function(err){
-		this.addError(err);
-	    });
-
         break;
 
     case ":module":
@@ -252,19 +251,23 @@ JSHC.Ymacs.Interpreter.prototype.runCommand = function(opt_text){
     if( opt_text !== undefined ){
 	// run given command
 
-	output = this.execCommand(opt_text);
-
 	// find position where last line begins
-	var pos = this.buf.getCodeSize() - this.buf.caretMarker.getRowCol().col;
+	//var pos = this.buf.getCodeSize() - this.buf.caretMarker.getRowCol().col;
 
-	// make sure output ends with a newline
-	if( output[output.length-1] !== "\n" ){
-	    output += "\n";
-	}
+	this.execCommand(opt_text);
 
-	// insert output before last line
-	this.buf.__insertText(output, pos);
-
+        // need to insert prompt if missing
+        line = this.buf.code[this.buf.code.length-1];
+        if( line !== this.prompt ){
+            // this case occurs when output is written out AFTER an existing
+            // prompt.
+            this.buf.__insertText(this.prompt);
+        } else {
+            // make sure we are at the end of the buffer
+            // this case occurs when output is written out BEFORE an existing
+            // prompt.
+            this.buf.caretMarker.setPosition(this.buf.getCodeSize());
+        }
     } else {
 	// run command using last line
 
@@ -273,13 +276,11 @@ JSHC.Ymacs.Interpreter.prototype.runCommand = function(opt_text){
 	// store buffer text in history
 	this.history.push(line);
 
-	output = this.execCommand(line);
-
-	// insert new line + output
 	this.buf.__insertText("\n");
-	this.buf.__insertText(output);
-	    
-	// insert prompt
+
+	this.execCommand(line);
+
+	// insert new prompt
 	this.buf.__insertText(this.prompt);
 	    
 	// clear undo information
@@ -292,15 +293,37 @@ JSHC.Ymacs.Interpreter.prototype.runCommand = function(opt_text){
 
 JSHC.Ymacs.Interpreter.prototype.addError = function(msg){
     this.errors++;
-    this.msgs.push("Error: "+msg+"\n");
+    this.outputToBuffer("Error: "+msg);
 };
 
 JSHC.Ymacs.Interpreter.prototype.addWarning = function(msg){
-    this.msgs.push("Warning: "+msg+"\n");
+    this.outputToBuffer("Warning: "+msg);
 };
 
 JSHC.Ymacs.Interpreter.prototype.addMessage = function(msg){
-    this.msgs.push(msg+"\n");
+    this.outputToBuffer(msg);
+};
+
+JSHC.Ymacs.Interpreter.prototype.outputToBuffer = function(msg){
+    // make sure we are at the end of the buffer
+    this.buf.caretMarker.setPosition(this.buf.getCodeSize());
+
+    line = this.buf.code[this.buf.code.length-1];
+    if( line === this.prompt ){
+        // if empty prompt, insert before it.
+	var pos = this.buf.getCodeSize() - this.buf.caretMarker.getRowCol().col;
+	this.buf.caretMarker.setPosition(pos);
+    } else if( line.length !== 0 ) {
+        // if not at the beginning of a line, make a new line.
+	this.buf.__insertText("\n");
+    }
+    
+    // make sure output ends with a newline
+    if( msg[msg.length-1] !== "\n" ){
+        msg += "\n";
+    }
+
+    this.buf.__insertText(msg);
 };
 
 ////////////////////////////////////////////////////////////////////////////////

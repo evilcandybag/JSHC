@@ -14,22 +14,16 @@ JSHC.Compiler = function(modulePrefix){
     this.modulePrefix = modulePrefix;
     this.modules = {};   // mapping from module names to modules
 
-    this.warnings = [];
-    this.errors = [];
-    this.onError = function(err){
-        this.errors.push(err);
-    };
-    this.onWarning = function(warn){
-        this.warnings.push(warn);
-    };
-
     this.syncLoadNames = JSHC.Load.syncLoadNames;
     this.syncLoadName = JSHC.Load.syncLoadName;
 
     this.syncLoad = function(names){
-	return this.syncLoadNames(this.fileSystem, this.path, names, {});
+	return this.syncLoadNames(this.fileSystem, this.path, names, this.modules);
     };
 
+    this.errorHandlers = [];
+    this.warningHandlers = [];
+    this.messageHandlers = [];
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -49,6 +43,41 @@ JSHC.Compiler.prototype.getTargets = function(){
 
 ////////////////////////////////////////////////////////////////////////////////
 
+JSHC.Compiler.prototype.onError = function(err){
+    this.errors++;
+    for(var i=0 ; i<this.errorHandlers.length ; i++){
+        this.errorHandlers[i](err);
+    }
+};
+
+JSHC.Compiler.prototype.onWarning = function(warn){
+    this.warnings++;
+    for(var i=0 ; i<this.warningHandlers.length ; i++){
+        this.warningHandlers[i](warn);
+    }
+};
+
+JSHC.Compiler.prototype.onMessage = function(msg){
+    this.messages++;
+    for(var i=0 ; i<this.messageHandlers.length ; i++){
+        this.messageHandlers[i](msg);
+    }
+};
+
+JSHC.Compiler.prototype.addErrorHandler = function(onError){
+    this.errorHandlers.push(onError);
+};
+
+JSHC.Compiler.prototype.addWarningHandler = function(onWarning){
+    this.warningHandlers.push(onWarning);
+};
+
+JSHC.Compiler.prototype.addMessageHandler = function(onMessage){
+    this.messageHandlers.push(onMessage);
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
 JSHC.Compiler.prototype.recompile = function(){
     var mods;
     var entries = [];
@@ -59,12 +88,22 @@ JSHC.Compiler.prototype.recompile = function(){
     // load files
     mods = this.syncLoad(names);
 
-    // clear old errors
-    this.errors = [];
+    // start with empty set of checked modules
+    var prev_modules = modules;
+    this.modules = {};
+
+    this.errors = [];   // clear old errors
 
     for(k in mods){ // mods : map
 	mod = mods[k];
 	if( mod.status === "success" ){
+	
+	    // if already loaded, and nothing has changed, then keep the old
+	    // module.
+	    if( mod === prev_modules[k] ){
+                compiler.onMessage("not reloading "+mod.name);
+	        this.modules[k] === prev_modules[k];
+	    }
 
 	    // compute/check top-level namespace and add it to AST body.
 	JSHC.addToplevelNamespace.call(this, mod.ast);
@@ -86,66 +125,66 @@ JSHC.Compiler.prototype.recompile = function(){
     }
 
     if( this.errors.length > 0 ){
-	return; // end because of errors.
+        return;
     }
-
-    // condense the graph of modules.
-//    entries = JSHC.Dep.condense(entries);
-/*
-    // temporary code to avoid handling module cycles. assumes there is
-    // only a single module in each entry below.
-    for(k=0 ; k<entries.length ; k++){
-	var entry = entries[k];
-	// if there is a cycle, add an error.
-	if( entry.values.length > 1 ){
-	    var modnames = [];
-	    entry.values.forEach(function(mod){
-		    modnames.push(mod.name);
-		});
-	    this.onError("module cycle: "+modnames);
-	}
-    }
-*/  
-
-    // if there are any errors, then stop and return (errors,warnings) here.
-    // errors could be: module cycles, duplicate top-level declarations,
-    // etc..
-    // there is no need to stop earlier than this because of errors.
-    if( this.errors.length > 0 )return 0;
-
-    this.modules = {};  // start with empty set of checked modules
-    var modules = this.modules;
-    var onError = this.onError;
 
     //traverse the graph in dependency order, and for each module group:
+    var compiler = this;
     var module_group_action = function(group){
-        alert("checking group "+group.name);
-        var module = group.values[0];
+        //compiler.onMessage("checking group "+group);
 
-        //name check
-        errs = JSHC.Check.nameCheck(modules, module.ast);
-        for (var i = 0; i < errs.length; i++) {
-            alert(JSHC.showError(errs[i]))
-            onError(errs[i]);
+        // name check: qualify imported names
+        for (var i = 0; i < group.values.length; i++) {
+            var module = group.values[i];
+
+            compiler.onMessage("checking "+module.ast.modid);
+
+            // TODO: should use compiler state to access modules/onError/onWarning
+            errs = JSHC.Check.nameCheck(compiler.modules, module.ast);
+            for (var i = 0; i < errs.length; i++) {
+                //alert(JSHC.showError(errs[i]))
+                compiler.onError("name check: "+errs[i]);
+            }
         }
-        //if errors, return
 
-        //JSHC.Check.typeCheck(module.ast);
-        //if errors, return
+        // errors in the name check represents reasons for the fixity and type
+        // checking to not be done (would otherwise be warnings).
+        // e.g missing or ambiguous names can be warnings.
+        // e.g anything that causes there to not be an espace must be an error.
+        if( compiler.errors.length > 0 ){
+            return;
+        }
+        
+        // adding all modules in the group to the list of checked modules since
+        // the espaces are now valid and can be used by other modules within
+        // the same group.
+        for (var i = 0; i < group.values.length; i++) {
+            var m = group.values[i];
+            compiler.modules[m.name] = m;
+        }
+        
+        // TODO: fixity resolution should be here
 
-        modules[module.name] = module;
-    }
+        // TODO: can fixity produce errors?
+        //       e.g treat precedence problems as warnings
+        if( compiler.errors.length > 0 ){
+            return;
+        }
+
+        // type check: add types and kinds to top-level declarations
+        //JSHC.Check.typeCheck(compiler,group.values);
+    };
 
     JSHC.Dep.check(entries,module_group_action);
 
-    //alert(JSHC.showAST(this.modules));
+    // TODO: skip code generation if errors have occured ?
+    if( this.errors.length > 0 ){
+        return;
+    }
 
     // for each graph entry in arbitrary order, simplify and generate code.
     for(k in this.modules) {
-//        alert(JSHC.showAST(modules[k].ast.body))
         JSHC.Simplify.runSimplify(this.modules[k].ast);
-//        alert(JSHC.showAST(modules[k].ast.body))
-        
     	this.modules[k].jscode = JSHC.Codegen.codegen(this.modules[k].ast, this.modulePrefix);
     }
 
@@ -154,6 +193,9 @@ JSHC.Compiler.prototype.recompile = function(){
 };
 
 JSHC.Compiler.prototype.checkExp = function (exp){
+
+    this.errors = [];   // clear old errors
+
     var res = JSHC.parseExp(exp);
     res = {name: "decl-fun",
            ident: {name: "varname", id: "Interact+", isSymbol: false},
