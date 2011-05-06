@@ -72,9 +72,9 @@ Ymacs_Buffer.newCommands({
 			return ymacs.getActiveBuffer();
 		    });
 
-		const PROMPT = JSHC.Ymacs.Interpreter.prompt;
+		var PROMPT = JSHC.Ymacs.Interpreter.prompt;
 
-		const line = buf.code[buf.code.length-1].substr(PROMPT.length);
+		var line = buf.code[buf.code.length-1].substr(PROMPT.length);
 		var result = buf.interpreter.autoComplete(line);
 		if( result.line !== undefined ){
 		    buf._replaceLine(buf.code.length-1, PROMPT + result.line);

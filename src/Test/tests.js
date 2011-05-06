@@ -28,7 +28,7 @@ JSHC.Test.Tests.parsable = function(){
     for(l in ls){
 	var strings = ls[l];
 	strings.forEach(function(input){
-	    const tc = new JSHC.Test.TestCase("parsable"+(number++),action);
+	    var tc = new JSHC.Test.TestCase("parsable"+(number++),action);
 	    tc.input = input;
 	    ts[tc.name] = tc;
 	});
@@ -63,7 +63,7 @@ JSHC.Test.Tests.codegen = function() {
     for(l in ls){
 	var strings = ls[l];
 	strings.forEach(function(input){
-	    const tc = new JSHC.Test.TestCase("codegen"+(number++),action);
+	    var tc = new JSHC.Test.TestCase("codegen"+(number++),action);
 	    tc.input = input;
 	    ts[tc.name] = tc;
 	});
@@ -83,14 +83,14 @@ JSHC.Test.Tests.simple = function(){
 	"f f = f"];
 
     var okModuleString = function(){
-	const r = JSHC.compileModules(JSHC.Load.loadString(this.input))
+	var r = JSHC.compileModules(JSHC.Load.loadString(this.input))
 	return this.result(r.errors.length === 0 && r.warnings.length === 0,r);
     };
 
     var tests = {};
 
     strings.forEach(function(input,i){
-	const test = new JSHC.Test.TestCase("t"+i, okModuleString);
+	var test = new JSHC.Test.TestCase("t"+i, okModuleString);
 	test.input = input;
 	tests[test.name] = test;
     });

@@ -25,23 +25,23 @@ JSHC.addToplevelNamespace = function(module){
     // must check that for each fixity declaration, the name exists in the
     // tspace in the AST body.
 
-    const ts = module.body.topdecls;
+    var ts = module.body.topdecls;
     for(i=0;i<ts.length;i++){
         if( ts[i].name === "topdecl-decl" ){
             // qualify name and add to tspace
-            const varname = ts[i].decl.lhs.ident;
+            var varname = ts[i].decl.lhs.ident;
             assert.ok( varname.loc === undefined );
             varname.loc = module.modid.id;
             ns[varname.toString(false)] = varname;
         } else if( ts[i].name === "topdecl-data" ){
             // add type constructor
-            const tycon = ts[i].typ.tycon;
+            var tycon = ts[i].typ.tycon;
             assert.ok( tycon.loc === undefined );
             tycon.loc = module.modid.id;
             ns[tycon.toString(false)] = tycon;
             // add all data constructors
             for(j=0;j<ts[i].constrs.length;j++){
-                const dacon = ts[i].constrs[j].dacon;  
+                var dacon = ts[i].constrs[j].dacon;
                 assert.ok( dacon.loc === undefined );
                 dacon.loc = module.modid.id;
                 dacon.memberOf = tycon;

@@ -67,10 +67,10 @@ JSHC.Check.prototype.lookupName = function(lspace, nameobj){
         }
     }
     
-    const impdecls = this.module.body.impdecls;
+    var impdecls = this.module.body.impdecls;
     for(i=0;i<impdecls.length;i++){
-        const impdecl = impdecls[i];
-        const exports = this.modules[impdecl.modid].ast.espace;
+        var impdecl = impdecls[i];
+        var exports = this.modules[impdecl.modid].ast.espace;
 
         // if the name was qualified and the qualification does not match the
         // import declaration, then skip it.
@@ -78,8 +78,8 @@ JSHC.Check.prototype.lookupName = function(lspace, nameobj){
             continue;
         }
 
-        const inames = impdecl.imports;
-	const exp = exports[name];
+	var inames = impdecl.imports;
+	var exp = exports[name];
 
 	// check if exported and imported accoring to the import list.
         if( exp !== undefined && JSHC.Check.isImported(exp,impdecl,name) ){
@@ -159,7 +159,7 @@ JSHC.Check.isInImportList = function(exp,inames,name){
 	    }
 
 	    // check if importing one if the data constructors.
-	    const dacons = inames[j].list;
+	    var dacons = inames[j].list;
 	    if( dacons === undefined ){
 		if( inames[j].all ){
 		    // all data constructors imported
@@ -356,7 +356,7 @@ JSHC.Check.prototype.checkNames["export"] = function(ls,ast){
 JSHC.Check.lookupDatatype = function(module,tycon){
     var i;
 //    alert("LOOKING FOR TYCON:\n" + JSHC.showAST(tycon));
-    const ts = module.body.topdecls;
+    var ts = module.body.topdecls;
     for(i=0;i<ts.length;i++){
 	if( ts[i].name !== "topdecl-data" || !ts[i].typ.tycon.equal(tycon) ){
 	    continue;
@@ -397,7 +397,7 @@ JSHC.Check.prototype.checkNames["body"] = function(ls,ast){
 JSHC.Check.prototype.checkNames["impdecl"] = function(ls,imp){
     var j,k,l;
 
-    const exports = this.modules[imp.modid];
+    var exports = this.modules[imp.modid];
     if( exports === undefined ){
 	// this should be impossible if compilation stops when parsing of any
 	// module fails.
@@ -409,7 +409,7 @@ JSHC.Check.prototype.checkNames["impdecl"] = function(ls,imp){
     if (imp.imports === undefined)
         return;
             
-    const inames = imp.imports;
+    var inames = imp.imports;
     for(j=0;j<inames.length;j++){
 	if( inames[j].name === "import-var" ){
 	    if( exports.containsVar(inames[j].varid.id) === false ){
@@ -419,8 +419,8 @@ JSHC.Check.prototype.checkNames["impdecl"] = function(ls,imp){
 	    if( exports.containsTycon(inames[j].tycon.id) === false ){
 		this.errors.push(new SourceError(module.modid.id, inames[j].varid.pos, "type constructor not exported by module " + imp.modid.id));
 	    } else {
-		const datatype = exports.lookupTycon(inames[j].tycon.id);
-		const dacons = inames[j].list;
+		var datatype = exports.lookupTycon(inames[j].tycon.id);
+		var dacons = inames[j].list;
 		if( dacons !== undefined ){
 		    for(k=0;k<dacons.length;k++){
 			// check if exported datatype contains the data constructor
@@ -450,7 +450,7 @@ JSHC.Check.prototype.checkNames["topdecl-data"] = function(ls,ast){
     }
 
     ds = {};  // namespace of the data constructors
-    const constrs = ast.constrs;
+    var constrs = ast.constrs;
     for(i=0;i<constrs.length;i++){
 	// check that data constructor name is not already used.
 	if( ds[constrs[i].dacon.toStringN()] !== undefined ){
@@ -468,7 +468,7 @@ JSHC.Check.prototype.checkNames["topdecl-decl"] = function(ls,ast){
 JSHC.Check.prototype.checkNames["constr"] = function(ls,ast){
     var i;
 
-    const types = ast.types;
+    var types = ast.types;
     for(i=0;i<types.length;i++){
 	this.lookupName(ls,types[i]);
     }
@@ -484,7 +484,7 @@ JSHC.Check.prototype.checkNames["decl-fun"] = function(ls,ast){
 
     // add parameter names.
     ps = {};  // namespace of the data constructors
-    const args = ast.lhs.args;
+    var args = ast.lhs.args;
     for(i=0;i<args.length;i++){
 	// check that no parameter names are the same.
 	if( ps[args[i]] !== undefined ){
@@ -515,7 +515,7 @@ JSHC.Check.prototype.checkNames["integer-lit"] = function(ls,ast){
 };
 
 JSHC.Check.prototype.checkNames["application"] = function(ls,ast){
-    const exps = ast.exps;
+    var exps = ast.exps;
     for(var i=0 ; i<exps.length ; i++){
         switch (exps[i].name) {
         case "varname": case "dacon": case "integer-lit": case "application":

@@ -67,7 +67,7 @@ JSHC.Ymacs.switchToInterpreter = function(cbuf){
 // create new interpreter
 JSHC.Ymacs.makeNewInterpreterBuffer = function(ymacs){
 
-    const PROMPT = JSHC.Ymacs.Interpreter.prompt;
+    var PROMPT = JSHC.Ymacs.Interpreter.prompt;
 
     // create a standard buffer. it is modified below.
     var buf = ymacs.createBuffer({ name: "jshc-interpreter" });
@@ -79,12 +79,12 @@ JSHC.Ymacs.makeNewInterpreterBuffer = function(ymacs){
     buf.cmd("insert", "JSHC interpreter\n"+PROMPT);
 
     // only allow deletion of selections on the last line
-    const old_delete = buf.deleteTransientRegion;
+    var old_delete = buf.deleteTransientRegion;
     buf.deleteTransientRegion = function(){
 	if( ! this.transientMarker )return;
 
-	const cm = this.caretMarker.getRowCol();
-	const tm = this.transientMarker.getRowCol();
+	var cm = this.caretMarker.getRowCol();
+	var tm = this.transientMarker.getRowCol();
 	if( this.code.length-1 === cm.row &&
 	    this.code.length-1 === tm.row ){
 	    if( cm.col < PROMPT.length ) {
@@ -100,9 +100,9 @@ JSHC.Ymacs.makeNewInterpreterBuffer = function(ymacs){
     }
 
     // only allow deletion of text if deleting at the last line after the prompt
-    const old_deleteText = buf._deleteText;
+    var old_deleteText = buf._deleteText;
     buf._deleteText = function(text,pos){
-	const cm = this.caretMarker.getRowCol();
+	var cm = this.caretMarker.getRowCol();
 	if( cm.row === this.code.length-1 &&
 	    cm.col > PROMPT.length ){
 	    old_deleteText.call(this,text,pos);

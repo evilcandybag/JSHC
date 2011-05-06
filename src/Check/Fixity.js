@@ -44,7 +44,7 @@ JSHC.Fixity.resolve = function(info,exps) {
     
     resolve_parseNeg = function(prec, fix){
 	assert.ok( exps.length > 0 );
-	const e0 = exps[0];
+	var e0 = exps[0];
 //	alert("resolve parseNeg of: " + JSHC.showAST(e0));
 	if( e0.name === "-" ){
 	    if( prec >= 6 ){
@@ -67,7 +67,7 @@ JSHC.Fixity.resolve = function(info,exps) {
 	    return exp1;
 	}
 	
-	const exp2 = exps[0];
+	var exp2 = exps[0];
 	if( exp2.name === "qop" ){
 	    var exp2_fixity = JSHC.Fixity.fixityLookup(info,exp2);
 	    prec2 = exp2_fixity.prec;
