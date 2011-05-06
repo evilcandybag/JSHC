@@ -81,10 +81,8 @@ JSHC.Fixity.resolve = function(info,exps) {
 //	    alert("resolve_parseNeg:\n\n" + "prec2: " + JSHC.showAST(prec2) + "\n\nfix2: " + JSHC.showAST(fix2));
 	        exps.shift();		
 		var rexp = resolve_parseNeg(prec2, fix2);
-//		alert("right expr is: " + JSHC.showAST(rexp))
 		//rexp = {name:"infix-app", lhs:exp1, op:exp2, rhs:rexp, pos:exp2.pos};
-		var opwrap = new JSHC.VarName(exp2.id.id,exp2.pos,true,(exp2.loc !== undefined)? exp2.loc : undefined);
-		rexp = {name:"application", exps:[opwrap,exp1,rexp], pos:exp2.pos, orig:"infix"};
+		rexp = {name:"application", exps:[exp2.id,exp1,rexp], pos:exp2.pos, orig:"infix"};
 //		alert("FIXED INFIXEXP: \n\n" + JSHC.showAST(rexp));
 		return resolve_parse(prec1, fix1, rexp);
 	    }
