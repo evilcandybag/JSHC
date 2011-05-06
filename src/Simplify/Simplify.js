@@ -55,7 +55,6 @@ JSHC.Simplify.simplify["decl-fun"] = function(ast){
                             ast.rhs;
     
     // TODO: should remove position information recursively from ast.args.
-    JSHC.alert(ast);
     if(ast.args.length > 0) {
         old_rhs = {name:"lambda", args: ast.args, rhs: old_rhs, pos: ast.pos};
         ast.rhs = {name: "infixexp", exps: [old_rhs], pos: ast.pos};
