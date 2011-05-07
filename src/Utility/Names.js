@@ -32,6 +32,22 @@ JSHC.ModName.prototype.toStringV = function(){
 };
 JSHC.ModName.prototype.toString = JSHC.ModName.prototype.toStringN;
 
+JSHC.ModName.prefixes = function(id){
+    var prefixes = [];
+
+    var startix = 0;
+    while(true){
+        var endix = id.indexOf(".", startix);
+        if( endix === -1 ){
+            prefixes.push(id);
+            break;
+        }
+        prefixes.push(id.substr(startix,endix));
+        startix = endix + 1;
+    }
+    return prefixes;
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 
 JSHC.TyCls = function(id,pos,loc){
@@ -122,7 +138,7 @@ JSHC.DaCon.prototype.toStringN = function(){
     return (this.isSymbol ? "("+this.id+")" : this.id);
 };
 JSHC.DaCon.prototype.toStringQ = function(){
-    var qid = this.loc===undefined ? "" : this.loc+".";
+    var qid = this.loc===undefined ? this.id : this.loc+"."+this.id;
     return (this.isSymbol ? "("+qid+")" : qid);
 };
 JSHC.DaCon.prototype.toStringV = function(){
@@ -150,7 +166,7 @@ JSHC.VarName.prototype.toStringN = function(){
     return (this.isSymbol ? "("+this.id+")" : this.id);
 };
 JSHC.VarName.prototype.toStringQ = function(){
-    var qid = this.loc===undefined ? "" : this.loc+".";
+    var qid = this.loc===undefined ? this.id : this.loc+"."+this.id;
     return (this.isSymbol ? "("+qid+")" : qid);
 };
 JSHC.VarName.prototype.toStringV = function(){

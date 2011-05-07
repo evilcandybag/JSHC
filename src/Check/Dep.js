@@ -8,16 +8,39 @@ if( JSHC.Dep === undefined ){
 /*
   Takes a list of entries and an action to perform for each dependency group.
 */
-JSHC.Dep.check = function(entrylist, action){
+JSHC.Dep.check = function(entries, action){
     var entrymap = {};
 
-    entrylist.forEach(function(entry){
+    var known_names = {};
+
+    if( entries instanceof Array ){
+        entries.forEach(function(entry){
+            //JSHC.alert("entry("+entry.values.length+"): ",entry);
 	    for(var name in entry.names){
 		entrymap[name] = entry;
+		for(var i=0 ; i<entry.names ; i++){
+		    assert.ok( known_names[entry.names[i]] === undefined );
+		    known_names[entry.names[i]] = null;
+		}
 	    }
 	});
+    } else {
+        for(var entry in entries){
+            entrymap[entry] = entries[entry];
+	    for(var i=0 ; i<entry.names ; i++){
+		assert.ok( known_names[entry.names[i]] === undefined );
+		known_names[entry.names[i]] = null;
+	    }
+        }
+    }
 
-    entrylist = JSHC.Dep.condense(entrymap);
+    var entrylist = JSHC.Dep.condense(entrymap);
+
+    //JSHC.alert("CONDENSE DONE");
+
+    //entrylist.forEach(function(entry){
+    //    JSHC.alert("entry("+entry.values.length+"): ",entry);
+    //});
 
     JSHC.Dep.removeSelfDeps(entrymap);
 
@@ -62,7 +85,18 @@ JSHC.Dep.transpose = function(entries){
 	if( entry.deps !== undefined ){
 	    continue;
 	}
-	entry.deps = JSHC.numberOfKeys(entry.ins);
+	
+	// compute number of dependencies
+	var deps = 0;
+	var depmap = {};
+	for(var i in entry.ins){
+	    var depname = entries[i].name;
+	    if( depmap[depname] === undefined ){
+	        depmap[depname] = null;
+	        deps++;
+	    }
+	}
+	entry.deps = deps;
 
 	// create outgoing edges for all incoming edges
 	for(var inEdge in entry.ins){
@@ -90,6 +124,7 @@ JSHC.Dep.Traverse = function(entrymap, entrylist){
     for(var i=0 ; i<entrylist.length ; i++){
 	var key = entrylist[i].name;
 	if( entrylist[i].deps === 0 ){
+	    delete entrylist[i].deps;
 	    this.ready[key] = entrylist[i];
 	} else {
 	    this.waiting[key] = entrylist[i];
@@ -107,7 +142,12 @@ JSHC.Dep.Traverse.prototype.takeOne = function(){
     for(k in this.ready){ // ready : map
 	break;
     }
-    if( k === undefined )return undefined;
+    if( k === undefined ){
+        if( !this.isDone() ){
+            JSHC.alert("remaining: ",this.remaining(),"entries waiting for nothing: ",this.waiting);
+        }
+        return undefined;
+    }
 
     var entry = this.ready[k];
     delete this.ready[k];
@@ -152,10 +192,10 @@ JSHC.Dep.Traverse.prototype.done = function(entry){
 */
 JSHC.Dep.Traverse.prototype.remaining = function(){
     var remaining = 0;
-    for(var k in ready){
+    for(var k in this.ready){
 	remaining++;
     }
-    for(var k in waiting){
+    for(var k in this.waiting){
 	remaining++;
     }
     return remaining;
@@ -190,23 +230,27 @@ JSHC.Dep.Traverse.prototype.isDone = function(){
     ins: entries that the entry is referring to
 */
 JSHC.Dep.Entry = function(values,names,edges){
-    assert.ok( values instanceof Array, "values is "+values );
+    assert.ok( values instanceof Array, "values are "+values );
 
     // initialize "values"
     this.values = values;
 
     // initialize "names"
-    this.name = names[0];
     this.names = {};
-    if( edges instanceof Array ){
+    if( names instanceof Array ){
+        this.name = names[0];
         for(var k=0 ; k<names.length ; k++){
 	    this.names[names[k]] = null;
         }
     } else {
         for(var k in names){
+            if( this.name === undefined ){
+                this.name = names[k];
+            }
 	    this.names[names[k]] = null;
         }
     }
+    assert.ok( this.name !== undefined );
 
     // initialize "ins"
     this.ins = {};
@@ -237,6 +281,10 @@ JSHC.Dep.Entry.prototype.addIncoming = function(edge){
 JSHC.Dep.Entry.prototype.addName = function(name){
     this.names[name] = null;   // add name
     delete this.ins[name];
+};
+
+JSHC.Dep.Entry.prototype.addValue = function(value){
+    this.values.push(value);
 };
 
 JSHC.Dep.Entry.prototype.toString = function(){
@@ -271,6 +319,8 @@ JSHC.Dep.condense = function(old_entries){
     var condense = function(ce) {
 	assert.ok( ce instanceof JSHC.Dep.Entry );
 
+        //JSHC.alert("name: "+ce.name,"\nnames: "+ce.names,"\ndeps: ",ce.ins);
+
 	var merged_entry;
 
 	// compute index of ce in eop
@@ -287,10 +337,11 @@ JSHC.Dep.condense = function(old_entries){
 	// cycle, and then the loop continues to add the rest of the edges to
 	// the merged entry.
 	for(var depname in ce.ins){
-	    dep = old_entries[depname];
+	    var dep = old_entries[depname];
 	    assert.ok( dep !== undefined, "missing dependency of an entry: "+depname);
 
-	    //JSHC.alert("depname: ",depname,"\nentry: ",dep,"\nnames: ",ce.names,"\ndeps: ",ce.ins);
+            //JSHC.alert("depname: ",depname,"\nnames: ",ce.names,"\ndeps: ",ce.ins);
+	    //JSHC.alert("depname: ",depname,"\nnames: ",ce.names,"\ndeps: ",ce.ins,"\nentry: ",dep);
 
 	    // skips edge if it is to itself, or if already checked.
 	    if( dep === ce || dep.status !== undefined ){
@@ -299,8 +350,15 @@ JSHC.Dep.condense = function(old_entries){
 	    }
 	    
 	    // dependency is some other unchecked entry, so check it.
+	    //JSHC.alert("recursive call. entry. stack("+eop.length+"): ",eop);
 	    merged_entry = condense(dep);
+	    //JSHC.alert("recursive call. exit. stack("+eop.length+"): ",eop);
 	    assert.ok( dep.status !== undefined );
+	    
+	    //JSHC.alert("group "+dep+" checked",
+	    //           "\ndep.status is "+dep.status,
+	    //           "\nmerged_entry: ",merged_entry+"",
+	    //           "\nnow in: ",ce+"");
 
             // check if 'dep' connected with 'ce'.
 
@@ -310,20 +368,22 @@ JSHC.Dep.condense = function(old_entries){
 		continue;
 	    }
 
+            assert.ok( merged_entry.status == "merged" );
+
             // check for beginning of cycle
 	    if( merged_entry === ce ){
-		assert.ok( dep.status === "removed" );
+		assert.ok( dep.status == "removed", "status is "+dep.status );
 		// found beginning of cycle.
 		// stop merging by returning null.
 		eop.pop();
 		return null;
 	    } else {
 		// merge 'ce' into 'merged_entry'.
-                assert.ok( ce.status === undefined || ce.status === "merged" );
+                assert.ok( ce.status === undefined );
 
                 // add all values
 		for(var ix=0 ; ix<ce.values.length ; ix++){
-		    merged_entry.values.push(ce.values[ix]);
+		    merged_entry.addValue(ce.values[ix]);
                 }
 
 		// add all edges

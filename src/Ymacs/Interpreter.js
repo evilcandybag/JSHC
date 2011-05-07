@@ -171,10 +171,10 @@ JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
 	var expression = line.substr(words[0].length+1);
 	var decl = this.compiler.checkExp(expression);
 	if( this.errors === 0 ){
-            if( decl.type === undefined ){
+            if( decl.ident.type === undefined ){
                 this.addError("type is missing");
             } else {
-                this.addError(decl);
+                this.addMessage(decl.ident.type);
             }
         }
 	break;

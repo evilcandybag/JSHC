@@ -1,82 +1,88 @@
+
+if( JSHC.Check === undefined)JSHC.Check = {};
+
 ////////////////////////////////////////////////////////////////////////////////
 // NAME CHECK
 
 /*
 produces errors for missing idents.
-
 keeps track of identifiers in scope.
-  must clone the namespace when introducing new variables that might shadow
-  existing identifiers.
-  can not just replace when shadowing, as the previous variable will disappear
-  if one just removes the new one, so the old can never be used later on.
-
-qualify all top-level names and usage of names in expressions.
-only local names are not qualified.
+qualifies all top-level names that are used. local names are not qualified.
 */
 
 ////////////////////////////////////////////////////////////////////////////////
 
-/*
-  makes a mapping from module name to module AST that contains all the already
-  checked modules.
-*/
-JSHC.Check = function(modules, module_ast){
-  this.modules = modules;
-  this.module = module_ast;
-  this.errors = [];  // list of errors found
-};
-
-JSHC.Check.nameCheck = function(modules,module) {
-    var check;
-
-    // create instance of Check
-    check = new JSHC.Check(modules,module);
+JSHC.Check.nameCheck = function(comp,module) {
 
     // call checkNames on module. handles all parts of AST recursively.
-    check.checkNames({},module);
-    return check.errors;
+    JSHC.Check.nameCheckModule(comp,module);
 };
 
-JSHC.Check.prototype.lookupName = function(lspace, name){
+////////////////////////////////////////////////////////////////////////////////
+
+/*
+  Checks the possible names that the given name can refer to.
+  if there is exactly one match, the name is qualified using the found name,
+  and the found name is returned.
+  
+  comp: the compiler
+  module: the current module
+  lspace: either the lspace or null
+  name: the name to look up
+*/
+JSHC.Check.lookupName = function(comp,module,lspace,name){
+    assert.ok( comp !== undefined );
+    assert.ok( module !== undefined );
     assert.ok( lspace !== undefined );
     assert.ok( name !== undefined );
     var i;
-    var ns = {};  // namespace to put all referenced names into
+    var nspace = new JSHC.Set(true,"toStringQ");  // namespace to put all referenced names into
     var loc = "";
 
     // check if in lspace
     if( name.loc === undefined ){
         // handle unqualified name
 
-        if( lspace[name] !== undefined ) {
-            return;  // local (always non-qualified) name
+        // if an lspace exists, then search it.
+        if( lspace !== null ){
+            var lname = lspace.lookup(name);
+            assert.ok( lname !== null, "the lspace is not storing the value for name "+name );
+            if( lname !== undefined ) {
+                //JSHC.alert("found ",name," as ",lspace.lookup(name));
+                nspace.add(lname);
+            }
         }
-    }	
+    }
 
     // check if in tspace
-    if( name.loc === undefined || name.loc === this.module.modid.id ){
+    if( name.loc === undefined || name.loc === module.modid.id ){
         // handle unqualified name or qualified with the module it is within
 
-        var name_in_tspace = this.module.body.tspace[name];
+        var name_in_tspace = module.body.tspace[name];
         if( name_in_tspace !== undefined ){
             // add top-level (currently non-qualified) name
             //ns[name] = {name: module.body.tspace[name], src: module.modid};
-	    ns[name_in_tspace.toStringQ()] = name_in_tspace;
+	    nspace.add(name_in_tspace);
         }
     }
-    
+
     // check impdecls
-    if( name.loc === undefined || name.loc !== this.module ){
+    if( name.loc === undefined || name.loc !== module ){
         // handle unqualified name or qualified with import module name
 
-        var impdecls = this.module.body.impdecls;
+        var impdecls = module.body.impdecls;
         for(i=0;i<impdecls.length;i++){
             var impdecl = impdecls[i];
-            var exports = this.modules[impdecl.modid].ast.espace;
+            var exports = comp.modules[impdecl.modid].ast.espace;
+
+            //if( module.modid.id == "interact+" ){
+            //    JSHC.alert("impdecl: ",impdecl.modid.id,"\nexports: ",JSHC.showKeys(exports));
+            //    JSHC.alert("found?: ",exports[name]);
+            //}
 
             // if the name was qualified and the qualification does not match the
             // import declaration, then skip it.
-            if( name.loc !== undefined && impdecl.modid !== name.loc ){
+            if( name.loc !== undefined && impdecl.modid.id !== name.loc ){
                 continue;
             }
 
@@ -85,35 +91,39 @@ JSHC.Check.prototype.lookupName = function(lspace, name){
 
 	    // check if exported and imported accoring to the import list.
             if( exp !== undefined && JSHC.Check.isImported(exp,impdecl,name) ){
-	        ns[exp] = exp;
+	        nspace.add(exp);
 	    }
         }
     }
 
-    amount = JSHC.numberOfKeys(ns);
+    amount = nspace.size();
     if( amount === 0 ){
 	// error: name not in scope
 	//make sure our internal functions pass the checks
 	var internal = "JSHC.Internal"
 	if( name.loc !== undefined && name.loc.substr(0,internal.length) === internal ){
-	    return;
+	    return undefined;
 	}
-//	JSHC.alert(lspace, nameobj, ns, this.module.body.tspace)
+//	JSHC.alert(lspace, nameobj, nspace, module.body.tspace)
 //	alert("LSPACE:\n\n"+JSHC.showAST(lspace))
-//	alert("nameobj:\n\n"+JSHC.showAST(nameobj))
-//	alert("ns:\n\n"+JSHC.showAST(ns))
-//	alert("tspace:\n\n"+JSHC.showAST(this.module.body.tspace))
+//	alert("name:\n\n"+JSHC.showAST(name))
+//	alert("nspace:\n\n"+JSHC.showAST(nspace))
+//	alert("tspace:\n\n"+JSHC.showAST(module.body.tspace))
 //	alert("LSPACE:\n\n"JSHC.showAST(lspace))
-	this.errors.push(new JSHC.SourceError(this.module.modid,name.pos,name+" not in scope"));
+        comp.onError(new JSHC.SourceError(module.modid,name.pos,name+" not in scope"));
+        JSHC.alert("failed to find: "+name);
     } else if( amount === 1 ){
         // declared in one location (topdecl or import)
-        if( name.loc === undefined ){
-	    // not a qualified name, so qualify
+        var matched_name = nspace.getAny();
+        if( matched_name.loc !== undefined ){
 
-            for (var temp in ns) {
-	        assert.ok( ns[temp].loc !== undefined );
-	        name.loc = ns[temp].loc;
+	    // if name is not qualified and referring to a qualified name,
+	    // then qualify it so that it has the same qualification.
+            if( name.loc === undefined ){
+	        name.loc = matched_name.loc;
 	    }
+
+	    return matched_name; // always return the found name when qualified
 	}
     } else { // amount.length >= 2
 	// error: ambiguity since more than one declaration in scope
@@ -125,12 +135,13 @@ JSHC.Check.prototype.lookupName = function(lspace, name){
 	}
 	msg.pop(); // remove last ", "
 
-	this.errors.push(new JSHC.SourceError(this.module.modid,nameobj.pos,msg.join("")));
+	comp.onE(new JSHC.SourceError(module.modid,nameobj.pos,msg.join("")));
     }
+    return undefined;
 };
-    
+
 ////////////////////////////////////////////////////////////////////////////////
-    
+
 JSHC.Check.isImported = function(exp,impdecl,name){
     if( impdecl.imports === undefined ){   // importing everything
 	return true;
@@ -188,176 +199,85 @@ JSHC.Check.isInImportList = function(exp,inames,name){
 
 ////////////////////////////////////////////////////////////////////////////////
 
-/*
-need a function that given a module, a local namespace, and a name to look up,
-will look it up in the local namespace, the top-level namespace (stored in the
-body) and by looking at the import declarations.
-
-if the name occurs in more than one location, then then it ambiguous and an
-error must be thrown, otherwise, it should return the complete name, which
-would be the qualified name for imported names and top-level declarations, and
-just the name itself for local names.
-N:all modules have an import "import Prelude" unless explicitly importing
-  from the Prelude.
-
-this function can be used to check every use of a name in any expression.
-*/
-
-////////////////////////////////////////////////////////////////////////////////
-
-JSHC.Check.prototype.checkNames = function(ls,ast){
-    assert.ok( ast !== undefined, "ast must not be undefined" );
-    assert.ok( ast.name !== undefined, "param 'ast' must be an AST");
-    var f = this.checkNames[ast.name];
-    if( f === undefined ){
-	throw new Error("no definition for "+ast.name);
-    }
-    assert.ok( f instanceof Function, ast.name+" <: Function." )
-    f.call(this,ls,ast);
-};
-
-JSHC.Check.prototype.checkNames["module"] = function(ls,ast){
+JSHC.Check.nameCheckModule = function(comp,ast){
     var i;
 
-    assert.ok( this.module === ast );
-
-    this.checkNames({}, ast.body);
-
-    // check exports
-    ast.espace = {};  // new empty namespace for all exports
-
     // no export specification, so export all top-level declarations
-    if( ast.exports === undefined ){
+    if( ast.espace === undefined && ast.exports === undefined ){
+        ast.espace = {};  // new empty namespace for all exports
         for(var name in ast.body.tspace){
             ast.espace[name] = ast.body.tspace[name];
         }
-    } else {
+    }
+
+    // check imports and topdecls
+    JSHC.Check.nameCheckBody(comp, ast, ast.body);
+
+    // check export specification if it exists
+    if( ast.exports !== undefined ){
+        ast.espace = {};  // new empty namespace for all exports
         for(i=0;i<ast.exports.length;i++){
-	    this.checkNames({}, ast.exports[i]);
+            JSHC.Check.nameCheckExport(comp,ast,ast.exports[i]);
         }
     }
 };
 
-JSHC.Check.prototype.checkNames["export-qvar"] = function(ls,ast){
-    var es = this.module.espace;
-    
-    this.lookupName({},ast.exp);
-    if( es[ast.exp.toStringN()] !== undefined ){
-        this.errors.push(new SourceError(this.module.modid, ast.exp.pos, ast.exp + " already exported."));
-    }
-    es[ast.exp.toStringN()] = ast.exp;
-};
+JSHC.Check.nameCheckExport = function(comp,module,ast){
 
-//TODO:
-//JSHC.Check.prototype.checkNames["export-module"] = function(ls,ast){
-//    var es = this.module.espace;
-//    
-//};
+    switch( ast.name ){
+    case "export-qvar":
+    case "export-type-unspec":
+        var ref = JSHC.Check.lookupName(comp,module,null,ast.exp);
+        if( module.espace[ref] === undefined ){
+            module.espace[ref] = ref;
+        } else {
+            comp.onError(new SourceError(module.modid, ast.exp.pos, ast.exp + " already exported."));
+            // TODO: refer to position of previous declaration
+        }
+        break;
 
-JSHC.Check.prototype.checkNames["export-type-unspec"] = function(ls,ast){
-    var es = this.module.espace;
-    
-    this.lookupName({},ast.tycon);
-    this.module.espace[ast.tycon.toStringN()] = ast.tycon;
-	
-};
+    case "export-type-all":
+        var ref = JSHC.Check.lookupName(comp,module,null,ast.exp);
+        module.espace[ref] = ref;
 
-JSHC.Check.prototype.checkNames["export-type-all"] = function(ls,ast){
-    var es = this.module.espace;
-    var decl;    
-        
-    
-    this.lookupName({},ast.exp);
-    this.module.espace[ast.exp.toStringN()] = ast.exp;
-    decl = JSHC.Check.lookupDatatype(this.module,ast.exp);
-    for(i=0;i<decl.constrs.length;i++){
-	// TODO: check if already exported
-	//       refer to position of previous declaration in case
-	//       of error.
-	es[decl.constrs[i].dacon.toStringN()] = decl.constrs[i].dacon;
-    }
-};
+        var decl = JSHC.Check.lookupDatatype(comp,module,ast.exp);
+        for(i=0;i<decl.constrs.length;i++){
+            // TODO: check if already exported
+            //       refer to position of previous declaration in case
+            //       of error.
+            var dacon = decl.constrs[i].dacon;
+            module.espace[dacon] = dacon;
+        }
+        break;
 
-JSHC.Check.prototype.checkNames["export-type-vars"] = function(ls,ast){
-    var es = this.module.espace;
+    case "export-type-vars":
+        var ref = JSHC.Check.lookupName(comp,module,null,ast.exp);
+        module.espace[ref] = ref;
 
-    this.lookupName({},ast.tycon);
-    this.module.espace[ast.tycon.toStringN()] = ast.tycon;
-    // find the datatype declaration and add the listed members
-    // produce error if not in datatype declaration.
-    decl = JSHC.Check.lookupDatatype(this.module,ast.tycon);
-    var dacons = {};
-    for(i=0;i<decl.constrs.length;i++){
-	dacons[decl.constrs[i].dacon.toStringN()] =
-	    decl.constrs[i].dacon;
-    }
-    for(i=0;i<ast.members.length;i++){
-	if( dacons[ast.members[i].toStringN()] === undefined ){
-	    this.errors.push(new SourceError(this.module.modid, ast.members[i].pos, ast.members[i] + " not in datatype"));
-	} else {
-	    es[ast.members[i].toStringN()] = ast.members[i];
-	    ast.members[i].loc = module.modid.id;
-	}
-    }
-	
-};
+        // find the datatype declaration and add the listed members.
+        // produce error if not in datatype declaration.
+        decl = JSHC.Check.lookupDatatype(comp,module,ast.exp);
+        var dacons = {};
+        for(i=0;i<decl.constrs.length;i++){
+            dacons[decl.constrs[i].dacon] = decl.constrs[i].dacon;
+        }
+        for(i=0;i<ast.vars.length;i++){
+            if( dacons[ast.vars[i].toStringN()] === undefined ){
+                this.errors.push(new SourceError(this.module.modid, ast.vars[i].pos, ast.vars[i] + " not in datatype"));
+            } else {
+                module.espace[ast.vars[i]] = ast.vars[i];
+                ast.vars[i].loc = module.modid.id;
+            }
+        }
+        break;
 
-//Old version of export kept for reference. TODO: remove
-JSHC.Check.prototype.checkNames["export"] = function(ls,ast){
-    var decl,es,i;
-
-    es = this.module.espace;
-
-    if( ast.varname !== undefined ){
-	this.lookupName({},ast.varname);
-	if( es[ast.varname.toStringN()] !== undefined ){
-	    this.errors.push(new SourceError(this.module.modid, ast.varname.pos, ast.varname + " already exported."));
-	}
-	es[ast.varname.toStringN()] = ast.varname;
-
-    } else if( ast.modname !== undefined ){
-	// TODO: exporting everything imported from a module
-	// need to traverse the import declarations importing from ast.modname
-	// and add every imported name (in some efficient way).
-
-    } else if( ast.tycon !== undefined ){
-	this.lookupName({},ast.tycon);
-	this.module.espace[ast.tycon.toStringN()] = ast.tycon;
-	if( ast.all ){
-	    decl = JSHC.Check.lookupDatatype(this.module,ast.tycon);
-	    for(i=0;i<decl.constrs.length;i++){
-		// TODO: check if already exported
-		//       refer to position of previous declaration in case
-		//       of error.
-		es[decl.constrs[i].dacon.toStringN()] = decl.constrs[i].dacon;
-	    }
-
-	} else if( ast.list ){
-	    // find the datatype declaration and add the listed members
-	    // produce error if not in datatype declaration.
-	    decl = JSHC.Check.lookupDatatype(this.module,ast.tycon);
-	    var dacons = {};
-	    for(i=0;i<decl.constrs.length;i++){
-		dacons[decl.constrs[i].dacon.toStringN()] =
-		    decl.constrs[i].dacon;
-	    }
-	    for(i=0;i<ast.members.length;i++){
-		if( dacons[ast.members[i].toStringN()] === undefined ){
-		    this.errors.push(new SourceError(this.module.modid, ast.members[i].pos, ast.members[i] + " not in datatype"));
-		} else {
-		    es[ast.members[i].toStringN()] = ast.members[i];
-		    ast.members[i].loc = module.modid.id;
-		}
-	    }
-	}
-    } else {
-	throw new JSHC.CompilerError("unknown export");
+    default:
+        throw new JSHC.CompilerError("missing export case:"+ast.name);
     }
 };
 
-JSHC.Check.lookupDatatype = function(module,tycon){
+JSHC.Check.lookupDatatype = function(comp,module,tycon){
     var i;
-//    alert("LOOKING FOR TYCON:\n" + JSHC.showAST(tycon));
     var ts = module.body.topdecls;
     for(i=0;i<ts.length;i++){
 	if( ts[i].name !== "topdecl-data" || !ts[i].typ.tycon.equal(tycon) ){
@@ -368,15 +288,17 @@ JSHC.Check.lookupDatatype = function(module,tycon){
     throw new JSHC.SourceError("Type not found", tycon.pos, "Module " + module.modid.toString() + " failed to export type " + tycon.id + ": not in scope.");
 };
 
-JSHC.Check.prototype.checkNames["body"] = function(ls,ast){
+////////////////////////////////////////////////////////////////////////////////
+
+JSHC.Check.nameCheckBody = function(comp,module,ast){
     var i;
 
     for(i=0 ; i<ast.impdecls.length ;){
         var id = ast.impdecls[i].modid.id;
-        if( id == this.module.modid.id ){
+        if( id == module.modid.id ){
             // self import
             if( id !== "Prelude" ){
-                //this.onWarning(new SourceError(imp.modid.id, imp.pos, "self imports have no effect");
+                //comp.onWarning(new SourceError(imp.modid.id, imp.pos, "self imports have no effect");
             }
             // delete self import
             ast.impdecls.splice(i,1);
@@ -387,23 +309,28 @@ JSHC.Check.prototype.checkNames["body"] = function(ls,ast){
 
     // check impdecls
     for(i=0 ; i<ast.impdecls.length ; i++){
-	this.checkNames({}, ast.impdecls[i]);
+	JSHC.Check.nameCheckImpdecl(comp,module,ast.impdecls[i]);
     }
 
     // check topdecls
     for(i=0 ; i<ast.topdecls.length ; i++){
-	this.checkNames({}, ast.topdecls[i]);
+	JSHC.Check.nameCheckTopdecl(comp,module,ast.topdecls[i]);
     }
 };
 
-JSHC.Check.prototype.checkNames["impdecl"] = function(ls,imp){
+
+JSHC.Check.nameCheckImpdecl = function(comp,module,imp){
     var j,k,l;
 
-    var exports = this.modules[imp.modid];
+    var exports = comp.modules[imp.modid];
     if( exports === undefined ){
 	// this should be impossible if compilation stops when parsing of any
 	// module fails.
 	//errors.push(new SourceError(module.modid.id, imp.pos, "imported module not available"));
+	JSHC.alert("missing module. looking for: ",imp.modid);
+	for(var module in comp.modules){
+	    JSHC.alert("has: ",module);
+	}
 	throw new JSHC.CompilerError("A module being dependent upon is missing.");
     }
     
@@ -415,11 +342,11 @@ JSHC.Check.prototype.checkNames["impdecl"] = function(ls,imp){
     for(j=0;j<inames.length;j++){
 	if( inames[j].name === "import-var" ){
 	    if( exports.containsVar(inames[j].varid.id) === false ){
-		this.errors.push(new SourceError(module.modid.id, inames[j].varid.pos, "variable not exported by module " + imp.modid.id));
+		comp.onError(new SourceError(module.modid.id, inames[j].varid.pos, "variable not exported by module " + imp.modid.id));
 	    }
 	} else if( inames[j].name === "import-tycon" ){
 	    if( exports.containsTycon(inames[j].tycon.id) === false ){
-		this.errors.push(new SourceError(module.modid.id, inames[j].varid.pos, "type constructor not exported by module " + imp.modid.id));
+		comp.onError(new SourceError(module.modid.id, inames[j].varid.pos, "type constructor not exported by module " + imp.modid.id));
 	    } else {
 		var datatype = exports.lookupTycon(inames[j].tycon.id);
 		var dacons = inames[j].list;
@@ -428,7 +355,7 @@ JSHC.Check.prototype.checkNames["impdecl"] = function(ls,imp){
 			// check if exported datatype contains the data constructor
 			for(l=0;l<datatype.constrs.length;l++){
 			    if( datatype.constrs[l].id === dacons[k].id ){
-				this.errors.push(new SourceError(module.modid.id, inames[j].varid.pos, "data constructor " + dacons[k].id + " not in datatype " + inames[j].tycon.id + " exported by module " + imp.modid.id));
+				comp.onError(new SourceError(module.modid.id, inames[j].varid.pos, "data constructor " + dacons[k].id + " not in datatype " + inames[j].tycon.id + " exported by module " + imp.modid.id));
 			    }
 			}
 		    }
@@ -438,109 +365,122 @@ JSHC.Check.prototype.checkNames["impdecl"] = function(ls,imp){
     }
 };
 
-JSHC.Check.prototype.checkNames["topdecl-data"] = function(ls,ast){
-    var i,ds;
+JSHC.Check.nameCheckTopdecl = function(comp,module,ast){
+    switch( ast.name ){
+    case "topdecl-data":
+        JSHC.Check.nameCheckTopdeclData(comp,module,ast);
+        break;
+    case "topdecl-decl":
+        JSHC.Check.nameCheckTopdeclDecl(comp,module,ast.decl);
+        break;
+    default:
+        throw new JSHC.CompilerError("missing topdecl case:"+ast.name);
+    }
+};
 
-    ls = {};  // start with empty local namespace
+////////////////////////////////////////////////////////////////////////////////
 
-    // add type constructor
-    ls[ast.typ.tycon.toStringN()] = ast.typ.tycon;
+JSHC.Check.nameCheckTopdeclData = function(comp,module,ast){
+
+    lspace = new JSHC.LSpace(true);
+
+    lspace.withSpace(function(){
+
+    // not adding type constructor (ast.typ.tycon) since in tspace
 
     // add type variables
-    for(i=0;i<ast.typ.vars.length;i++){
-	ls[ast.typ.vars[i].toStringN()] = ast.typ.vars[i];
+    for(var i=0 ; i<ast.typ.vars.length ; i++){
+	lspace.add(ast.typ.vars[i]);
     }
 
-    ds = {};  // namespace of the data constructors
-    var constrs = ast.constrs;
-    for(i=0;i<constrs.length;i++){
-	// check that data constructor name is not already used.
-	if( ds[constrs[i].dacon.toStringN()] !== undefined ){
-	    this.errors.push(new SourceError(this.module.modid,constrs[i].dacon.pos,constrs[i].dacon + " already exists."));
+    // the check that data constructor names are not overlapping is done when
+    // creating the tspace.
+    for(var i=0 ; i<ast.constrs.length ; i++){
+        var types = ast.constrs[i].types;
+        
+        // check the types given the type variables in the lspace
+        for(var j=0 ; j<types.length ; j++){
+            JSHC.Check.nameCheckType(comp,module,lspace,types[j]);
 	}
-	ds[constrs[i].dacon.toStringN()] = constrs[i].dacon;
-	this.checkNames(ls, constrs[i]);
+    }
+
+    });
+};
+
+JSHC.Check.nameCheckType = function(comp,module,lspace,ast){
+    switch( ast.name ){
+    case "apptype":
+        JSHC.Check.nameCheckType(comp,module,lspace,ast.lhs);
+        JSHC.Check.nameCheckType(comp,module,lspace,ast.rhs);
+        break;
+
+    case "tyvar":
+    case "tycon":
+        JSHC.Check.lookupName(comp,module,lspace,ast);
+        break;
+
+    default:
+        throw new JSHC.CompilerError("missing type case:"+ast.name);
     }
 };
 
-JSHC.Check.prototype.checkNames["topdecl-decl"] = function(ls,ast){
-    this.checkNames({},ast.decl);
-};
-
-JSHC.Check.prototype.checkNames["constr"] = function(ls,ast){
-    var i;
-
-    var types = ast.types;
-    for(i=0;i<types.length;i++){
-	    this.checkNames(ls,types[i]);
+JSHC.Check.nameCheckTopdeclDecl = function(comp,module,ast){
+    switch( ast.name ){
+    case "decl-fun":
+        JSHC.Check.nameCheckDeclFun(comp, module, new JSHC.LSpace(true), ast);
+        break;
+    default:
+        throw new JSHC.CompilerError("missing decl case:"+ast.name);
     }
 };
 
-JSHC.Check.prototype.checkNames["apptype"] = function(ls,ast){
+////////////////////////////////////////////////////////////////////////////////
 
-    this.checkNames(ls,ast.lhs);
-    this.checkNames(ls,ast.rhs);
-};
-
-
-JSHC.Check.prototype.checkNames["decl-fun"] = function(ls,ast){
-    var i;
-
-    ls = {};  // start with empty local namespace
-
-    // add parameter names.
-    ps = {};  // namespace of the data constructors
+JSHC.Check.nameCheckDeclFun = function(comp,module,lspace,ast){
     var args = ast.args;
-    for(i=0;i<args.length;i++){
-	// check that no parameter names are the same.
-	if( ps[args[i]] !== undefined ){
-	    this.errors.push(new SourceError(this.module.modid,args[i].pos,args[i] + " declared twice."));
-	}
-	ps[args[i]] = args[i];
-	ls[args[i]] = args[i];
+    lspace.push(); // add space for names in patterns
+    JSHC.Check.nameCheckPatterns(comp,module,lspace,args);
+    JSHC.Check.nameCheckExp(comp,module,lspace,ast.rhs);
+    lspace.pop();
+};
+
+JSHC.Check.nameCheckPatterns = function(comp,module,lspace,patterns){
+    // checks all patterns using the same set so that overlaps are detected.
+    for(var i=0 ; i<patterns.length ; i++){
+        JSHC.Check.nameCheckPattern(comp,module,lspace,patterns[i]);
     }
-
-    // check RHS.
-    this.checkNames(ls,ast.rhs);
 };
 
-JSHC.Check.prototype.checkNames["case"] = function(ls,ast){
-    //TODO: definition for case
+JSHC.Check.nameCheckPattern = function(comp,module,lspace,ast){
+    switch( ast.name ){
+    case "dacon":
+        JSHC.Check.lookupName(comp,module,lspace,ast);
+        lspace.add(ast);
+        break;
+    default:
+        throw new JSHC.CompilerError("missing pattern case:"+ast.name);
+    }
 };
 
-JSHC.Check.prototype.checkNames["varname"] = function(ls,ast){
-    this.lookupName(ls,ast);
-};
-
-JSHC.Check.prototype.checkNames["dacon"] = function(ls,ast){
-    this.lookupName(ls,ast);
-};
-
-JSHC.Check.prototype.checkNames["tyvar"] = function(ls,ast){
-    this.lookupName(ls,ast);
-};
-
-JSHC.Check.prototype.checkNames["tycon"] = function(ls,ast){
-    this.lookupName(ls,ast);
-};
-
-
-JSHC.Check.prototype.checkNames["integer-lit"] = function(ls,ast){
-    // nothing to check
-};
-
-
-
-JSHC.Check.prototype.checkNames["application"] = function(ls,ast){
-    var exps = ast.exps;
-    for(var i=0 ; i<exps.length ; i++){
-        switch (exps[i].name) {
-        case "varname": case "dacon": case "integer-lit": case "application":
-            this.checkNames(ls,exps[i]);
-            break;
-        default:
-            throw new Error("missing case for "+exps[i].name);
+JSHC.Check.nameCheckExp = function(comp,module,lspace,ast){
+    switch( ast.name ){
+    case "varname":
+    case "dacon":
+        JSHC.Check.lookupName(comp,module,lspace,ast);
+        //JSHC.alert(ast.id," at ",ast.loc);
+        break;
+    
+    case "application":
+        for(var i=0 ; i<ast.exps.length ; i++){
+            JSHC.Check.nameCheckExp(comp,module,lspace,ast.exps[i]);
         }
+        break;
+
+    case "integer-lit":
+        break;
+
+    default:
+        throw new JSHC.CompilerError("missing topdecl case:"+ast.name);
     }
 };
 

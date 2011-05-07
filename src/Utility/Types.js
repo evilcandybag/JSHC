@@ -6,7 +6,7 @@
 */
 JSHC.FunType = function(types,pos){
     assert.ok( types.length !== undefined );
-    assert.ok( types.length !== 1 );
+    assert.ok( types.length > 1 );
     assert.ok( types instanceof Array );
     this.name = "funtype";
     this.types = types;
@@ -16,8 +16,8 @@ JSHC.FunType = function(types,pos){
 };
 JSHC.FunType.prototype.toString = function(){
     var m = ["("];
-    for(var type in this.types){
-	m.push(this.types[type]);
+    for(var i=0 ; i<this.types.length ; i++){
+	m.push(this.types[i]);
 	m.push(" -> ");
     };
     m.pop();

@@ -84,7 +84,7 @@ JSHC.Compiler.prototype.recompile = function(){
     var mod,k;
     var names = this.targets;
     var errs = [];
- 
+
     // load files
     mods = this.syncLoad(names);
 
@@ -131,7 +131,21 @@ JSHC.Compiler.prototype.recompile = function(){
     //traverse the graph in dependency order, and for each module group:
     var compiler = this;
     var module_group_action = function(group){
-        //compiler.onMessage("checking group "+group);
+        compiler.onMessage("checking group "+group);
+
+        // export check hack to solve cycles
+        for (var i = 0; i < group.values.length; i++) {
+            var ast = group.values[i].ast;
+
+            // no export specification, so export all top-level declarations
+            if( ast.exports === undefined ){
+                ast.espace = {};  // new empty namespace for all exports
+                for(var name in ast.body.tspace){
+                    ast.espace[name] = ast.body.tspace[name];
+                }
+                compiler.modules[ast.modid] = group.values[i];
+            }
+        }
 
         // name check: qualify imported names
         for (var i = 0; i < group.values.length; i++) {
@@ -139,12 +153,7 @@ JSHC.Compiler.prototype.recompile = function(){
 
             compiler.onMessage("checking "+module.ast.modid);
 
-            // TODO: should use compiler state to access modules/onError/onWarning
-            errs = JSHC.Check.nameCheck(compiler.modules, module.ast);
-            for (var i = 0; i < errs.length; i++) {
-                //alert(JSHC.showError(errs[i]))
-                compiler.onError("name check: "+errs[i]);
-            }
+            JSHC.Check.nameCheck(compiler, module.ast);
         }
 
         // errors in the name check represents reasons for the fixity and type
@@ -172,7 +181,9 @@ JSHC.Compiler.prototype.recompile = function(){
         }
 
         // type check: add types and kinds to top-level declarations
-        //JSHC.Check.typeCheck(compiler,group.values);
+        var asts = [];
+        group.values.forEach(function(mod){asts.push(mod.ast);});
+        JSHC.Check.typeCheck(compiler,asts);
     };
 
     JSHC.Dep.check(entries,module_group_action);
@@ -204,8 +215,8 @@ JSHC.Compiler.prototype.checkExp = function (exp){
     res = {name: "topdecl-decl", decl: res};
 
     var impdecls = [];
-    for(var modid in this.modules ){
-        impdecls.push({name: "impdecl", modid: modid});
+    for(var modname in this.modules ){
+        impdecls.push({name: "impdecl", modid: this.modules[modname].ast.modid});
     }
 
     res = {name: "body", impdecls: impdecls, topdecls: [res]};
@@ -214,10 +225,8 @@ JSHC.Compiler.prototype.checkExp = function (exp){
     
     JSHC.addToplevelNamespace(res);
     JSHC.Fixity.fixityResolution(res);
-    var errors = JSHC.Check.nameCheck(this.modules,res);
-    for(var ix=0 ; ix<errors.length ; ix++ ){
-      this.onError(errors[ix]);
-    }
+    JSHC.Check.nameCheck(this,res);
+    JSHC.Check.typeCheck(this,[res]);
     JSHC.Simplify.runSimplify(res);
     return res.body.topdecls[0].decl;
 };

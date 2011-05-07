@@ -22,10 +22,13 @@ JSHC.Codegen.codegen = function (input,namespace) {
 //        if (module.exports) {
 //           throw new Error ("compilation of exports not defined!");
 //        }
-        var res = (modid + " = new Object();\n")
+        var res = "";
+        JSHC.ModName.prefixes(module.modid.id).forEach(function(prefix){
+            res += "if( "+namespace+"."+prefix+" === undefined ){ "+
+                   namespace+"."+prefix+" = new Object(); }\n";
+        });
         res += comBody(module.body);
-        return res
-
+        return res;
     }
     
     var comSoloExp = function(exp) {
