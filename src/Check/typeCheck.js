@@ -123,9 +123,9 @@ JSHC.Check.checkTopdecl = function(comp,ctx,ast){
 
 	 // free the type variables <ident_tv> and <params_tv>.
 	 //for(ix in params_tv){
-	 //    ctx.freeTyvar(params_tv[ix]);
+	 //    ctx.freeTyVar(params_tv[ix]);
 	 //}
-	 //ctx.freeTyvar(ident_tv);
+	 //ctx.freeTyVar(ident_tv);
 
 	 // quantify the remaining free type variables used by the params to
 	 // produce the decl type.
@@ -158,7 +158,13 @@ JSHC.Check.checkTopdecl = function(comp,ctx,ast){
 
 	 ctx.push();
 	 var tycon = ast.typ.tycon;
-	 var tycon_tv = ctx.add(tycon);
+	 
+	 // since all types are declared at top-level, all references to them
+	 // are qualified, so no purpose of adding the tycon to the local
+	 // context since it will never be used.
+	 // the type must instead of placed on the name in the tspace.
+	 //var tycon_tv = ctx.add(tycon);
+	 tycon.kind = ctx.newBoundTyVar();
 
          var params = ast.typ.vars;
 	 for(var ix=0 ; ix<params.length ; ix++){
@@ -184,10 +190,10 @@ JSHC.Check.checkTopdecl = function(comp,ctx,ast){
 	     ctx.pop();
 	 }
 
-         ctx.constrain(tycon_tv, rhs_kind);
+         ctx.constrain(tycon.kind, rhs_kind);
 
          // replace all remaining type variables with "*".
-         tycon.kind = ctx.quantifyKind(rhs_kind);
+         tycon.kind = ctx.quantifyKind(tycon.kind);
 
          // create tycon type (tycon applied to the type vars).
          // this is the result type of the dacons.
@@ -258,7 +264,7 @@ JSHC.Check.checkType = function(comp,ctx,ast){
     case "apptype":
         var lhs_kind = JSHC.Check.checkType(comp,ctx,ast.lhs);
         var rhs_kind = JSHC.Check.checkType(comp,ctx,ast.rhs);
-        var ret_type = ctx.newUnboundTyvar();
+        var ret_type = ctx.newUnboundTyVar();
 
         var fun_type = new JSHC.FunType([rhs_kind, ret_type]);
         ctx.constrain(lhs_kind,fun_type);
@@ -318,7 +324,7 @@ JSHC.Check.checkExp = function(comp,ctx,ast){
 	    }
 	    var fun_type = exp_types[0];
 	    exp_types.shift();
-	    var ret_type = ctx.newUnboundTyvar();
+	    var ret_type = ctx.newUnboundTyVar();
 	    exp_types.push(ret_type);
             var inferred_type = new JSHC.FunType(exp_types);
             ctx.constrain(fun_type,inferred_type);
@@ -404,6 +410,7 @@ JSHC.Check.checkExpPattern = function(comp,ctx,args,rhs){
 	 }
 
 	 // check RHS:
+         //JSHC.alert("checking: ",rhs);
 	 var rhs_type = JSHC.Check.checkExp(comp,ctx,rhs);
 	 assert.ok( rhs_type !== undefined );
 
@@ -462,7 +469,7 @@ JSHC.Check.Ctx = function(){
 /*
   checks if tyvar is bound by any outer or current declaration.
 */
-JSHC.Check.Ctx.prototype.isUnboundTyvar = function(tyvar1){
+JSHC.Check.Ctx.prototype.isUnboundTyVar = function(tyvar1){
   // return true if and only if not in this.tyvars
   for(var ix=0 ; ix<this.tyvars.length ; ix++){
     var tyvar_ctx = this.tyvars[ix];
@@ -520,7 +527,7 @@ JSHC.Check.Ctx.prototype.quantifyType = function(type){
     //        set that quantifies all that may be quantified.
     var empty = true;
     for(var k in used){
-	if( this.isUnboundTyvar(k) ){
+	if( this.isUnboundTyVar(k) ){
 	    empty = false;
 	} else {
 	    delete used[k];
@@ -546,13 +553,13 @@ JSHC.Check.Ctx.prototype.quantify = function(name){
 };
 
 
-//JSHC.Check.Ctx.prototype.clearTyvars = function(){
+//JSHC.Check.Ctx.prototype.clearTyVars = function(){
     //this.freevars = new Freevars();
 //    this.tyvars = {};
 //    this.constraints = {};
 //};
 /*
-JSHC.Check.Ctx.prototype.freeTyvar = function(tyvar){
+JSHC.Check.Ctx.prototype.freeTyVar = function(tyvar){
     if( this.tyvars[tyvar] === undefined ){
 	throw new Error("unable to free type variable "+tyvar+" as it is not bound.");
     }
@@ -568,12 +575,12 @@ JSHC.Check.Ctx.prototype.freeTyvar = function(tyvar){
     }
 };
 */
-JSHC.Check.Ctx.prototype.newBoundTyvar = function(){
+JSHC.Check.Ctx.prototype.newBoundTyVar = function(){
     var tyvar = this.freevars.next();
     this.tyvars[this.tyvars.length-1][tyvar] = tyvar;
     return tyvar;
 };
-JSHC.Check.Ctx.prototype.newUnboundTyvar = function(){
+JSHC.Check.Ctx.prototype.newUnboundTyVar = function(){
     var tyvar = this.freevars.next();
     return tyvar;
 };
@@ -632,6 +639,9 @@ JSHC.Check.Ctx.prototype.insertConstraint = function(tyvar,type1){
 
       // simplify type1 using existing constraints.
 
+      //if( type1.name=="forall" ){
+      //    JSHC.alert("simplifying: ",type1.toString());
+      //}
       type1 = this.simplify(type1);
 
       // check for occurences of "tyvar" in "type1". if so, fail.
@@ -643,7 +653,7 @@ JSHC.Check.Ctx.prototype.insertConstraint = function(tyvar,type1){
       this.tyvar_ctx[tyvar] = type1;
       
       // eliminate all occurences of "tyvar" in RHSs.
-      this.eliminateTyvar(tyvar);
+      this.eliminateTyVar(tyvar);
    }
 };
 /*
@@ -666,6 +676,11 @@ JSHC.Check.Ctx.prototype.simplify = function(type){
     case "starkind":
         return type;
 
+    case "apptype":
+        var lhs = this.simplify(type.lhs);
+        var rhs = this.simplify(type.rhs);
+        return new JSHC.AppType(lhs,rhs);
+
     case "funtype":
         var ts = [];
         for(var t=0 ; t<type.types.length ; t++){
@@ -680,7 +695,7 @@ JSHC.Check.Ctx.prototype.simplify = function(type){
         throw new Error("unknown type: "+type.name);
     };
 };
-JSHC.Check.Ctx.prototype.eliminateTyvar = function(tyvar1){
+JSHC.Check.Ctx.prototype.eliminateTyVar = function(tyvar1){
   // look up the RHS of the given tyvar
   var type1 = this.tyvar_ctx[tyvar1];
   var type1_vars = JSHC.Check.computeUsedVars(type1);
@@ -692,7 +707,7 @@ JSHC.Check.Ctx.prototype.eliminateTyvar = function(tyvar1){
       var type2 = context[name];
 
       // replace all occurences of 'tyvar1' in 'type2' with 'type1'
-      type2 = JSHC.Check.replaceTyvarWith(tyvar1,type1,type2);
+      type2 = JSHC.Check.replaceTyVarWith(tyvar1,type1,type2);
 
       // replace old type with the new type
       context[name] = type2;
@@ -704,7 +719,7 @@ JSHC.Check.Ctx.prototype.eliminateTyvar = function(tyvar1){
     var type2 = this.tyvar_ctx[tyvar2];
 
     // replace all occurences of 'tyvar1' in 'type2' with 'type1'
-    type2 = JSHC.Check.replaceTyvarWith(tyvar1,type1,type2);
+    type2 = JSHC.Check.replaceTyVarWith(tyvar1,type1,type2);
 
     // replace old type with the new type
     this.tyvar_ctx[tyvar2] = type2;
@@ -717,7 +732,7 @@ JSHC.Check.Ctx.prototype.eliminateTyvar = function(tyvar1){
 // can take specified types (signatures) for params
 JSHC.Check.Ctx.prototype.add = function(name,type){
     if( type === undefined ){
-	type = this.newBoundTyvar();
+	type = this.newBoundTyVar();
     }
     //name.type = type;
     this.contexts[this.contexts.length-1][name] = type;
@@ -732,7 +747,8 @@ JSHC.Check.Ctx.prototype.rem = function(name){
   lookup type and instantiate quantified type variables
 */
 JSHC.Check.Ctx.prototype.lookupType = function(comp,name){
-   return this.lookupAny(comp,name,"type");
+   var type = this.lookupAny(comp,name,"type");
+   return this.instantiate(type);
 };
 JSHC.Check.Ctx.prototype.lookupKind = function(comp,name){
    return this.lookupAny(comp,name,"kind");
@@ -769,13 +785,16 @@ JSHC.Check.Ctx.prototype.lookupAny = function(comp,name,field){
             }
         }
 
-        //JSHC.alert("looking up (qualified): ",name);
-        //for( var xxcm in comp.modules ){
-        //    JSHC.alert(xxcm);
+        //if( name.loc !== "Prelude" ){
+        //    JSHC.alert("looking up (qualified): ",name);
+        //    for( var xxcm in comp.modules ){
+        //        JSHC.alert(xxcm);
+        //    }
+        //    JSHC.alert(comp.modules[name.loc].ast.espace);
         //}
         var espace = comp.modules[name.loc].ast.espace;
         var expo = espace[name];
-        //JSHC.alert("found ",expo);
+        //if( name.loc !== "Prelude" )JSHC.alert("found ",expo);
         var info = espace[name][field];
         if( info === undefined ){
             comp.onError("type information missing for "+name.toStringQ());
@@ -796,6 +815,7 @@ JSHC.Check.Ctx.prototype.lookupAny = function(comp,name,field){
 	        return n;
 	    }
         }
+        //JSHC.alert("not found");
     }
 
     // only possible if error in name check or if continuing after name check
@@ -847,7 +867,7 @@ JSHC.Check.Freevars.prototype.next = function(){
   find all occurences of 'tyvar' in 'type' and replace them with 'rtype',
   and then return the new type.
 */
-JSHC.Check.replaceTyvarWith = function(tyvar,rtype,type){
+JSHC.Check.replaceTyVarWith = function(tyvar,rtype,type){
     assert.ok ( type !== undefined );
 
     var replace = function(type){
@@ -862,6 +882,11 @@ JSHC.Check.replaceTyvarWith = function(tyvar,rtype,type){
 	case "forall":
 	    assert.ok( false );
 	    return type;
+
+        case "apptype":
+            var lhs = replace(type.lhs);
+            var rhs = replace(type.rhs);
+            return new JSHC.AppType(lhs,rhs);
 
         case "funtype":
             var ts = [];
@@ -1002,6 +1027,10 @@ JSHC.Check.computeUsedQualifiedNames = function(ast){
                 }
             }
             break;
+
+        case "apptype":
+            find(ast.lhs);
+            find(ast.rhs);
         
         case "tyvar":
         case "integer-lit":
@@ -1018,6 +1047,7 @@ JSHC.Check.computeUsedQualifiedNames = function(ast){
             break;
 
         case "dacon":
+        case "tycon":
         case "varname":
             names[ast] = ast;
             break;
@@ -1067,6 +1097,57 @@ JSHC.Check.computeDeclaredQualifiedNames = function(ast){
 
     find(ast);
     return names;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+/*
+  Remove the
+*/
+JSHC.Check.Ctx.prototype.instantiate = function(ast){
+    // should not be any quantification within types, only at the top.
+    if( ast.name !== "forall" ){
+        return ast;
+    }
+
+    var ctx = this;
+    var boundVars = {};
+    for(var b in ast.binds){
+        boundVars[b] = ctx.newUnboundTyVar();
+    }
+
+    var replace = function(ast){
+	switch( ast.name ){
+	case "apptype":
+	   var lhs = replace(ast.lhs);
+	   var rhs = replace(ast.rhs);
+	   return new JSHC.AppType(lhs,rhs);
+
+	case "tycon":
+	    return ast;
+
+	case "funtype":
+            var ts = [];
+            for(var t=0 ; t<ast.types.length ; t++){
+               ts.push(replace(ast.types[t]));
+            }
+            return new JSHC.FunType(ts);
+
+        case "tyvar":
+            if( boundVars[ast] !== undefined ){
+                return boundVars[ast];
+            } else {
+                return ast;
+            }
+
+	default:
+            throw new JSHC.CompilerError("missing case: "+ast.name);
+	};
+    };
+
+    var newtype = replace(ast.type);
+    //JSHC.alert("instantiated ",ast.toString()," into ",newtype.toString());
+    return newtype;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
