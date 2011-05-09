@@ -642,6 +642,8 @@ JSHC.Check.Ctx.prototype.constrain = function(type1,type2){
         }
     } else if( type1 == JSHC.Check.StarKind && type2 == JSHC.Check.StarKind ) {
         return;
+    } else if( type1.toString() == type2.toString() ) {
+        return;
     } else {
 	throw new Error("trying to add invalid constraint: "+type1+" and "+type2);
     }
