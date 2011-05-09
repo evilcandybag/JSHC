@@ -205,6 +205,9 @@ JSHC.Compiler.prototype.recompile = function(){
     }
 
 //    alert("GENERATED CODE: \n\n" + this.getAllJSCode())
+
+    eval("delete "+this.modulePrefix);
+    eval(this.modulePrefix+" = {};");
     eval(this.getAllJSCode());
 };
 
