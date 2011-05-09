@@ -103,7 +103,7 @@ JSHC.Interpreter.prototype.execCommand = function(line){
     case ":kind":
         // :kind name     // must be a type constructor
         for(var w=1 ; w<words.length ; w++ ){
-            this.commandKind(words[w]);
+            this.commandKind(words[w].toString());
         }
 	break;
 
@@ -186,7 +186,7 @@ JSHC.Interpreter.prototype.execCommand = function(line){
             if( decl.ident.type === undefined ){
                 this.onError("type is missing");
             } else {
-                this.onMessage(decl.ident.type);
+                this.onMessage(decl.ident.type.toString());
             }
         }
 	break;
@@ -226,7 +226,7 @@ JSHC.Interpreter.prototype.execCommand = function(line){
             }
 
             var expr = JSHC.Codegen.codegen(decl.rhs, this.prefix);
-            this.onMessage(eval(expr));
+            this.onMessage(eval(expr).toString());
         } catch (err) {
             alert("expression:\n" + line + "\ngenerated code:\n" + expr + "\nwith error:\n\n" + JSHC.showError(err));
             this.onError(err);
