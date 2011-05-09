@@ -1028,9 +1028,17 @@ JSHC.Check.computeUsedQualifiedNames = function(ast){
             }
             break;
 
+        case "application":
+            var exps = ast.exps;
+            for(var i=0 ; i<exps.length ; i++){
+                find(exps[i]);
+            }
+            break;
+
         case "apptype":
             find(ast.lhs);
             find(ast.rhs);
+            break;
         
         case "tyvar":
         case "integer-lit":
