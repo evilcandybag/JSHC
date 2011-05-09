@@ -165,7 +165,7 @@ JSHC.Check.checkTopdecl = function(comp,ctx,ast){
 	 // the type must instead of placed on the name in the tspace.
 	 //var tycon_tv = ctx.add(tycon);
 	 tycon.kind = ctx.newBoundTyVar();
-
+	 
          var params = ast.typ.vars;
 	 for(var ix=0 ; ix<params.length ; ix++){
 	     var param = params[ix];
@@ -193,6 +193,7 @@ JSHC.Check.checkTopdecl = function(comp,ctx,ast){
          ctx.constrain(tycon.kind, rhs_kind);
 
          // replace all remaining type variables with "*".
+         tycon.kind = ctx.simplify(tycon.kind);
          tycon.kind = ctx.quantifyKind(tycon.kind);
 
          // create tycon type (tycon applied to the type vars).
@@ -657,6 +658,8 @@ JSHC.Check.Ctx.prototype.insertConstraint = function(tyvar,type1){
       this.constrain(type1,this.tyvar_ctx[tyvar]);
    } else {
       // if tyvar does NOT exist in the mapping
+
+      //JSHC.alert("tyvar: ",tyvar,"\ntype: ",type1.toString());
 
       // simplify type1 using existing constraints.
 
