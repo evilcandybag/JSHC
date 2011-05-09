@@ -50,6 +50,7 @@ JSHC.Test.TestResult = function(id, ok, info){
     }
     this.ok = ok;
     if( info !== undefined ){
+        assert.ok( typeof info == "string", "test result \""+this.getName()+"\" has a non-string as info");
 	this.info = info;
     }
 };
@@ -253,7 +254,7 @@ JSHC.Test.runData = function(tester,td){
     tester.addResult(new JSHC.Test.TestResult(
         td.name,
         success,
-        info.length==0 ? [] : info.join("\n")));
+        info.length==0 ? undefined : info.join("\n")));
 };
 
 ////////////////////////////////////////////////////////////////////////////////

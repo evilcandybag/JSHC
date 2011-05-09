@@ -19,9 +19,9 @@ JSHC.Test.Tests.parsable = function(){
     var action = function(){
 	try{
 	    var ast = JSHC.parse(this.input);
-	    return this.result(true, ast);
+	    return this.result(true);
 	}catch(err){
-	    return this.result(false, err);
+	    return this.result(false, JSHC.showError(err));
 	}
     };
 
@@ -50,13 +50,13 @@ JSHC.Test.Tests.codegen = function() {
         eval(prog);
         var com = eval(this.input.r);
         if (com === this.input.e) {
-            return this.result(true,prog);
+            return this.result(true);
         } else {
             var msg = "expected: " + this.input.e + " got: " + com;
             return this.result.false,msg
         }
 	}catch(err){
-	    return this.result(false, err);
+	    return this.result(false, JSHC.showError(err));
 	}
     };
 
