@@ -41,6 +41,11 @@ JSHC.Compiler.prototype.getTargets = function(){
     return this.targets;
 };
 
+JSHC.Compiler.prototype.setFileSystem = function(fileSystem){
+    assert.ok( fileSystem !== undefined );
+    this.fileSystem = fileSystem;
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 
 JSHC.Compiler.prototype.onError = function(err){
