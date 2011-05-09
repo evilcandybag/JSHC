@@ -452,10 +452,25 @@ JSHC.Check.nameCheckPatterns = function(comp,module,lspace,patterns){
 };
 
 JSHC.Check.nameCheckPattern = function(comp,module,lspace,ast){
-    switch( ast.name ){
+    switch( ast.name ) {
     case "dacon":
         JSHC.Check.lookupName(comp,module,lspace,ast);
+        break;
+    case "conpat":
+        JSHC.Check.lookupName(comp,module,lspace,ast.con);
+        for (var i = 0; i < ast.pats.length; i++) {
+            JSHC.Check.nameCheckPattern(comp,module,lspace,ast.pats[i]);
+        }
+        break;
+    case "varname":
         lspace.add(ast);
+        break;
+    case "integer-lit":
+        break;
+    case "tuple_pat":
+        for (var i = 0; i < ast.members.length; i++) {
+            JSHC.Check.nameCheckPattern(comp, module, lspace, ast.members[i]);
+        }
         break;
     default:
         throw new JSHC.CompilerError("missing pattern case:"+ast.name);
@@ -475,12 +490,18 @@ JSHC.Check.nameCheckExp = function(comp,module,lspace,ast){
             JSHC.Check.nameCheckExp(comp,module,lspace,ast.exps[i]);
         }
         break;
+        
+    case "tuple":
+        for(var i=0 ; i<ast.members.length ; i++){
+            JSHC.Check.nameCheckExp(comp,module,lspace,ast.members[i]);
+        }
+        break;
 
     case "integer-lit":
         break;
 
     default:
-        throw new JSHC.CompilerError("missing topdecl case:"+ast.name);
+        throw new JSHC.CompilerError("missing exp case:"+ast.name + "\n" + JSHC.showAST(ast));
     }
 };
 
