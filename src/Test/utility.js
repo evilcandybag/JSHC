@@ -252,7 +252,7 @@ JSHC.Test.runData = function(tester,td){
 
     tester.addResult(new JSHC.Test.TestResult(
         td.name,
-        tester.interpreter.errors === errorAmount,
+        success,
         info.length==0 ? [] : info.join("\n")));
 };
 
