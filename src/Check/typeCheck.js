@@ -877,14 +877,12 @@ JSHC.Check.Ctx.prototype.pop = function(){
 
 /*
   generator for new unique type variables
-  TODO: need to give them names that are impossible to parse so that they are
-        unique.
 */
 JSHC.Check.Freevars = function(){
     this.amount = 0;
 };
 JSHC.Check.Freevars.prototype.next = function(){
-    return new JSHC.TyVar("tv"+(++this.amount));
+    return new JSHC.TyVar("'t"+(++this.amount));
 };
 
 ////////////////////////////////////////////////////////////////////////////////
