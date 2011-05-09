@@ -141,7 +141,7 @@ JSHC.Compiler.prototype.recompile = function(){
 	JSHC.addToplevelNamespace.call(this, mod.ast);
         
         // calculate operator precendencies and convert to ordinary function calls
-        JSHC.Fixity.fixityResolution(mod.ast);
+        
         
 	    // produce an entry in the dependency graph
 	entries.push(new JSHC.Dep.Entry([mod],[mod.ast.modid.id],mod.deps()));
@@ -184,7 +184,7 @@ JSHC.Compiler.prototype.recompile = function(){
             var module = group.values[i];
 
             compiler.onMessage("checking "+module.ast.modid);
-
+            JSHC.Fixity.fixityResolution(module.ast);
             JSHC.Check.nameCheck(compiler, module.ast);
         }
 
@@ -215,7 +215,7 @@ JSHC.Compiler.prototype.recompile = function(){
         // type check: add types and kinds to top-level declarations
         var asts = [];
         group.values.forEach(function(mod){asts.push(mod.ast);});
-        JSHC.Check.typeCheck(compiler,asts);
+//        JSHC.Check.typeCheck(compiler,asts);
     };
 
     JSHC.Dep.check(entries,module_group_action);
@@ -244,6 +244,7 @@ JSHC.Compiler.prototype.checkExp = function (exp){
     this.errorList = [];
 
     var res = JSHC.parseExp(exp);
+//    JSHC.alert("Parsed expr: ", res)
     res = {name: "decl-fun",
            ident: {name: "varname", id: "Interact+", isSymbol: false},
            args: [],
@@ -262,7 +263,7 @@ JSHC.Compiler.prototype.checkExp = function (exp){
     JSHC.addToplevelNamespace(res);
     JSHC.Fixity.fixityResolution(res);
     JSHC.Check.nameCheck(this,res);
-    JSHC.Check.typeCheck(this,[res]);
+//    JSHC.Check.typeCheck(this,[res]);
     JSHC.Simplify.runSimplify(res);
     return res.body.topdecls[0].decl;
 };
