@@ -45,6 +45,7 @@ JSHC.Fixity.resolve = function(info,exps) {
     resolve_parseNeg = function(prec, fix){
 	assert.ok( exps.length > 0 );
 	var e0 = exps[0];
+//	JSHC.alert("checking fixity of an exp:",e0)
 //	alert("resolve parseNeg of: " + JSHC.showAST(e0));
 	if( e0.name === "-" ){
 	    if( prec >= 6 ){
@@ -116,6 +117,7 @@ JSHC.Fixity.translateInfixMember = function(info, ast, member){
   function and return the result.
 */
 JSHC.Fixity.translateInfixExp = function(info, ast){
+//        JSHC.alert("translate:", ast)
     if( ast.name === "infixexp" ){
 	return JSHC.Fixity.resolve(info, ast.exps);
     } else {
@@ -133,7 +135,7 @@ JSHC.Fixity.translateInfixLists = function(info, ast){
 //    alert("translateInfixLists: " + ast.name);
     var f = JSHC.Fixity.translateInfixLists[ast.name];
     if( f === undefined ){
-	throw new Error("no definition for "+ast.name);
+	throw new Error("no definition for " + JSHC.showAST(ast) ); //+ast.name);
     }
     assert.ok( f instanceof Function, ast.name+" <: Function." )
     f(info, ast);
@@ -208,6 +210,17 @@ JSHC.Fixity.translateInfixLists["application"] = function(info, ast){
     for(i=0;i<ast.exps.length;i++){
 	ast.exps[i] = JSHC.Fixity.translateInfixExp(info, ast.exps[i]);
 	JSHC.Fixity.translateInfixLists(info, ast.exps[i]);
+    }
+};
+
+JSHC.Fixity.translateInfixLists["tuple"] = function(info, ast){
+    var i;
+//    alert("App contains: " + JSHC.showAST(ast));
+    for(i=0;i<ast.members.length;i++){	
+//        JSHC.alert("translating this tuple member;", ast.members[i]);    
+	ast.members[i] = JSHC.Fixity.translateInfixExp(info, ast.members[i]);
+//	JSHC.alert("translated this tuple member;", ast.members[i]);
+	JSHC.Fixity.translateInfixLists(info, ast.members[i]);
     }
 };
 
