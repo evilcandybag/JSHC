@@ -12,9 +12,9 @@ JSHC.Test.Tests.exports = function(tester){
 
     var cases = {};    
     for(var fs in fss){
-        JSHC.Test.runData(
+        JSHC.Test.runData(tester,
             {name: "export-"+fs,
              errors: 0,
-             fileSystem: fss[fs]},tester);
+             fileSystem: fss[fs]});
     }
 };

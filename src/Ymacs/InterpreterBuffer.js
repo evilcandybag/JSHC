@@ -47,7 +47,7 @@ JSHC.Ymacs.switchToInterpreter = function(cbuf){
 	if( ymacs.frames[i].buffer === ibuf ){
 	    // switch to a frame already showing the interpreter buffer
 	    ymacs.setActiveFrame(ymacs.frames[i]);
-	    if( modulename )ibuf.interpreter.runCommand(":load "+modulename);
+	    if( modulename )ibuf.runInterpreterCommand(":load "+modulename);
 	    return;
 	}
     }
@@ -58,25 +58,30 @@ JSHC.Ymacs.switchToInterpreter = function(cbuf){
     bs.remove(ibuf);
     bs.unshift(ibuf);
     ymacs._do_switchToBuffer(ibuf);
-    if( modulename )ibuf.interpreter.runCommand(":load "+modulename);
+    if( modulename )ibuf.runInterpreterCommand(":load "+modulename);
     return;
 };
+
+////////////////////////////////////////////////////////////////////////////////
+
+JSHC.Ymacs.interpreterPrompt = "> ";
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // create new interpreter
 JSHC.Ymacs.makeNewInterpreterBuffer = function(ymacs){
 
-    var PROMPT = JSHC.Ymacs.Interpreter.prompt;
-
     // create a standard buffer. it is modified below.
     var buf = ymacs.createBuffer({ name: "jshc-interpreter" });
 
+    buf.PROMPT = JSHC.Ymacs.interpreterPrompt;
     buf.JSHC_commandHistory = [];
     buf.JSHC_commandHistoryPos = -1;
 
+    buf.runInterpreterCommand = JSHC.Ymacs.runInterpreterCommand;
+
     // write prompt for first line
-    buf.cmd("insert", "JSHC interpreter\n"+PROMPT);
+    buf.cmd("insert", "JSHC interpreter\n"+buf.PROMPT);
 
     // only allow deletion of selections on the last line
     var old_delete = buf.deleteTransientRegion;
@@ -87,11 +92,11 @@ JSHC.Ymacs.makeNewInterpreterBuffer = function(ymacs){
 	var tm = this.transientMarker.getRowCol();
 	if( this.code.length-1 === cm.row &&
 	    this.code.length-1 === tm.row ){
-	    if( cm.col < PROMPT.length ) {
-		this.caretMarker.setPosition(this.caretMarker.getPosition()+PROMPT.length-cm.col);
+	    if( cm.col < buf.PROMPT.length ) {
+		this.caretMarker.setPosition(this.caretMarker.getPosition()+buf.PROMPT.length-cm.col);
 	    }
-	    if( tm.col < PROMPT.length ) {
-		this.transientMarker.setPosition(this.transientMarker.getPosition()+PROMPT.length-tm.col);
+	    if( tm.col < buf.PROMPT.length ) {
+		this.transientMarker.setPosition(this.transientMarker.getPosition()+buf.PROMPT.length-tm.col);
 	    }
 	    old_delete.call(this);
 	} else {
@@ -104,7 +109,7 @@ JSHC.Ymacs.makeNewInterpreterBuffer = function(ymacs){
     buf._deleteText = function(text,pos){
 	var cm = this.caretMarker.getRowCol();
 	if( cm.row === this.code.length-1 &&
-	    cm.col > PROMPT.length ){
+	    cm.col > buf.PROMPT.length ){
 	    old_deleteText.call(this,text,pos);
 	}
     };
@@ -127,13 +132,99 @@ JSHC.Ymacs.makeNewInterpreterBuffer = function(ymacs){
     // generated code can be the same.
     // if one allows several interpreter buffers, then one must create a
     // unique prefix for each buffer.
-    buf.interpreter = new JSHC.Ymacs.Interpreter(buf,"JSHC.modules");
+    buf.interpreter = new JSHC.Interpreter("JSHC.Ymacs.modules");
+    var errorHandler = function(err){
+        JSHC.Ymacs.outputToBuffer.call(buf,"Error: "+err);
+    };
+    var warningHandler = function(warn){
+        JSHC.Ymacs.outputToBuffer.call(buf,"Warning: "+warn);
+    };
+    var messageHandler = function(msg){
+        JSHC.Ymacs.outputToBuffer.call(buf,msg);
+    };
+    buf.interpreter.addErrorHandler(errorHandler);
+    buf.interpreter.addWarningHandler(warningHandler);
+    buf.interpreter.addMessageHandler(messageHandler);
 
     buf.cmd("JSHC_IB_mode");
     return buf;
 };
 
-// create the prefix used above
-if( JSHC.modules === undefined )JSHC.modules = {};
+JSHC.Ymacs.outputToBuffer = function(msg){
+    // make sure we are at the end of the buffer
+    this.caretMarker.setPosition(this.getCodeSize());
+
+    line = this.code[this.code.length-1];
+    if( line === this.PROMPT ){
+        // if empty prompt, insert before it.
+	var pos = this.getCodeSize() - this.caretMarker.getRowCol().col;
+	this.caretMarker.setPosition(pos);
+    } else if( line.length !== 0 ) {
+        // if not at the beginning of a line, make a new line.
+	this.__insertText("\n");
+    }
+    
+    // make sure output ends with a newline
+    if( msg[msg.length-1] !== "\n" ){
+        msg += "\n";
+    }
+
+    this.__insertText(msg);
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+/*
+  Called with a command to run. defaults to using the input on the last
+  line of the buffer.
+  The command will be auto-completed if possible.
+  Output will be written to the buffer.
+*/
+JSHC.Ymacs.runInterpreterCommand = function(opt_text){
+    // NOTE: currently running commands synchronuously.
+    //       should probably be done asynchronuously instead.
+    
+    var output, line;
+
+    if( opt_text !== undefined ){
+	// run given command
+
+	// find position where last line begins
+	//var pos = this.buf.getCodeSize() - this.buf.caretMarker.getRowCol().col;
+
+	this.interpreter.execCommand(opt_text);
+
+        // need to insert prompt if missing
+        line = this.code[this.code.length-1];
+        if( line !== this.PROMPT ){
+            // this case occurs when output is written out AFTER an existing
+            // prompt.
+            this.__insertText(this.PROMPT);
+        } else {
+            // make sure we are at the end of the buffer
+            // this case occurs when output is written out BEFORE an existing
+            // prompt.
+            this.caretMarker.setPosition(this.getCodeSize());
+        }
+    } else {
+	// run command using last line
+
+	line = this.code[this.code.length-1].substr(this.PROMPT.length);
+
+	// store buffer text in history
+	this.interpreter.history.push(line);
+
+	this.__insertText("\n");
+
+	this.interpreter.execCommand(line);
+
+	// insert new prompt
+	this.__insertText(this.PROMPT);
+	    
+	// clear undo information
+	this.__undoQueue = [];
+	this.__redoQueue = [];
+    }
+};
 
 ////////////////////////////////////////////////////////////////////////////////

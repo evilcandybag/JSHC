@@ -21,7 +21,13 @@ JSHC.Compiler = function(modulePrefix){
 	return this.syncLoadNames(this.fileSystem, this.path, names, this.modules);
     };
 
-    this.errorList = []; // used if no handlers have been set
+    this.errors = 0;
+    this.warnings = 0;
+    this.messages = 0;
+    this.errorList = [];
+    this.warningList = [];
+    this.messageList = [];
+
     this.errorHandlers = [];
     this.warningHandlers = [];
     this.messageHandlers = [];
@@ -51,6 +57,7 @@ JSHC.Compiler.prototype.setFileSystem = function(fileSystem){
 
 JSHC.Compiler.prototype.onError = function(err){
     this.errors++;
+
     if( this.errorHandlers.length == 0 ){
         this.errorList.push(err);
     } else {
@@ -62,15 +69,25 @@ JSHC.Compiler.prototype.onError = function(err){
 
 JSHC.Compiler.prototype.onWarning = function(warn){
     this.warnings++;
-    for(var i=0 ; i<this.warningHandlers.length ; i++){
-        this.warningHandlers[i](warn);
+
+    if( this.warningHandlers.length == 0 ){
+        this.warningList.push(err);
+    } else {
+        for(var i=0 ; i<this.warningHandlers.length ; i++){
+            this.warningHandlers[i](warn);
+        }
     }
 };
 
 JSHC.Compiler.prototype.onMessage = function(msg){
     this.messages++;
-    for(var i=0 ; i<this.messageHandlers.length ; i++){
-        this.messageHandlers[i](msg);
+
+    if( this.messageHandlers.length == 0 ){
+        this.messageList.push(err);
+    } else {
+        for(var i=0 ; i<this.messageHandlers.length ; i++){
+            this.messageHandlers[i](msg);
+        }
     }
 };
 
@@ -103,7 +120,11 @@ JSHC.Compiler.prototype.recompile = function(){
     this.modules = {};
 
     this.errors = 0;   // clear old errors
+    this.warnings = 0;
+    this.messages = 0;
     this.errorList = [];
+    this.warningList = [];
+    this.messageList = [];
 
     for(k in mods){ // mods : map
 	mod = mods[k];

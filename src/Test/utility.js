@@ -64,7 +64,7 @@ JSHC.Test.Tester = function(){
     this.results = {};
     this.passed = 0;
     this.failed = 0;
-    this.comp = new JSHC.Compiler("JSHC.Test.modules");
+    this.interpreter = new JSHC.Interpreter("JSHC.Test.modules");
 };
 
 /*
@@ -166,11 +166,11 @@ JSHC.Test.Tester.prototype.toHTML = function(tc){
 
 	// show failed tests
 	msg.push("name: "+r.getName()+"<br>");
-        // TODO: should somehow convert to HTML ?
 	if( r.info === undefined || r.info.length == 0 ){
 	    msg.push("(no information)");
 	} else {
-            msg.push(r.info);
+            // TODO: should somehow convert to HTML ?
+            msg.push(r.info.replace(/\n/g,"<p>"));
 	}
 	msg.push("<hr>");
     }
@@ -193,11 +193,11 @@ JSHC.Test.runtests = function(tests, showHTML){
 /*
   run test tests using test data
 */
-JSHC.Test.runData = function(td,tester){
+JSHC.Test.runData = function(tester,td){
     assert.ok( td.fileSystem !== undefined );
 
     // set file system
-    tester.comp.setFileSystem(td.fileSystem);
+    tester.interpreter.compiler.setFileSystem(td.fileSystem);
 
     // set targets
     if( td.targets === undefined ){
@@ -208,10 +208,10 @@ JSHC.Test.runData = function(td,tester){
     } else {
        targets = td.targets;
     }
-    tester.comp.setTargets(targets);
-        
+    tester.interpreter.compiler.setTargets(targets);
+
     // compile
-    tester.comp.recompile();
+    tester.interpreter.compiler.recompile();
 
     var errorAmount;
     if( td.errors === undefined ){
@@ -220,12 +220,40 @@ JSHC.Test.runData = function(td,tester){
         errorAmount = td.errors;
     }
 
-    var info = (tester.comp.errors !== errorAmount) ? tester.comp.errorList.join("\n") : undefined;
+    var info = [];
+    if( tester.interpreter.errors !== errorAmount ){
+        for(var i=0 ; i<tester.interpreter.errorList.length ; i++){
+            var err = tester.interpreter.errorList[i];
+            if( typeof err !== "string" ){
+                err = JSHC.showError(err);
+            }
+            info.push(err);
+        }
+    }
+
+    var success = tester.interpreter.errors === errorAmount;
+
+    var commands = td.commands;
+    for(var command in commands){
+        tester.interpreter.execCommand(command);
+        if( tester.interpreter.messageList.length !== 1 ){
+            success = false;
+            info.push("got more than one result when executing \""+command+"\"");
+            continue;
+        }
+        if( tester.interpreter.messageList[0] !== commands[command] ){
+            success = false;
+            info.push("got result \""+tester.interpreter.messageList[0]+"\""+
+                      " instead of \""+commands[command]+"\" when executing "+
+                      "\""+command+"\"");
+            continue;
+        }
+    }
 
     tester.addResult(new JSHC.Test.TestResult(
         td.name,
-        tester.comp.errors === errorAmount,
-        info));
+        tester.interpreter.errors === errorAmount,
+        info.length==0 ? [] : info.join("\n")));
 };
 
 ////////////////////////////////////////////////////////////////////////////////

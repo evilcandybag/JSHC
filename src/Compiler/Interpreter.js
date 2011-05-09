@@ -2,36 +2,43 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Interpreter
-JSHC.Ymacs.Interpreter = function(buf, modulePrefix){
-    assert.ok( buf !== undefined );
+JSHC.Interpreter = function(modulePrefix){
     assert.ok( modulePrefix !== undefined );
     this.history = [];    // command history
     this.compiler = new JSHC.Compiler(modulePrefix);
 
     // make compiler messages be added to the interpreter messages
     var interpreter = this;
-    var onError = function(err){
-        interpreter.addError(err);
+    var errorHandler = function(err){
+        interpreter.onError(err);
     };
-    var onWarning = function(warn){
-        interpreter.addWarning(warn);
+    var warningHandler = function(warn){
+        interpreter.onWarning(warn);
     };
-    var onMessage = function(msg){
-        interpreter.addMessage(msg);
+    var messageHandler = function(msg){
+        interpreter.onMessage(msg);
     };
-    this.compiler.addErrorHandler(onError);
-    this.compiler.addWarningHandler(onWarning);
-    this.compiler.addMessageHandler(onMessage);
+    this.compiler.addErrorHandler(errorHandler);
+    this.compiler.addWarningHandler(warningHandler);
+    this.compiler.addMessageHandler(messageHandler);
 
-    this.buf = buf;
-    this.prompt = JSHC.Ymacs.Interpreter.prompt;
     this.prefix = modulePrefix;
-    this.msgs;
+
+    this.errors = 0;
+    this.warnings = 0;
+    this.messages = 0;
+    this.errorList = [];
+    this.warningList = [];
+    this.messageList = [];
+
+    this.errorHandlers = [];
+    this.warningHandlers = [];
+    this.messageHandlers = [];
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 
-JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
+JSHC.Interpreter.prototype.execCommand = function(line){
     var command;
     var commands = ["?", "help", "show-path",
 		      "show-code"];
@@ -44,20 +51,25 @@ JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
 	command = "";
     }
 
+    // clear old messages
     this.errors = 0;
-    this.msgs = [];  // clear old messages
+    this.warnings = 0;
+    this.messages = 0;
+    this.errorList = [];
+    this.warningList = [];
+    this.messageList = [];
 
     switch( command ){
     case ":":
 	// repeat previous command
 
-	this.addError("\""+words[0]+"\" not implemented");
+	this.onError("\""+words[0]+"\" not implemented");
 	break;
 
     case ":add":
 	// add modules to target set
 
-	this.addError("\""+words[0]+"\" not implemented");
+	this.onError("\""+words[0]+"\" not implemented");
 	break;
 
     case ":browse":
@@ -67,25 +79,25 @@ JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
 	//      i.e union up all ispaces and the tspace, then resolve each
 	//      name so that it will be qualified if ambiguous, otherwise not.
 
-	this.addError("\""+words[0]+"\" not implemented");
+	this.onError("\""+words[0]+"\" not implemented");
 	break;
 
     case ":edit":
 	// :edit modulename/URL
 	// open a module (creates new buffer) from the file system or URL
 
-	this.addError("\""+words[0]+"\" not implemented");
+	this.onError("\""+words[0]+"\" not implemented");
 	break;
 
     case ":help": case ":?":
-	this.addMessage(commands.join("\n"));
+	this.onMessage(commands.join("\n"));
 	break;
 
     case ":info":
 	// :info name     // give location of any name. members of tycon/tycls.
 	//    tab-completion on names.
 
-	this.addError("\""+words[0]+"\" not implemented");
+	this.onError("\""+words[0]+"\" not implemented");
 	break;
 
     case ":kind":
@@ -115,25 +127,25 @@ JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
 	//   '*'      access to tspace + ispaces.
 	//   non-'*'  access to espace.
 
-	this.addError("\""+words[0]+"\" not implemented");
+	this.onError("\""+words[0]+"\" not implemented");
 	break;
 
     case ":quit":
 	// :quit     // remove buffer (and frame if >1) "kill_frame" ?
 
-	this.addError("\""+words[0]+"\" not implemented");
+	this.onError("\""+words[0]+"\" not implemented");
 	break;
 
     case ":reload":
 	// :reload   // reload the targets. get a new set of loaded modules.
 
-	this.addError("\""+words[0]+"\" not implemented");
+	this.onError("\""+words[0]+"\" not implemented");
 	break;
 
     case ":set":
 	// :set       // set an interpreter variable
 
-	this.addError("\""+words[0]+"\" not implemented");
+	this.onError("\""+words[0]+"\" not implemented");
 	break;
 
     case ":show":
@@ -146,23 +158,23 @@ JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
 	//                // should have a command to open code in a buffer ?
 
 	if( words.length !== 2 ){
-	    this.addError("invalid number of arguments for :show");
+	    this.onError("invalid number of arguments for :show");
 	    break;
 	}
 	switch( words[1] ){
 	case "path":
-	    this.addMessage(this.compiler.path.join("\n"));
+	    this.onMessage(this.compiler.path.join("\n"));
 	    break;
 	case "code":
-	    this.addMessage(this.compiler.getAllJSCode());
+	    this.onMessage(this.compiler.getAllJSCode());
 	    break;
 	case "modules":
 	    for(var loaded_module in this.compiler.modules){
-	        this.addMessage(loaded_module);
+	        this.onMessage(loaded_module);
 	    }
 	    break;
 	default:
-	    this.addError("invalid interpreter variable");
+	    this.onError("invalid interpreter variable");
 	}
 	break;
 
@@ -172,9 +184,9 @@ JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
 	var decl = this.compiler.checkExp(expression);
 	if( this.errors === 0 ){
             if( decl.ident.type === undefined ){
-                this.addError("type is missing");
+                this.onError("type is missing");
             } else {
-                this.addMessage(decl.ident.type);
+                this.onMessage(decl.ident.type);
             }
         }
 	break;
@@ -182,9 +194,9 @@ JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
     case ":!":
     case ":js":
         try {
-            this.addMessage(eval(line.substr(3)));
+            this.onMessage(eval(line.substr(3)));
         } catch (err) {
-            this.addError(err);
+            this.onError(err);
         }
         break;
     
@@ -214,150 +226,97 @@ JSHC.Ymacs.Interpreter.prototype.execCommand = function(line){
             }
 
             var expr = JSHC.Codegen.codegen(decl.rhs, this.prefix);
-            this.addMessage(eval(expr));
+            this.onMessage(eval(expr));
         } catch (err) {
             alert("expression:\n" + line + "\ngenerated code:\n" + expr + "\nwith error:\n\n" + JSHC.showError(err));
-            this.addError(err);
+            this.onError(err);
         }
 	break;
 
-    default: this.addError("unknown command: "+command);
+    default: this.onError("unknown command: "+command);
     }
-
-    return this.msgs.join("");
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 
-JSHC.Ymacs.Interpreter.prototype.autoComplete = function(){
+JSHC.Interpreter.prototype.autoComplete = function(){
    // TODO
    return {error: "auto-completion not implemented"};
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 
-/*
-  Called with a command to run. defaults to using the input on the last
-  line of the buffer.
-  The command will be auto-completed if possible.
-  Output will be written to the buffer.
-*/
-JSHC.Ymacs.Interpreter.prototype.runCommand = function(opt_text){
-    // NOTE: currently running commands synchronuously.
-    //       should probably be done asynchronuously instead.
-    
-    var output, line;
-
-    if( opt_text !== undefined ){
-	// run given command
-
-	// find position where last line begins
-	//var pos = this.buf.getCodeSize() - this.buf.caretMarker.getRowCol().col;
-
-	this.execCommand(opt_text);
-
-        // need to insert prompt if missing
-        line = this.buf.code[this.buf.code.length-1];
-        if( line !== this.prompt ){
-            // this case occurs when output is written out AFTER an existing
-            // prompt.
-            this.buf.__insertText(this.prompt);
-        } else {
-            // make sure we are at the end of the buffer
-            // this case occurs when output is written out BEFORE an existing
-            // prompt.
-            this.buf.caretMarker.setPosition(this.buf.getCodeSize());
-        }
-    } else {
-	// run command using last line
-
-	line = this.buf.code[this.buf.code.length-1].substr(this.prompt.length);
-
-	// store buffer text in history
-	this.history.push(line);
-
-	this.buf.__insertText("\n");
-
-	this.execCommand(line);
-
-	// insert new prompt
-	this.buf.__insertText(this.prompt);
-	    
-	// clear undo information
-	this.buf.__undoQueue = [];
-	this.buf.__redoQueue = [];
-    }
-};
-
-////////////////////////////////////////////////////////////////////////////////
-
-JSHC.Ymacs.Interpreter.prototype.addError = function(msg){
+JSHC.Interpreter.prototype.onError = function(err){
     this.errors++;
-    this.outputToBuffer("Error: "+msg);
-};
 
-JSHC.Ymacs.Interpreter.prototype.addWarning = function(msg){
-    this.outputToBuffer("Warning: "+msg);
-};
-
-JSHC.Ymacs.Interpreter.prototype.addMessage = function(msg){
-    this.outputToBuffer(msg);
-};
-
-JSHC.Ymacs.Interpreter.prototype.outputToBuffer = function(msg){
-    // make sure we are at the end of the buffer
-    this.buf.caretMarker.setPosition(this.buf.getCodeSize());
-
-    line = this.buf.code[this.buf.code.length-1];
-    if( line === this.prompt ){
-        // if empty prompt, insert before it.
-	var pos = this.buf.getCodeSize() - this.buf.caretMarker.getRowCol().col;
-	this.buf.caretMarker.setPosition(pos);
-    } else if( line.length !== 0 ) {
-        // if not at the beginning of a line, make a new line.
-	this.buf.__insertText("\n");
+    if( this.errorHandlers.length == 0 ){
+        this.errorList.push(err);
+    } else {
+        for(var i=0 ; i<this.errorHandlers.length ; i++){
+            this.errorHandlers[i](err);
+        }
     }
-    
-    // make sure output ends with a newline
-    if( msg[msg.length-1] !== "\n" ){
-        msg += "\n";
-    }
-
-    this.buf.__insertText(msg);
 };
 
-////////////////////////////////////////////////////////////////////////////////
+JSHC.Interpreter.prototype.onWarning = function(warn){
+    this.warnings++;
 
-// FIXME:
-// need to currently exist as a constant outside the created interpreter object
-// since the interpreter-mode needs to know the prompt to color it, which
-// seemingly must be written to be applied on an arbitrary buffer, not just a
-// buffer that has a prompt ?
-JSHC.Ymacs.Interpreter.prompt = "> ";
+    if( this.warningHandlers.length == 0 ){
+        this.warningList.push(warn);
+    } else {
+        for(var i=0 ; i<this.warningHandlers.length ; i++){
+            this.warningHandlers[i](warn);
+        }
+    }
+};
+
+JSHC.Interpreter.prototype.onMessage = function(msg){
+    this.messages++;
+
+    if( this.messageHandlers.length == 0 ){
+        this.messageList.push(msg);
+    } else {
+        for(var i=0 ; i<this.messageHandlers.length ; i++){
+            this.messageHandlers[i](msg);
+        }
+    }
+};
+
+JSHC.Interpreter.prototype.addErrorHandler = function(onError){
+    this.errorHandlers.push(onError);
+};
+
+JSHC.Interpreter.prototype.addWarningHandler = function(onWarning){
+    this.warningHandlers.push(onWarning);
+};
+
+JSHC.Interpreter.prototype.addMessageHandler = function(onMessage){
+    this.messageHandlers.push(onMessage);
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 // functions to handle commands
 
-JSHC.Ymacs.Interpreter.prototype.commandKind = function(qname){
+JSHC.Interpreter.prototype.commandKind = function(qname){
 
     var ast = this.lookupName(qname);
     if( ast !== undefined ){
         if( ast.kind === undefined ){
-            this.addError("kind is missing for \""+ast+"\"");
+            this.onError("kind is missing for \""+ast+"\"");
         } else {
-            this.addMessage(ast.kind);
+            this.onMessage(ast.kind);
         }
     }
 };
 
-JSHC.Ymacs.Interpreter.prototype.commandType = function(qname){
+JSHC.Interpreter.prototype.commandType = function(qname){
 
     var ast = this.lookupName(qname);
     if( ast !== undefined ){
         if( ast.type === undefined ){
-            this.addError("type is missing for \""+ast+"\"");
+            this.onError("type is missing for \""+ast+"\"");
         } else {
-            this.addMessage(ast.type);
+            this.onMessage(ast.type);
         }
     }
 };
@@ -371,7 +330,7 @@ JSHC.Ymacs.Interpreter.prototype.commandType = function(qname){
   
   if not found, an error is added and 'undefined' is returned.
 */
-JSHC.Ymacs.Interpreter.prototype.lookupName = function(qname){
+JSHC.Interpreter.prototype.lookupName = function(qname){
     var dotix = qname.lastIndexOf(".");
     var name;
 
@@ -386,7 +345,7 @@ JSHC.Ymacs.Interpreter.prototype.lookupName = function(qname){
        }
        switch( asts.length ){
        case 0:
-           this.addError("\""+qname+"\" not in scope");
+           this.onError("\""+qname+"\" not in scope");
            break;
        case 1:
            return asts[0];
@@ -398,18 +357,18 @@ JSHC.Ymacs.Interpreter.prototype.lookupName = function(qname){
                msg.push(", ");
            }
            msg.pop();
-           this.addError(msg.join(""));
+           this.onError(msg.join(""));
        }
     } else {
         var name = qname.substr(dotix+1);
         var loc = qname.substr(0,dotix);
         var module = this.compiler.modules[loc];
         if( module === undefined ){
-           this.addError("module "+loc+" is not loaded");
+           this.onError("module "+loc+" is not loaded");
         } else {
             var ast = module.ast.espace[name];
             if( ast === undefined ){
-               this.addError(loc+" does not export "+name);
+               this.onError(loc+" does not export "+name);
             } else {
                 return ast;
             }
