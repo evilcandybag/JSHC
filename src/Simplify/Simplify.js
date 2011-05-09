@@ -147,10 +147,18 @@ JSHC.Simplify.patSimplify = function (ast) {
     var toMerge = {};
 
     var merge = function(funs) {
-    
-      assert.ok(funs.length > 0, "patSimplify.merge() shouldn't be called with a list of 0 length")
       
-      if (funs.length > 1) {
+      assert.ok(funs.length > 0, "patSimplify.merge() shouldn't be called with a list of 0 length")
+        // check whether a one line function uses matching on its arguments      
+      var hasMatching = false;
+      for (var i = 0; i < funs[0].args.length; i++) {
+          if (funs[0].args[i].name !== "varname") {
+                hasMatching = true;
+                break;
+          }
+      }
+      
+      if (funs.length > 1 || hasMatching) {
           var newArgs = [];
           var newAlts = [];
           var newArgsT = [];
