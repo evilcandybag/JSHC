@@ -21,6 +21,7 @@ JSHC.Compiler = function(modulePrefix){
 	return this.syncLoadNames(this.fileSystem, this.path, names, this.modules);
     };
 
+    this.errorList = []; // used if no handlers have been set
     this.errorHandlers = [];
     this.warningHandlers = [];
     this.messageHandlers = [];
@@ -50,8 +51,12 @@ JSHC.Compiler.prototype.setFileSystem = function(fileSystem){
 
 JSHC.Compiler.prototype.onError = function(err){
     this.errors++;
-    for(var i=0 ; i<this.errorHandlers.length ; i++){
-        this.errorHandlers[i](err);
+    if( this.errorHandlers.length == 0 ){
+        this.errorList.push(err);
+    } else {
+        for(var i=0 ; i<this.errorHandlers.length ; i++){
+            this.errorHandlers[i](err);
+        }
     }
 };
 
@@ -97,7 +102,8 @@ JSHC.Compiler.prototype.recompile = function(){
     var prev_modules = modules;
     this.modules = {};
 
-    this.errors = [];   // clear old errors
+    this.errors = 0;   // clear old errors
+    this.errorList = [];
 
     for(k in mods){ // mods : map
 	mod = mods[k];
@@ -213,7 +219,8 @@ JSHC.Compiler.prototype.recompile = function(){
 
 JSHC.Compiler.prototype.checkExp = function (exp){
 
-    this.errors = [];   // clear old errors
+    this.errors = 0;   // clear old errors
+    this.errorList = [];
 
     var res = JSHC.parseExp(exp);
     res = {name: "decl-fun",
