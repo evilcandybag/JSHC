@@ -246,8 +246,12 @@ JSHC.Compiler.prototype.checkExp = function (exp){
     return res.body.topdecls[0].decl;
 };
 
-JSHC.Compiler.compileExp = function (exp,prefix){
+JSHC.Compiler.compileExp = function (exp,prefix,fileSystem){
     var compiler = new JSHC.Compiler(prefix);
+    
+    if (fileSystem !== undefined)
+        compiler.setFileSystem(fileSystem);
+    
     var decl = compiler.checkExp(exp);
     return JSHC.Codegen.codegen(decl.rhs, prefix);
 };
