@@ -534,8 +534,29 @@ JSHC.Check.Ctx.prototype.quantifyType = function(type){
 	}
     }
 
+    var keyAmount = JSHC.numberOfKeys(used);
+    var binds = {};
+    if( keyAmount > 26 ){
+        var n=0;
+        for(var u in used){
+            var tyvar = new JSHC.TyVar("t"+n);
+            binds[tyvar] = tyvar;
+            used[u] = tyvar;
+            n++;
+        }
+    } else {
+        var c=97;
+        for(var u in used){
+            var tyvar = new JSHC.TyVar(String.fromCharCode(c));
+            binds[tyvar] = tyvar;
+            used[u] = tyvar;
+            c++;
+        }
+    }
+
     if( ! empty ){
-        type = new JSHC.ForallType(used, type);
+        type = JSHC.Check.replaceTyVars(used, type);
+        type = new JSHC.ForallType(binds, type);
     }
     return type;
 };
@@ -875,6 +896,52 @@ JSHC.Check.replaceTyVarWith = function(tyvar,rtype,type){
 	case "tyvar":
 	    if( type == tyvar ){
 	        return rtype;
+	    } else {
+	        return type;
+	    }
+
+	case "forall":
+	    assert.ok( false );
+	    return type;
+
+        case "apptype":
+            var lhs = replace(type.lhs);
+            var rhs = replace(type.rhs);
+            return new JSHC.AppType(lhs,rhs);
+
+        case "funtype":
+            var ts = [];
+            for(var t=0 ; t<type.types.length ; t++){
+               ts.push(replace(type.types[t]));
+            }
+            return new JSHC.FunType(ts);
+
+	case "tycon":
+	    return type;
+
+        case "starkind":
+            return type;
+
+	default:
+	    throw new Error("unknown type: "+type.name);
+	};
+    };
+
+    return replace(type);
+};
+
+/*
+  find all occurences of 'tyvar' in 'type' and replace them with 'rtype',
+  and then return the new type.
+*/
+JSHC.Check.replaceTyVars = function(mapping,type){
+    assert.ok ( type !== undefined );
+
+    var replace = function(type){
+	switch( type.name ){
+	case "tyvar":
+	    if( mapping[type] !== undefined ){
+	        return mapping[type];
 	    } else {
 	        return type;
 	    }
