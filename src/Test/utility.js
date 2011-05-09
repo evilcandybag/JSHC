@@ -64,6 +64,7 @@ JSHC.Test.Tester = function(){
     this.results = {};
     this.passed = 0;
     this.failed = 0;
+    this.comp = new JSHC.Compiler("JSHC.Test.modules");
 };
 
 /*
@@ -105,12 +106,12 @@ JSHC.Test.Tester.prototype.addResult = function(result){
 JSHC.Test.Tester.prototype.runFunction = function(fun){
     assert.ok( fun instanceof Function );
     
-    tester = this;
-    var resultHandler = function(result){
-        tester.addResult(result);
-    };
+    //tester = this;
+    //var resultHandler = function(result){
+    //    tester.addResult(result);
+    //};
 
-    fun(resultHandler);
+    fun(this);
 };
 
 /*
@@ -138,7 +139,11 @@ JSHC.Test.Tester.prototype.toString = function(tc){
 
 	// show failed tests
 	msg.push("name: "+r.name+"\n");
-	msg.push(r.info);
+	if( r.info === undefined || r.info.length == 0 ){
+	    msg.push("(no information)");
+	} else {
+            msg.push(r.info);
+	}
 	msg.push("\n\n");
     }
     return msg.join("");
@@ -160,8 +165,13 @@ JSHC.Test.Tester.prototype.toHTML = function(tc){
 	if( r.ok )continue;
 
 	// show failed tests
-	msg.push("name: "+r.tc.name+"<br>");
-	msg.push(r.info);  // TODO: should somehow convert to HTML ?
+	msg.push("name: "+r.getName()+"<br>");
+        // TODO: should somehow convert to HTML ?
+	if( r.info === undefined || r.info.length == 0 ){
+	    msg.push("(no information)");
+	} else {
+            msg.push(r.info);
+	}
 	msg.push("<hr>");
     }
     return msg.join("");
@@ -180,3 +190,42 @@ JSHC.Test.runtests = function(tests, showHTML){
 
 ////////////////////////////////////////////////////////////////////////////////
 
+/*
+  run test tests using test data
+*/
+JSHC.Test.runData = function(td,tester){
+    assert.ok( td.fileSystem !== undefined );
+
+    // set file system
+    tester.comp.setFileSystem(td.fileSystem);
+
+    // set targets
+    if( td.targets === undefined ){
+       var targets = [];
+       for(var modname in td.fileSystem){
+          targets.push(modname);
+       }
+    } else {
+       targets = td.targets;
+    }
+    tester.comp.setTargets(targets);
+        
+    // compile
+    tester.comp.recompile();
+
+    var errorAmount;
+    if( td.errors === undefined ){
+        errorAmount = 0;
+    } else {
+        errorAmount = td.errors;
+    }
+
+    var info = (tester.comp.errors !== errorAmount) ? tester.comp.errorList.join("\n") : undefined;
+
+    tester.addResult(new JSHC.Test.TestResult(
+        td.name,
+        tester.comp.errors === errorAmount,
+        info));
+};
+
+////////////////////////////////////////////////////////////////////////////////
