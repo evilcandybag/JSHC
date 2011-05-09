@@ -103,7 +103,7 @@ JSHC.Interpreter.prototype.execCommand = function(line){
     case ":kind":
         // :kind name     // must be a type constructor
         for(var w=1 ; w<words.length ; w++ ){
-            this.commandKind(words[w].toString());
+            this.commandKind(words[w]);
         }
 	break;
 
@@ -304,7 +304,7 @@ JSHC.Interpreter.prototype.commandKind = function(qname){
         if( ast.kind === undefined ){
             this.onError("kind is missing for \""+ast+"\"");
         } else {
-            this.onMessage(ast.kind);
+            this.onMessage(ast.kind.toString());
         }
     }
 };
@@ -316,7 +316,7 @@ JSHC.Interpreter.prototype.commandType = function(qname){
         if( ast.type === undefined ){
             this.onError("type is missing for \""+ast+"\"");
         } else {
-            this.onMessage(ast.type);
+            this.onMessage(ast.type.toString());
         }
     }
 };
