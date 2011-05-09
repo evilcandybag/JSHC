@@ -41,12 +41,21 @@ JSHC.Test.TestCase.prototype.result = function(ok, info){
 
 ////////////////////////////////////////////////////////////////////////////////
 
-JSHC.Test.TestResult = function(tc, ok, info){
-    this.tc = tc;
+JSHC.Test.TestResult = function(id, ok, info){
+    assert.ok( typeof ok == "boolean" );
+    if( typeof id == "string" ){
+        this.name = id;
+    } else if( id instanceof JSHC.Test.TestCase ){
+        this.tc = id;
+    }
     this.ok = ok;
     if( info !== undefined ){
 	this.info = info;
     }
+};
+
+JSHC.Test.TestResult.prototype.getName = function(){
+    return this.name !== undefined ? this.name : this.tc.name;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -66,13 +75,42 @@ JSHC.Test.Tester.prototype.run = function(tests){
     // run the single test case
     if( tests instanceof JSHC.Test.TestCase ){
 	this.runTC(tests);
-	return;
+    } else if( tests instanceof Function ){
+        this.runFunction(tests);
+    } else {
+        // run all test cases in the object
+        for(t in tests){
+	    this.run(tests[t]);
+        }
     }
+};
 
-    // run all test cases in the object
-    for(t in tests){
-	this.run(tests[t]);
+JSHC.Test.Tester.prototype.addResult = function(result){
+    assert.ok( result instanceof JSHC.Test.TestResult );
+    var name = result.getName();
+    if( this.results[name] !== undefined ){
+        throw new Error("test names overlap. \""+name+"\" exists more than once.");
     }
+    this.results[name] = result;
+    if( result.ok ){
+        this.passed++;
+    } else {
+        this.failed++;
+    }
+};
+
+/*
+  Runs a single test case.
+*/
+JSHC.Test.Tester.prototype.runFunction = function(fun){
+    assert.ok( fun instanceof Function );
+    
+    tester = this;
+    var resultHandler = function(result){
+        tester.addResult(result);
+    };
+
+    fun(resultHandler);
 };
 
 /*
@@ -80,13 +118,7 @@ JSHC.Test.Tester.prototype.run = function(tests){
 */
 JSHC.Test.Tester.prototype.runTC = function(tc){
     assert.ok( tc instanceof JSHC.Test.TestCase );
-    if( this.results[tc.name] !== undefined ){
-	throw new Error("test names overlap");
-    }
-    var result = tc.action();
-    assert.ok( result instanceof JSHC.Test.TestResult );
-    this.results[tc.name] = result;
-    if( result.ok ){ this.passed++; }else{ this.failed++; }
+    this.addResult(tc.action());
 };
 
 /*
