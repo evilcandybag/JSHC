@@ -489,7 +489,7 @@ apat // : object
     | gcon              {{$$ = $1; }}
     | literal           {{$$ = $1; }}
     | tuple_pat         {{$$ = $1; }}
-    // TODO: incomplete
+    | "(" pat ")"       {{$$ = $2; }}
     ;
 
 tuple_pat // object

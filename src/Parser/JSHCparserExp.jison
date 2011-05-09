@@ -48,6 +48,7 @@ start_
     : "{" exp "}" EOF    { return $2; }
     ;
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // 5.1 Module Structure
 
@@ -489,7 +490,7 @@ apat // : object
     | gcon              {{$$ = $1; }}
     | literal           {{$$ = $1; }}
     | tuple_pat         {{$$ = $1; }}
-    // TODO: incomplete
+    | "(" pat ")"       {{$$ = $2; }}
     ;
 
 tuple_pat // object
