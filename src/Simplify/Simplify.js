@@ -78,12 +78,12 @@ JSHC.Simplify.reduceExp = function (exp) {
                            exp: JSHC.Simplify.reduceExp(exp.e2)};
                 var fals = {name: "alt", pat: new JSHC.DaCon("False", exp.e3.pos, false), 
                            exp: JSHC.Simplify.reduceExp(exp.e3)};            
-                e.exps[0] = {name: "case", exp: JSHC.Simplify.reduceExp(exp.e1), 
+                exp = {name: "case", exp: JSHC.Simplify.reduceExp(exp.e1), 
                              alts: [tru,fals]};
                 break;
             case "lambda":
                 var rhs_new = JSHC.Simplify.reduceExp(exp.rhs)
-                e.exps[0] = {name: "lambda", args: exp.args, rhs: rhs_new, pos: exp.pos};
+                exp = {name: "lambda", args: exp.args, rhs: rhs_new, pos: exp.pos};
                 break;
             case "let":
                 var new_exp = {name:"tuple",members: [],pos: exp.pos};

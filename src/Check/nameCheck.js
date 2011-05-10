@@ -49,13 +49,25 @@ JSHC.Check.lookupName = function(comp,module,lspace,name){
             assert.ok( lname !== null, "the lspace is not storing the value for name "+name );
             if( lname !== undefined ) {
                 //JSHC.alert("found ",name," as ",lspace.lookup(name));
+                lname.isLocal = true;
                 nspace.add(lname);
             }
         }
-    }
+    } 
 
+    var hasLocals = function(ns) {
+        var vals = ns.getValues();
+
+        for (var i = 0; i < vals.length; i++) {
+            if (vals[i].isLocal !== undefined) {
+                return vals[i].isLocal;
+            }
+        }
+        return false;
+    }
+    
     // check if in tspace
-    if( name.loc === undefined || name.loc === module.modid.id ){
+    if( (name.loc === undefined || name.loc === module.modid.id) && !hasLocals(nspace) ){
         // handle unqualified name or qualified with the module it is within
 
         var name_in_tspace = module.body.tspace[name];
@@ -67,7 +79,7 @@ JSHC.Check.lookupName = function(comp,module,lspace,name){
     }
 
     // check impdecls
-    if( name.loc === undefined || name.loc !== module ){
+    if( (name.loc === undefined || name.loc !== module) && !hasLocals(nspace) ){
         // handle unqualified name or qualified with import module name
 
         var impdecls = module.body.impdecls;
@@ -131,14 +143,10 @@ JSHC.Check.lookupName = function(comp,module,lspace,name){
     } else { // amount.length >= 2
 	// error: ambiguity since more than one declaration in scope
 	msg = ["Ambiguity. Names in scope: "];
+        
+    msg = msg.concat(nspace.getKeys());
 
-	for(dn in ns){
-	    msg.push(dn);
-	    msg.push(", ");
-	}
-	msg.pop(); // remove last ", "
-
-	comp.onE(new JSHC.SourceError(module.modid,nameobj.pos,msg.join("")));
+	comp.onError(new JSHC.SourceError(module.modid,name.pos,msg.join(" ")));
     }
     return undefined;
 };
@@ -560,6 +568,17 @@ JSHC.Check.nameCheckExp = function(comp,module,lspace,ast){
     case "application":
         for(var i=0 ; i<ast.exps.length ; i++){
             JSHC.Check.nameCheckExp(comp,module,lspace,ast.exps[i]);
+        }
+        break;
+
+    case "case":
+        JSHC.Check.nameCheckExp(comp,module,lspace,ast.exp);
+        for (var i = 0; i < ast.alts.length; i++) {
+            var alt = ast.alts[i];
+            lspace.push();
+            JSHC.Check.nameCheckPattern(comp,module,lspace,alt.pat);
+            JSHC.Check.nameCheckExp(comp,module,lspace,ast.exp);
+            lspace.pop();
         }
         break;
 
