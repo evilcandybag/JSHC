@@ -9,6 +9,7 @@ JSHC.Fixity = {};  // Fixity module
   modifies the module AST by rewriting infix lists into function applications.
 */
 JSHC.Fixity.fixityResolution = function(module_ast){
+//    JSHC.alert(module_ast.modid + " fspace", module_ast.body.fspace);
     assert.ok(module_ast.body.fspace !== undefined, "fixityResolution: no fspace in AST!");
     JSHC.Fixity.translateInfixLists(module_ast.body.fspace,module_ast);
 };
@@ -67,20 +68,27 @@ JSHC.Fixity.resolve = function(info,exps) {
 	if( exps.length === 0 ){
 	    return exp1;
 	}
-	
+//	JSHC.alert("resolve_parse args\nprec1:",prec1,"fix1:",fix1,"\nexp1:",exp1);
 	var exp2 = exps[0];
 	if( exp2.name === "qop" ){
 	    var exp2_fixity = JSHC.Fixity.fixityLookup(info,exp2);
 	    prec2 = exp2_fixity.prec;
 	    fix2 = exp2_fixity.fix;
+//	    JSHC.alert("prec2:",prec2,"fix2:",fix2,"\nexp2:",exp2);
+	
 	    if( prec1 === prec2 && (fix1 !== fix2 || fix1 === "nonfix") ){
 		throw new JSHC.SourceError("same precedence with non-associative operator");
 	    } else if( prec1 > prec2 || (prec1 === prec2 && fix1 == "leftfix" ) ){
-		exps.unshift(exp2);
+	        //this commented out for chained operator applications to work,
+	        //i.e. 1 + 2 + 3
+//		exps.unshift(exp2);
+//		JSHC.alert("unshifted:",exp2,exps,"\nand returned:",exp1);
 		return exp1;
 	    } else {
 //	    alert("resolve_parseNeg:\n\n" + "prec2: " + JSHC.showAST(prec2) + "\n\nfix2: " + JSHC.showAST(fix2));
-	        exps.shift();		
+//                JSHC.alert("before shift: ", exps);
+	        exps.shift();
+//	        JSHC.alert("shifted:",exps,"\nand calling parseNeg on: ", prec2, fix2)		
 		var rexp = resolve_parseNeg(prec2, fix2);
 		//rexp = {name:"infix-app", lhs:exp1, op:exp2, rhs:rexp, pos:exp2.pos};
 		rexp = {name:"application", exps:[exp2.id,exp1,rexp], pos:exp2.pos, orig:"infix"};
@@ -237,6 +245,10 @@ JSHC.Fixity.translateInfixLists["integer-lit"] = function(info, ast){
 };
 
 JSHC.Fixity.translateInfixLists["qop"] = function(info, ast){
+    // nothing
+};
+
+JSHC.Fixity.translateInfixLists["fixity"] = function(info, ast){
     // nothing
 };
 

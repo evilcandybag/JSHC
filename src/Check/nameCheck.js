@@ -429,6 +429,9 @@ JSHC.Check.nameCheckTopdeclDecl = function(comp,module,ast){
     case "decl-fun":
         JSHC.Check.nameCheckDeclFun(comp, module, new JSHC.LSpace(true), ast);
         break;
+    case "fixity":
+        JSHC.Check.nameCheckFixity(comp,module,ast);
+        break;
     default:
         throw new JSHC.CompilerError("missing decl case:"+ast.name);
     }
@@ -442,6 +445,17 @@ JSHC.Check.nameCheckDeclFun = function(comp,module,lspace,ast){
     JSHC.Check.nameCheckPatterns(comp,module,lspace,args);
     JSHC.Check.nameCheckExp(comp,module,lspace,ast.rhs);
     lspace.pop();
+};
+
+//Check that fixity information is presented only of ops declared in this module.
+JSHC.Check.nameCheckFixity = function (comp,module,ast) {
+    var ops = ast.ops;
+    var ts = module.body.tspace;
+    for (var i = 0; i < ops.length; i++) {
+        var def = ts[ops[i].toString()]
+        if (def === undefined)
+             throw new JSHC.CompilerError("operator " + ops[i].toString() + " not defined in the same module as fixity declaration");
+    }
 };
 
 JSHC.Check.nameCheckPatterns = function(comp,module,lspace,patterns){

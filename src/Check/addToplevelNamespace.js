@@ -28,6 +28,9 @@ JSHC.addToplevelNamespace = function(module){
     var ts = module.body.topdecls;
     for(i=0;i<ts.length;i++){
         if( ts[i].name === "topdecl-decl" ){
+            //ignore fixity declarations
+            if (ts[i].decl.name === "fixity")
+                continue;
             // qualify name and add to tspace
             var varname = ts[i].decl.ident;
             assert.ok( varname.loc === undefined );
@@ -68,12 +71,14 @@ JSHC.addFixitySpace = function(module_ast) {
     //         imported ?
     // TODO: fix to work with expressions as well. need fixity info of modules.
     assert.ok(module_ast.name === "module", "argument to Fixity.findInfo must be a module AST!");
+    var decls = module_ast.body.topdecls;
     var map = {};
-    for (var decl in module_ast.body.topdecls) {
-        if (decl.name === "topdecl-decl") {
-            if (decl.decl.name === "fixity") {
-                for (var nam in decl.decl.ops) {
-                    map[nam.id] = {fix: decl.decl.fix, prec: decl.decl.num};
+    for (var d in decls) {
+        if (decls[d].name === "topdecl-decl") {
+            if (decls[d].decl.name === "fixity") {
+                var ops = decls[d].decl.ops;
+                for (var nam in ops) {
+                    map[ops[nam]] = {fix: decls[d].decl.fix, prec: decls[d].decl.num};
                 }
             }
         }
