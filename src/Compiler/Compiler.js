@@ -215,7 +215,7 @@ JSHC.Compiler.prototype.recompile = function(){
         // type check: add types and kinds to top-level declarations
         var asts = [];
         group.values.forEach(function(mod){asts.push(mod.ast);});
-//        JSHC.Check.typeCheck(compiler,asts);
+        JSHC.Check.typeCheck(compiler,asts);
     };
 
     JSHC.Dep.check(entries,module_group_action);
@@ -263,7 +263,7 @@ JSHC.Compiler.prototype.checkExp = function (exp){
     JSHC.addToplevelNamespace(res);
     JSHC.Fixity.fixityResolution(res);
     JSHC.Check.nameCheck(this,res);
-//    JSHC.Check.typeCheck(this,[res]);
+    JSHC.Check.typeCheck(this,[res]);
     JSHC.Simplify.runSimplify(res);
     return res.body.topdecls[0].decl;
 };
