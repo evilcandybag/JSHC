@@ -55,3 +55,28 @@ JSHC.alert = function(){
 };
 
 ////////////////////////////////////////////////////////////////////////////////
+
+JSHC.deepCopy = function(obj){
+    switch( typeof obj ){
+
+    // immutable
+    case "number":
+    case "boolean":
+    case "string":
+    case "function":
+        return obj;
+
+    case "object":
+        var clone = new Object;
+        for(var key in obj){
+            clone[key] = JSHC.deepCopy(obj[key]);
+        }
+        return clone;
+
+    default:
+        throw new Error("JSHC.deepCopy: missing case: "+typeof obj);
+    }
+};
+
+////////////////////////////////////////////////////////////////////////////////
+

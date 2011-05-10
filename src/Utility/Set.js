@@ -20,28 +20,38 @@ JSHC.Set = function(storeValues,opt_toString){
 };
 
 JSHC.Set.prototype.add = function(name){
-    this.obj[name[this.toString]()] = this.storeValues ? name : null;
+    this.obj[this.getKey(name)] = this.storeValues ? name : null;
 };
 
 /*
   If already in the set, the handler is called with the previous element.
 */
 JSHC.Set.prototype.addUnique = function(name,handler){
-    var key = name[this.toString]();
+    var key = this.getKey(name);
     if( this.obj[key] === undefined ){
         this.obj[key] = this.storeValues ? name : null;
     } else {
-        handler(this.obj[key]);
+        if( handler !== undefined ){
+            handler(this.obj[key]);
+        } else {
+            throw new Error("duplicate value");
+        }
     }
 };
 
 JSHC.Set.prototype.rem = function(name){
-    delete this.obj[name[this.toString]()];
+    delete this.obj[this.getKey(name)];
+};
+
+JSHC.Set.prototype.contains = function(name){
+    return this.obj[this.getKey(name)] !== undefined;
 };
 
 JSHC.Set.prototype.lookup = function(name){
-    return this.obj[name[this.toString]()];
+    assert.ok( this.storeValues === true );
+    return this.obj[this.getKey(name)];
 };
+JSHC.Set.prototype.get = JSHC.Set.prototype.lookup;
 
 JSHC.Set.prototype.getObject = function(){
     return this.obj;
@@ -51,6 +61,10 @@ JSHC.Set.prototype.getAny = function(){
     for(var k in this.obj){
         return this.obj[k];
     }
+};
+
+JSHC.Set.prototype.getKey = function(name){
+    return typeof name == "string" ? name : name[this.toString]();
 };
 
 JSHC.Set.prototype.getKeys = function(){
