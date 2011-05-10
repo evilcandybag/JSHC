@@ -55,7 +55,10 @@ JSHC.addToplevelNamespace = function(module){
         }
     }
     module.body.tspace = ns;
-    module.body.fspace = JSHC.addFixitySpace(module);
+//    JSHC.alert("NS: ", ns)
+    JSHC.addFixitySpace(module, ns);
+//    JSHC.alert("NS2s: ", ns)
+    
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,7 +67,7 @@ JSHC.addToplevelNamespace = function(module){
   produces a map from operator name (both id and symbol possible) to
   {fix,prec} object.
 */
-JSHC.addFixitySpace = function(module_ast) {
+JSHC.addFixitySpace = function(module_ast,ns) {
     // TODO: find operator precedences by filtering out all top-level fixity
     //       declarations and producing a map from operators to fixity.
     //       Q:is this affected by built-in syntax and if the Prelude was
@@ -72,17 +75,14 @@ JSHC.addFixitySpace = function(module_ast) {
     // TODO: fix to work with expressions as well. need fixity info of modules.
     assert.ok(module_ast.name === "module", "argument to Fixity.findInfo must be a module AST!");
     var decls = module_ast.body.topdecls;
-    var map = {};
     for (var d in decls) {
         if (decls[d].name === "topdecl-decl") {
             if (decls[d].decl.name === "fixity") {
                 var ops = decls[d].decl.ops;
-                for (var nam in ops) {
-                    map[ops[nam]] = {fix: decls[d].decl.fix, prec: decls[d].decl.num};
+                for (var i = 0; i < ops.length; i++ ) {
+                    ns[ops[i]].fixity = {fix: decls[d].decl.fix, prec: decls[d].decl.num.value};
                 }
             }
         }
     }
-
-    return map;
 };
