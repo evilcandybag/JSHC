@@ -31,6 +31,10 @@ JSHC.Check.typeCheckModules = function(comp,modules){
 
         for(var j=0 ; j<topdecls.length ; j++){
             var topdecl = topdecls[j];
+            //if the declaration is a fixity declaration, no typechecking needs to be done.
+            if (topdecl.name === "topdecl-decl" && topdecl.decl.name === "fixity")
+                continue;
+                
             var deps = JSHC.Check.computeUsedQualifiedNames(topdecl);
             for(var dep in deps){
                 var loc = deps[dep].loc;
@@ -405,6 +409,7 @@ JSHC.Check.checkExpPattern = function(comp,ctx,args,rhs){
 	             throw new JSHC.SourceError(undefined, param.pos, "data constructor "+param+"must be given arguments");
 	         }
 	         break;
+	     
 	     default:
 	         throw new Error("missing case for " + param.name);
 	     }
@@ -846,7 +851,7 @@ JSHC.Check.Ctx.prototype.lookupAny = function(comp,name,field){
 
     // only possible if error in name check or if continuing after name check
     // anyway.
-    throw new JSHC.SourceError(undefined,undefined,name+" not in scope when type checking");
+    throw new JSHC.SourceError(undefined,undefined,name + " not in scope when type checking");
 };
 JSHC.Check.Ctx.prototype.push = function(){
     //this.contexts.push(opt_list===undefined ? {} : opt_list);
@@ -1105,6 +1110,20 @@ JSHC.Check.computeUsedQualifiedNames = function(ast){
             }
             break;
 
+        case "conpat":
+            var pats = ast.pats;
+            for(var i = 0; i < pats.length; i++){
+                find(pats[i]);
+            }
+            break;
+
+        case "tuple_pat":
+            var mems = ast.members;
+            for(var i = 0; i < mems.length; i++){
+                find(mems[i]);
+            }
+            break;    
+
         case "apptype":
             find(ast.lhs);
             find(ast.rhs);
@@ -1112,6 +1131,7 @@ JSHC.Check.computeUsedQualifiedNames = function(ast){
         
         case "tyvar":
         case "integer-lit":
+        case "fixity":
             // nothing to add.
             break;
 
@@ -1166,6 +1186,10 @@ JSHC.Check.computeDeclaredQualifiedNames = function(ast){
 
         case "decl-fun":
             names[ast.ident] = ast.ident;
+            break;
+            
+        case "fixity":
+            //no typechecking needs to be done for fixity declarations
             break;
 
 	default:
