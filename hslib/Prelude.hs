@@ -10,10 +10,12 @@ data Bool = True | False
  -- deriving (Eq, Ord, Enum, Read, Show, Bounded)
 
 -- (&&), (||) :: Bool -> Bool -> Bool
--- True  && x =  x
--- False && _ =  False
--- True  || _ =  True
--- False || x =  x
+infixr 3 &&
+infixr 2 ||
+True  && x =  x
+False && x =  False
+True  || x =  True
+False || x =  x
 
 --not :: Bool -> Bool
 not True  = False
@@ -33,12 +35,41 @@ data Either a b = Left a | Right b
 --------------------------------------------------------------------------------
 -- arithmetic operators
 
---infixl 7 *, /
---infixl 6 +, -
+infixl 7 *, /
+infixl 6 +, -
 (+) = JSHC.Internal.Prelude.int32add
 (-) = JSHC.Internal.Prelude.int32sub
 (*) = JSHC.Internal.Prelude.int32mul
 (/) = JSHC.Internal.Prelude.int32div
+
+-- arithmetic comparisons
+
+--infix 4 < , > , <= , >= , == , /=
+--(<)  = JSHC.Internal.Prelude.int32lt
+--(>)  = JSHC.Internal.Prelude.int32gt
+--(<=) = JSHC.Internal.Prelude.int32le
+--(>=) = JSHC.Internal.Prelude.int32ge
+--(==) = JSHC.Internal.Prelude.int32eq
+--(/=) = JSHC.Internal.Prelude.int32ne
+
+--------------------------------------------------------------------------------
+-- function functions
+
+--id :: a -> a
+id x = x
+
+--(.) :: (b -> c) -> (a -> b) -> a -> c
+--f . g = \ x -> f (g x)
+
+--flip :: (a -> b -> c) -> b -> a -> c
+flip f x y = f y x
+
+infixr 0 $
+--($) :: (a -> b) -> a -> b
+f $ x = f x
+
+
+
 
 --------------------------------------------------------------------------------
 -- list functions
