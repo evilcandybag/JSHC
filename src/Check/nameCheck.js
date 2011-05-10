@@ -573,6 +573,7 @@ JSHC.Check.nameCheckExp = function(comp,module,lspace,ast){
         break;
     
     case "fun-where":
+    case "let":
         lspace.push();
         JSHC.Check.getLocalBindings(comp,module,lspace,ast);
         for (var i = 0; i < ast.decls.length; i++) {

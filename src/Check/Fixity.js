@@ -188,6 +188,15 @@ JSHC.Fixity.translateInfixLists["fun-where"] = function (info,ast) {
     }
 };
 
+JSHC.Fixity.translateInfixLists["let"] = function (info,ast) {
+    JSHC.Fixity.translateInfixMember(info, ast, "exp");
+    JSHC.Fixity.translateInfixLists(info, ast.exp);
+    
+    for (var i = 0; i < ast.decls.length; i++) {
+        JSHC.Fixity.translateInfixLists(info,ast.decls[i]);
+    }
+};
+
 JSHC.Fixity.translateInfixLists["constrained-exp"] = function(info, ast){
     // no infix expressions in type signatures.
     
