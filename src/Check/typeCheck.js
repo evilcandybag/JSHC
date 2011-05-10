@@ -5,7 +5,11 @@ JSHC.Check.typeCheck = function(comp,modules){
     try{
         JSHC.Check.typeCheckModules(comp,modules);
     }catch(err){
-        JSHC.alert("error in type checking\n",JSHC.showError(err));
+        if( err instanceof JSHC.TypeError ){
+            comp.onError("type error: "+err.toString());
+        } else {
+            JSHC.alert("error in type checking\n",JSHC.showError(err));
+        }
     }
 };
 
@@ -326,13 +330,25 @@ JSHC.Check.checkExp = function(comp,ctx,ast){
 	    var exp_types = [];
 	    for(var ix=0 ; ix<ast.exps.length ; ix++ ){
 	        exp_types.push(JSHC.Check.checkExp(comp,ctx,ast.exps[ix]));
+	        //JSHC.alert("got ",exp_types[exp_types.length-1]," from ",ast.exps[ix]);
 	    }
+            //JSHC.alert(exp_types);
+            //JSHC.alert(ctx.toString());
+
 	    var fun_type = exp_types[0];
 	    exp_types.shift();
 	    var ret_type = ctx.newUnboundTyVar();
 	    exp_types.push(ret_type);
             var inferred_type = new JSHC.FunType(exp_types);
-            ctx.constrain(fun_type,inferred_type);
+            //JSHC.alert("constraining ",fun_type.toString()," to ",inferred_type.toString());
+            try{
+                ctx.constrain(fun_type,inferred_type);
+            } catch(err){
+                if( err instanceof JSHC.TypeError ){
+                    err.value = ast.exps[0];
+                }
+                throw err;
+            }
 	    return ret_type;
         }
 	//if( ! (fun_type instanceof JSHC.FunType) ){
@@ -370,7 +386,7 @@ JSHC.Check.checkExp = function(comp,ctx,ast){
 
     case "integer-lit":
         // should be "forall a. Num a => a"
-        return new JSHC.TyCon("Data.Int.Int32");
+        return new JSHC.TyCon("Int32",{},"Data.Int");
 
     case "dacon": case "varname":
         return ctx.lookupType(comp,ast);
@@ -389,6 +405,9 @@ JSHC.Check.checkExp = function(comp,ctx,ast){
         }
 };
 
+/*
+  checks an expression given some arguments.
+*/
 JSHC.Check.checkExpPattern = function(comp,ctx,args,rhs){
 	 for(var ix=0 ; ix<args.length ; ix++){
 	     var param = args[ix];
@@ -416,7 +435,6 @@ JSHC.Check.checkExpPattern = function(comp,ctx,args,rhs){
 	 }
 
 	 // check RHS:
-         //JSHC.alert("checking: ",rhs);
 	 var rhs_type = JSHC.Check.checkExp(comp,ctx,rhs);
 	 assert.ok( rhs_type !== undefined );
 
@@ -611,6 +629,9 @@ JSHC.Check.Ctx.prototype.newUnboundTyVar = function(){
     var tyvar = this.freevars.next();
     return tyvar;
 };
+/*
+  takes two types and adds appropriate constraints or throws a type error
+*/
 JSHC.Check.Ctx.prototype.constrain = function(type1,type2){
     assert.ok( type1 !== undefined );
     assert.ok( type2 !== undefined );
@@ -650,7 +671,7 @@ JSHC.Check.Ctx.prototype.constrain = function(type1,type2){
     } else if( type1.toString() == type2.toString() ) {
         return;
     } else {
-	throw new Error("trying to add invalid constraint: "+type1+" and "+type2);
+	throw new JSHC.TypeError(type1, type2);
     }
 };
 /*
@@ -804,13 +825,15 @@ JSHC.Check.Ctx.prototype.lookupAny = function(comp,name,field){
     if( name.loc !== undefined ){
         if( name.loc == "JSHC.Internal.Prelude" ){
             // TODO: should use foreign declarations instead to specify the type.
+            var int32_type = new JSHC.TyCon("Int32",{},"Data.Int");
+            var iii_type = new JSHC.FunType([int32_type,int32_type,int32_type]);
             if( field == "type" ){
                 switch( name.id ){
                 case "int32add":
                 case "int32sub":
                 case "int32mul":
                 case "int32div":
-                    return new JSHC.TyCon("Int32",{},"Data.Int");
+                    return iii_type;
                     break;
                 }
             }
