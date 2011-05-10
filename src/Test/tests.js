@@ -37,42 +37,6 @@ JSHC.Test.Tests.parsable = function(){
     return ts;
 }();
 
-JSHC.Test.Tests.codegen = function() {
-    var l;
-    var ls = new JSHC.Test.Cases.codegen();
-    var ts = {};
-    var number = 0;
-
-    var action = function(){
-	try{
-	    var prog = JSHC.Compile.compile(this.input.p);
-	    
-        eval(prog);
-        var com = eval(this.input.r);
-        if (com === this.input.e) {
-            return this.result(true);
-        } else {
-            var msg = "expected: " + this.input.e + " got: " + com;
-            return this.result.false,msg
-        }
-	}catch(err){
-	    return this.result(false, JSHC.showError(err));
-	}
-    };
-
-    for(l in ls){
-	var strings = ls[l];
-	strings.forEach(function(input){
-	    var tc = new JSHC.Test.TestCase("codegen"+(number++),action);
-	    tc.input = input;
-	    ts[tc.name] = tc;
-	});
-    }
-    
-    return ts;
-}();
-
-
 ////////////////////////////////////////////////////////////////////////////////
 
 /*
