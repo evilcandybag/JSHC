@@ -9,8 +9,7 @@ JSHC.Fixity = {};  // Fixity module
   modifies the module AST by rewriting infix lists into function applications.
 */
 JSHC.Fixity.fixityResolution = function(module_ast){
-//    JSHC.alert(module_ast.modid + " fspace", module_ast.body.fspace);
-    assert.ok(module_ast.body.fspace !== undefined, "fixityResolution: no fspace in AST!");
+//        JSHC.alert(module_ast)
     JSHC.Fixity.translateInfixLists(module_ast.body.fspace,module_ast);
 };
 
@@ -23,7 +22,8 @@ JSHC.Fixity.fixityResolution = function(module_ast){
   looks up fixity information and defaults to infixl 9 if missing.
 */
 JSHC.Fixity.fixityLookup = function(info,name){
-    var r = info[name.id];
+        
+    var r = name.id.fixity;
     if( r === undefined ){
 	r = {fix: "leftfix", prec: 9};
     }

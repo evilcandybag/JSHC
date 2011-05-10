@@ -121,6 +121,9 @@ JSHC.Check.lookupName = function(comp,module,lspace,name){
 	    // then qualify it so that it has the same qualification.
             if( name.loc === undefined ){
 	        name.loc = matched_name.loc;
+	        if (name.fixity === undefined) {
+	            name.fixity = matched_name.fixity;
+	        }
 	    }
 
 	    return matched_name; // always return the found name when qualified
@@ -493,6 +496,16 @@ JSHC.Check.nameCheckPattern = function(comp,module,lspace,ast){
 
 JSHC.Check.nameCheckExp = function(comp,module,lspace,ast){
     switch( ast.name ){
+    case "infixexp":
+        for (var i = 0; i < ast.exps.length; i++) {
+            JSHC.Check.nameCheckExp(comp,module,lspace,ast.exps[i]);
+        }
+        break;
+        
+    case "qop":
+        JSHC.Check.nameCheckExp(comp,module,lspace,ast.id);
+        break;
+        
     case "varname":
     case "dacon":
         JSHC.Check.lookupName(comp,module,lspace,ast);

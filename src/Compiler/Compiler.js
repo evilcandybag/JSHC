@@ -184,8 +184,8 @@ JSHC.Compiler.prototype.recompile = function(){
             var module = group.values[i];
 
             compiler.onMessage("checking "+module.ast.modid);
-            JSHC.Fixity.fixityResolution(module.ast);
             JSHC.Check.nameCheck(compiler, module.ast);
+            JSHC.Fixity.fixityResolution(module.ast);
         }
 
         // errors in the name check represents reasons for the fixity and type
@@ -261,8 +261,8 @@ JSHC.Compiler.prototype.checkExp = function (exp){
     res = {name: "module", modid: {name: "modname", id: "interact+"}, body: res};
     
     JSHC.addToplevelNamespace(res);
-    JSHC.Fixity.fixityResolution(res);
     JSHC.Check.nameCheck(this,res);
+    JSHC.Fixity.fixityResolution(res);
     JSHC.Check.typeCheck(this,[res]);
     JSHC.Simplify.runSimplify(res);
     return res.body.topdecls[0].decl;
