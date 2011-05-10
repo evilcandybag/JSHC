@@ -250,6 +250,11 @@ JSHC.Fixity.translateInfixLists["tuple"] = function(info, ast){
     }
 };
 
+JSHC.Fixity.translateInfixLists["lambda"] = function(info, ast) {
+    JSHC.Fixity.translateInfixMember(info, ast, "rhs");
+    JSHC.Fixity.translateInfixLists(info, ast.rhs);
+};
+
 JSHC.Fixity.translateInfixLists["varname"] = function(info, ast){
     // nothing
 };

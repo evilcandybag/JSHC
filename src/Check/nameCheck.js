@@ -562,6 +562,13 @@ JSHC.Check.nameCheckExp = function(comp,module,lspace,ast){
             JSHC.Check.nameCheckExp(comp,module,lspace,ast.exps[i]);
         }
         break;
+
+    case "lambda":
+        lspace.push();
+        JSHC.Check.nameCheckPatterns(comp,module,lspace,ast.args);
+        JSHC.Check.nameCheckExp(comp,module,lspace,ast.rhs);
+        lspace.pop();
+        break;
         
     case "tuple":
         for(var i=0 ; i<ast.members.length ; i++){
