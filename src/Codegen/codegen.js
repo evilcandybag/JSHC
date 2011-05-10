@@ -285,9 +285,11 @@ JSHC.Codegen.codegen = function (input,namespace) {
         
         var res = "";
         switch (exp.name) {
+        
             case "dacon":
                 res += "[\"" + exp.id + "\"]"
                 break; 
+                
             case "varname":
                 if (exp.loc !== undefined) {
 //                    var x = exp.id.substr(exp.loc.length);
@@ -301,21 +303,24 @@ JSHC.Codegen.codegen = function (input,namespace) {
                     else
                         res += namespace + "." + r + "[\"" + x + "\"]()";
                     res += (strict)? "" : "})"; 
-                    break;
                 } else {
                     if (strict) 
                         res += exp.id;
                     else
                         res += "JSHC.TC(function() {return " + exp.id + "})";
-                    break;
                 }
+                break;
+                
             case "integer-lit":
                 res += exp.value;
                 break;
+
+            case "lambda":    
             case "infixexp":
             case "application":
                 res += comExp(exp);
                 break;
+            
             case "tuple":
                 res += "[";
 //                alert("TUPLE MEMBERS: " + JSHC.showAST(exp.members))
@@ -326,6 +331,7 @@ JSHC.Codegen.codegen = function (input,namespace) {
                 }
                 res += "]"
                 break;
+                
             default:
                 throw new Error("comAexp not defined for name " + exp.name);
         }
