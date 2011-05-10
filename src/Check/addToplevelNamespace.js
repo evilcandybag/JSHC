@@ -80,7 +80,6 @@ JSHC.addFixitySpace = function(module_ast,ns) {
             if (decls[d].decl.name === "fixity") {
                 var ops = decls[d].decl.ops;
                 for (var i = 0; i < ops.length; i++ ) {
-                    JSHC.alert("ns:", ns, "ops:", ops, "nam:",i )
                     ns[ops[i]].fixity = {fix: decls[d].decl.fix, prec: decls[d].decl.num.value};
                 }
             }
