@@ -48,11 +48,9 @@ JSHC.Simplify.simplify["topdecl-decl"] = function(ast){
 JSHC.Simplify.simplify["decl-fun"] = function(ast){
     // take all parameters in the LHS and add as lambdas on the RHS.
     var i;
-    var old_rhs = (ast.rhs.name === "infixexp")? 
-                        JSHC.Simplify.reduceExp(ast.rhs) : 
-                  (ast.rhs.name === "fun-where")? 
+    var old_rhs = (ast.rhs.name === "fun-where")? 
                         JSHC.Simplify.reduceWhere(ast.rhs) :
-                            ast.rhs;
+                            JSHC.Simplify.reduceExp(ast.rhs);
     
     // TODO: should remove position information recursively from ast.args.
     if(ast.args.length > 0) {
@@ -72,9 +70,8 @@ JSHC.Simplify.simplify["fixity"] = function(ast) {
     
 };
 
-JSHC.Simplify.reduceExp = function (e) {
-    if (e.name === "infixexp") {
-        var exp = e.exps[0];
+JSHC.Simplify.reduceExp = function (exp) {
+//        var exp = e.exps[0];
         switch (exp.name) {
             case "ite":
                 var tru = {name: "alt", pat: new JSHC.DaCon("True", exp.e2.pos, false), 
@@ -105,12 +102,12 @@ JSHC.Simplify.reduceExp = function (e) {
                 }
                 new_exp = {name:"application", exps: [new_exp], pos: new_exp.pos}
                 new_exp = {name:"infixexp", exps:[new_exp], pos: new_exp.pos};
-                e.exps[0] = {name:"case", exp: new_exp, 
+                exp = {name:"case", exp: new_exp, 
                              alts: [{name:"alt", pat: new_pat, exp: exp.exp}]};
+                
             default:
         }
-    }
-    return e;
+    return exp;
 };
 
 JSHC.Simplify.reduceWhere = function (e) {

@@ -219,3 +219,26 @@ JSHC.TupleTyCon = function(numberOfParams,pos){
     this.numberOfParams = numberOfParams;
 };
 JSHC.TupleTyCon.prototype = new JSHC.TyCon(null,{});
+
+////////////////////////////////////////////////////////////////////////////////
+
+JSHC.ConPat = function(con, pats, pos){
+    this.name = "conpat";
+    
+    this.con = con;
+    this.pats = pats;
+    this.pos = pos;
+};
+JSHC.ConPat.prototype = new JSHC.Name();
+JSHC.ConPat.prototype.toStringN = function(){
+    return (this.con.toStringN());
+};
+JSHC.ConPat.prototype.toStringQ = function(){
+    return this.con.toStringQ();
+};
+JSHC.ConPat.prototype.toStringV = function(){
+    return "data constructor " + this.toStringQ();
+};
+JSHC.ConPat.prototype.toString = JSHC.ConPat.prototype.toStringN;
+
+////////////////////////////////////////////////////////////////////////////////

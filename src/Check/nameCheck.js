@@ -440,6 +440,51 @@ JSHC.Check.nameCheckTopdeclDecl = function(comp,module,ast){
     }
 };
 
+JSHC.Check.nameCheckLocalDecl = function(comp,module,lspace,ast){
+    switch( ast.name ){
+    case "decl-fun":
+        JSHC.Check.nameCheckDeclFun(comp, module, lspace, ast);
+        break;
+    case "fixity":
+        JSHC.Check.nameCheckFixity(comp,module,ast);
+        break;
+    default:
+        throw new JSHC.CompilerError("missing decl case:"+ast.name);
+    }
+};
+
+JSHC.Check.getLocalBindings = function(comp,module,lspace,ast){
+    var decls = ast.decls;
+    var names = {};
+    var fix = {};
+    
+    for (var i = 0; i < decls.length; i++) {
+        switch( decls[i].name ){
+        case "decl-fun":
+            names[decls[i].ident] = decls[i].ident;
+            break;
+        case "fixity":
+            for (var j = 0; j < decls[j].ops.length; j++) {
+                fix[ops[i]] = {fix: decls[i].fix, prec: decls[i].num.val};
+            }
+            break;
+        default:
+            throw new JSHC.CompilerError("missing decl case:"+ast.name);
+        }
+    }
+    
+    for (var k in fix) {
+        if (names[k] !== undefined) {
+            names[k].fixity = fix[k];
+        }
+    }
+    
+    for (var k in names) {
+        lspace.add(names[k]);
+    }
+    
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 
 JSHC.Check.nameCheckDeclFun = function(comp,module,lspace,ast){
@@ -526,7 +571,19 @@ JSHC.Check.nameCheckExp = function(comp,module,lspace,ast){
 
     case "integer-lit":
         break;
-
+    
+    case "fun-where":
+    case "let":
+        lspace.push();
+        JSHC.Check.getLocalBindings(comp,module,lspace,ast);
+        for (var i = 0; i < ast.decls.length; i++) {
+             JSHC.Check.nameCheckLocalDecl(comp,module,lspace,ast.decls[i]);
+        
+        }
+        JSHC.Check.nameCheckExp(comp,module,lspace,ast.exp);
+        lspace.pop();
+        break; 
+    
     default:
         throw new JSHC.CompilerError("missing exp case:"+ast.name + "\n" + JSHC.showAST(ast));
     }
