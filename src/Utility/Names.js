@@ -175,3 +175,47 @@ JSHC.VarName.prototype.toStringV = function(){
 JSHC.VarName.prototype.toString = JSHC.VarName.prototype.toStringN;
 
 ////////////////////////////////////////////////////////////////////////////////
+
+JSHC.UnitDaCon = function(pos){
+    if( pos !== undefined ){
+        this.pos = pos;
+    }
+};
+JSHC.UnitDaCon.prototype = new JSHC.DaCon("()",{}, false);
+
+JSHC.ListDaCon = function(pos){
+    if( pos !== undefined ){
+        this.pos = pos;
+    }
+};
+JSHC.ListDaCon.prototype = new JSHC.DaCon("[]",{}, false);
+
+JSHC.TupleDaCon = function(numberOfParams,pos){
+    var id = "(";
+    for(var ix=1 ; ix<numberOfParams ; ix++){
+        id += ",";
+    }
+    id += ")";
+    this.id = id;
+    if( pos !== undefined ){
+        this.pos = pos;
+    }
+    this.numberOfParams = numberOfParams;
+};
+JSHC.TupleDaCon.prototype = new JSHC.DaCon(null, {}, false);
+
+////////////////////////////////////////////////////////////////////////////////
+
+JSHC.TupleTyCon = function(numberOfParams,pos){
+    var id = "(";
+    for(var ix=1 ; ix<numberOfParams ; ix++){
+        id += ",";
+    }
+    id += ")";
+    this.id = id;
+    if( pos !== undefined ){
+        this.pos = pos;
+    }
+    this.numberOfParams = numberOfParams;
+};
+JSHC.TupleTyCon.prototype = new JSHC.TyCon(null,{});
