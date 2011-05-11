@@ -790,6 +790,9 @@ JSHC.Check.Ctx.prototype.constrain = function(type1,type2){
 	}
     } else if( type2 instanceof JSHC.TyVar ){
         this.insertConstraint(type2, type1);
+    } else if( type1 instanceof JSHC.AppType && type2 instanceof JSHC.AppType ){
+        this.constrain(type1.lhs,type2.lhs);
+        this.constrain(type1.rhs,type2.rhs);
     } else if( type1 instanceof JSHC.FunType && type2 instanceof JSHC.FunType ) {
         var t2 = type2.types;
         var t1 = type1.types;
