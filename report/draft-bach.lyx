@@ -1,4 +1,4 @@
-#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+#LyX 1.6.9 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
@@ -67,10 +67,6 @@ LatexCommand tableofcontents
 Introduction
 \end_layout
 
-\begin_layout Section
-Background
-\end_layout
-
 \begin_layout Standard
 Modern web applications are becoming more and more complex, with users expecting
  more and more automation of menial tasks such as spelling correction and
@@ -79,7 +75,8 @@ Modern web applications are becoming more and more complex, with users expecting
  in turn means that they are becoming more error prone<TODO: reference?>.
  One large source of errors in web applications is the absence of type safety
  in the form of static type checking in most scripting languages aimed at
- web development, such as JavaScript or PHP <TODO: reference?>.
+ web development, such as JavaScript or PHP <TODO: reference? A Type System
+ for Dynamic Web Documents has some stuff, then the Curry stuff can be useful>.
  One solution to this problem is providing an extra layer of abstraction
  on top of these scripts, that in turn can be subject to static type checking.
  
@@ -97,6 +94,31 @@ key "haskell-report"
 \end_inset
 
 
+\end_layout
+
+\begin_layout Section
+Related work
+\end_layout
+
+\begin_layout Standard
+Using Haskell for web-programming is not a new concept; there are several
+ projects out there with a similar approach to the one presented here.
+ Notable ones are Yesod 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "yesod-book"
+
+\end_inset
+
+, which is a full-featured web server framework, and YCR2JS 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "yhc-js"
+
+\end_inset
+
+, a JavaScript back end to the York Haskell Compiler.
+ <TODO: elaborate here>
 \end_layout
 
 \begin_layout Section
@@ -124,52 +146,212 @@ key "haskell-report"
 .<TODO: Extensions?>
 \end_layout
 
-\begin_layout Section
-Related work
-\end_layout
-
-\begin_layout Standard
-Using Haskell for web-programming is not a new concept; there are several
- projects out there with a similar approach to the one presented here.
- Notable ones are Yesod [6], which is a full-featured web server framework,
- and YCR2JS [7], a JavaScript back end to the York Haskell Compiler.
- <TODO: elaborate here>
-\end_layout
-
 \begin_layout Chapter
-Theory
-\end_layout
-
-\begin_layout Section
 Introduction to Haskell
 \end_layout
 
 \begin_layout Standard
-<TODO: this chapter; how detailed does it really need to be?> 
-\end_layout
-
-\begin_layout Standard
-This subchapter is intended as a quick but thorough introduction to Haskell
- for readers unfamiliar with or new to Haskell, or as a quick reference
- to specific language features for more experienced users.
+This chapter is intended as a quick but thorough introduction to Haskell
+ for readers unfamiliar with or new to Haskell and/or functional languages.
  It consists of a very general overview, followed by separate sub chapters
  with details about specific features.
 \end_layout
 
 \begin_layout Standard
-Haskell is a lazy, purely functional programming language with strong static
- typing.
+\paragraph_spacing onehalf
+Haskell is a 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+\paragraph_spacing onehalf
+lazy
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+\paragraph_spacing onehalf
+purely functional
+\end_layout
+
+\end_inset
+
+ programming language with
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+\paragraph_spacing onehalf
+ strong static typing
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+\paragraph_spacing onehalf
+type inference
+\end_layout
+
+\end_inset
+
+.
  A program in Haskell consists of one or more modules, interconnected by
  their import and export specifications.
  The contents of a module is a set of top-level declarations, which can
  be, among others, function declarations, datatype declarations and typeclass
  declarations.
  Functions consist of a name, a set of arguments and an expression, that
- expresses the result of the function when applied to its arguments.,
+ expresses the result of the function when applied to its arguments.
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
 \end_layout
 
-\begin_layout Subsection
-Module system
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Being lazy means that an expression is only evaluated when its result is
+ needed.
+ Any expression whose result is not used is simply ignored.
+ This enables lazy languages to feature some things that are otherwise impossibl
+e, such as infinite data structures.
+ Since the data structure is lazy, only the part that is needed.
+ For example, a list of infinite length can be described in Haskell using
+ like so:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+x = [1..]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This statement assigns to the variable x an expression that calculates an
+ infinite list containing all integers > 0 in rising order.
+ While an expression calculating this in a strict language would never terminate
+ as the set of integers > 0 is infinite, a lazy language only calculates
+ the needed parts, e.g:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+take 5 x
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where take is a function that returns a list consisting of the first n elements
+ in a list, only needs the first 5 elements of x, so no more than 5 elements
+ are computed.
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Purely functional languages do 
+\end_layout
+
+\begin_layout Standard
+Another feature of purely functional languages is that functions are first-class
+ objects.
+ This means that functions can be passed around as arguments to other functions,
+ be returned as the result of a function or created at runtime.
+ This enables the creation of 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+higher order functions
+\end_layout
+
+\end_inset
+
+, generalized functions that use other functions as arguments.
+ For example, the function 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+filter
+\end_layout
+
+\end_inset
+
+ from the Haskell standard libraries takes a function, which takes one argument
+ and returns a boolean, and a list.
+ The function then applies the supplied function to each element in the
+ list and returns a new list with all elements for which the supplied function
+ returned 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+True
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Haskell’s module system is its main method of encapsulation.
+ Apart from local variables in a certain function, it is the only way to
+ determine whether something is known (i.e.
+ in scope) or not.
+ Each module has a name, a set of imports and a set of exports.
+ The specification of these is optional, with defaults being “Main”, the
+ empty import set and the export set containing all top-level declarations,
+ respectively.
+ 
+\end_layout
+
+\begin_layout Section
+Module system <TODO; need not be this much>
 \end_layout
 
 \begin_layout Standard
@@ -226,16 +408,6 @@ Name
 
 \family typewriter
 (f, module M, T) 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -421,6 +593,187 @@ g
 \end_layout
 
 \begin_layout Chapter
+Introduction to Compilation
+\end_layout
+
+\begin_layout Standard
+This chapter is intended as an introduction to the general concepts of compilati
+on for readers who have no experience with the inner workings of compilers.
+ 
+\end_layout
+
+\begin_layout Standard
+A compiler is a program that, given program code, produces new code in another
+ language, the 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+target language
+\end_layout
+
+\end_inset
+
+.
+ <TODO: more on target language>
+\end_layout
+
+\begin_layout Standard
+A compiler consists of two main parts; the 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+front-end
+\end_layout
+
+\end_inset
+
+ and the 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+back-end
+\end_layout
+
+\end_inset
+
+.
+ The front-end takes the program code and creates an abstract representation
+ of it, and the back-end takes that representation and converts it into
+ the target language.
+ 
+\end_layout
+
+\begin_layout Section
+Front-end
+\end_layout
+
+\begin_layout Standard
+The front-end <TODO>
+\end_layout
+
+\begin_layout Subsection
+Lexical analysis
+\end_layout
+
+\begin_layout Standard
+Lexical analysis is the process by which the compiler takes the program
+ code in the form of an input string, and parses it into a list of separate
+ tokens, lexemes, which are the smallest significant components in a programming
+ language.
+ <TODO: reference to somewhere in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "dragon-book"
+
+\end_inset
+
+>
+\end_layout
+
+\begin_layout Standard
+For example, given a program in a simple language with Haskell-like syntax
+ with a source code that looks like this:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+fun x y = x + y
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+a lexer could generate a list of tokens in this vein:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[fun,x,y,=,x,+,y]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Parsing
+\end_layout
+
+\begin_layout Standard
+Parsing takes the list of lexemes and interprets it according to a grammar,
+ creating a data structure containing an abstract representation of the
+ code, called the abstract syntax tree (AST).
+ The AST is a tree (or tree-like) graph with nodes representing the application
+ of a certain rule in the grammar.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename adsgadgs.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Graphic representation of an AST of a function definition in a simple language
+ with Haskell- like syntax.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Checking
+\end_layout
+
+\begin_layout Subsection
+Simplification
+\end_layout
+
+\begin_layout Section
+Back-end
+\end_layout
+
+\begin_layout Subsection
+Code generation
+\end_layout
+
+\begin_layout Subsection
+Optimization
+\end_layout
+
+\begin_layout Chapter
 Method
 \end_layout
 
@@ -454,11 +807,19 @@ Tools and libraries used
 \end_layout
 
 \begin_layout Standard
+PEG.js, Jison, Ymacs
+\end_layout
+
+\begin_layout Standard
 <TODO: describe the tools and libraries used, hows and whys>
 \end_layout
 
 \begin_layout Section
 Testing
+\end_layout
+
+\begin_layout Standard
+Custom built test suite 
 \end_layout
 
 \begin_layout Standard
@@ -527,21 +888,26 @@ Lexical analysis
 \end_layout
 
 \begin_layout Standard
-Lexical analysis is the process by which the compiler takes the program
- code in the form of an input string, and parses it into a list of separate
- tokens, lexemes, which are the smallest significant components in a programming
- language.
- <TODO: reference to somewhere in >
-\end_layout
-
-\begin_layout Standard
 The lexical analysis in JSHC is performed in several steps.
  First, the input (i.e.
  the Haskell source code) is parsed into tokens.
  This is done by using a parser built using a JavaScript implementation
- of Parsing Expression Grammar [3], PEG.js [4] that was fed a translation
- (into PEG.js-readable form) of the lexical program structure described in
- 
+ of Parsing Expression Grammar 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "parsing-expression-grammars"
+
+\end_inset
+
+, PEG.js 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "peg-js"
+
+\end_inset
+
+ that was fed a translation (into PEG.js-readable form) of the lexical program
+ structure described in 
 \begin_inset CommandInset citation
 LatexCommand cite
 key "haskell-report"
@@ -564,60 +930,20 @@ key "haskell-report"
 
 \end_inset
 
-, chapter 10.3, is converted into a context-free syntax [2] <TODO: pages/chapters
-?>.
+, chapter 10.3, is converted into a context-free syntax 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "dragon-book"
+
+\end_inset
+
+ <TODO: pages/chapters?>.
  A context-free syntax is required for the parsing step.
  
 \end_layout
 
 \begin_layout Subsection
 Parsing
-\end_layout
-
-\begin_layout Standard
-Parsing takes the list of lexemes and interprets it according to a grammar,
- creating a data structure containing an abstract representation of the
- code, called the abstract syntax tree (AST).
- The AST is a tree (or tree-like) graph with nodes representing the application
- of a certain rule in the grammar.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename adsgadgs.png
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-Graphic representation of an AST of a function definition in a simple language
- with Haskell- like syntax.
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Figure <TODO>: Graphic representation of an AST of a function definition
- in a simple language with Haskell- like syntax.
 \end_layout
 
 \begin_layout Standard
@@ -730,7 +1056,7 @@ The following constructs disappear as they are translated into other constructs:
 \end_layout
 
 \begin_layout Section
-Compiler back end
+Compiler back-end
 \end_layout
 
 \begin_layout Standard
@@ -778,10 +1104,6 @@ Standard libraries
 \begin_layout Standard
 <TODO: describe how the code from the Haskell report was used to construct
  the standard libraries for the compiler>
-\end_layout
-
-\begin_layout Chapter
-Bibliography
 \end_layout
 
 \begin_layout Standard
