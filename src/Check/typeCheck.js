@@ -19,21 +19,80 @@ JSHC.Check.typeCheck = function(comp,modules){
 JSHC.Check.typeCheckModules = function(comp,modules){
     assert.ok( modules instanceof Array );
 
+/*
     // compute the set of locations which are being type checked
     var locations = {};
     for(var i=0 ; i<modules.length ; i++){
         var loc = modules[i].modid.toString();
         locations[loc] = null;
     }
+*/
 
-    // create entries for topdecls
-    var entrymap = {};
+    var all_topdecls = [];
     for(var i=0 ; i<modules.length ; i++){
         var module = modules[i];
-
+        
         var topdecls = module.body.topdecls;
+        for(var ix=0 ; ix<topdecls.length ; ix++){
+            all_topdecls.push(topdecls[ix]);
+        }
+    }
 
-        JSHC.Check.typeCheckDeclsDep(topdecls,entrymap,locations);
+    var ctx = new JSHC.Check.Ctx();  // empty ctx at top-level
+
+    JSHC.Check.typeCheckTopDeclsInDepOrder(comp,ctx,all_topdecls);
+};
+
+JSHC.Check.typeCheckTopDeclsInDepOrder = function(comp,ctx,topdecls){
+    // compute the declared names for all decls
+    // these are the names the decls can depend upon.
+    dnames = {};
+    for(var i=0 ; i<topdecls.length ; i++){
+        var names = JSHC.Check.computeDeclaredNames(topdecls[i]);
+        for(var n in names){
+            dnames[n] = names[n];
+        }
+    }
+
+    // map for the entries
+    var entrymap = {};
+
+    for(var i=0 ; i<topdecls.length ; i++){
+        var topdecl = topdecls[i];
+
+        //if the declaration is a fixity declaration, no typechecking needs to be done.
+        if (topdecl.name === "topdecl-decl" && topdecl.decl.name === "fixity")
+           continue;
+
+        var names = JSHC.Check.computeDeclaredNames(topdecls[i]);
+
+        //   compute used names in dnames
+        // previously used "computeUsedQualifiedNames"
+        var deps = JSHC.Check.computeUsedNamesInDecl(dnames, topdecls[i]);
+
+        //   make entry with declared names and used names
+        var entry = new JSHC.Dep.Entry([topdecl],names,deps);
+        //JSHC.alert("new entry: ",entry);
+        for( var k in names ){
+            var current_entry = entrymap[names[k]];
+            //JSHC.alert("current keys: "+JSHC.showKeys(entrymap),"\ncurrent entry("+names[k]+"): ",current_entry);
+            if( current_entry === undefined ){
+                assert.ok( entry !== undefined );
+                entrymap[names[k]] = entry;
+            } else {
+                // add declared names, used names, and values to the
+                // existing entry.
+                for( var l in names ){
+                    current_entry.addName(names[l]);
+                }
+                for( var l in deps ){
+                    current_entry.addIncoming(deps[l]);
+                }
+                current_entry.addValue(topdecl);
+            }
+        }
+
+
     }
 
     // create action for each group
@@ -41,7 +100,7 @@ JSHC.Check.typeCheckModules = function(comp,modules){
         //JSHC.alert("type group (topdecls):",entry);
 
         // read module name from entry and pass along.
-        JSHC.Check.typeCheckTopdecls(comp,entry.name.loc,entry.values);
+        JSHC.Check.typeCheckTopdeclsTogether(comp,entry.name.loc,ctx,entry.values);
     }
 
     // create and traverse groups in dependency order
@@ -88,7 +147,7 @@ JSHC.Check.typeCheckDeclsDep = function(topdecls,entrymap,locations) {
         }
     }
 };
-
+/*
 JSHC.Check.typeCheckLocalDecls = function (comp, decls) {
     
     var entrymap = {};
@@ -100,15 +159,15 @@ JSHC.Check.typeCheckLocalDecls = function (comp, decls) {
         //JSHC.alert("type group (topdecls):",entry);
 
         // read module name from entry and pass along.
-        JSHC.Check.typeCheckTopdecls(comp,entry.name.loc,entry.values);
+        JSHC.Check.typeCheckTopdeclsTogether(comp,entry.name.loc,entry.values);
     }
 
     // create and traverse groups in dependency order
     JSHC.Dep.check(entrymap,action);
 
 };
-
-JSHC.Check.typeCheckTopdecls = function(comp,module,topdecls){
+*/
+JSHC.Check.typeCheckTopdeclsTogether = function(comp,module,ctx,topdecls){
 
     // created for each group of topdecls, but could just as well be created
     // once and used for all modules. doing it like this means that it does
@@ -117,7 +176,6 @@ JSHC.Check.typeCheckTopdecls = function(comp,module,topdecls){
 
     // TODO: add type variables to names that are visible to all declarations
     //       in the group.
-    var ctx = new JSHC.Check.Ctx();
 
     for(var ix=0 ; ix<topdecls.length ; ix++){
         try {
@@ -139,9 +197,10 @@ JSHC.Check.checkTopdecl = function(comp,ctx,ast){
     try {
   switch( ast.name ){
   case "topdecl-decl":
-     ast = ast.decl;
-     switch( ast.name ){
-     case "decl-fun":
+     JSHC.Check.checkTopdecl(comp,ctx,ast.decl);
+     break;
+
+  case "decl-fun":
 
 	 ctx.push();
 	 var ident = ast.ident;
@@ -177,15 +236,11 @@ JSHC.Check.checkTopdecl = function(comp,ctx,ast){
 	 ctx.pop();
 	 break;
 
-     // skip fixity and type signature declarations
-     // TODO: should have been removed by the name checker.
-     case "fixity": case "type-signature":
-         break;
-     default:
-         throw new JSHC.CompilerError("decl: missing case: "+ast.name);
-     };
+  // skip fixity and type signature declarations
+  // TODO: should have been removed by the name checker.
+  case "fixity": case "type-signature":
+      break;
 
-  break;
   case "topdecl-data": // .constrs
 
 	 ctx.push();
@@ -266,7 +321,7 @@ JSHC.Check.checkTopdecl = function(comp,ctx,ast){
      
      // give each of the data constructors the type that they have in the type
      // declaration.
-  break;
+
   default:
       throw new JSHC.CompilerError("topdecl: missing case: "+ast.name);
   };
@@ -321,17 +376,24 @@ JSHC.Check.checkExp = function(comp,ctx,ast){
 	return JSHC.Check.checkExp(comp,ctx,ast.exps[0]);
 	break;
 
+    case "let":
     case "fun-where": // .decls .exp
 	// check ast.decls (create dep groups of list of "decl-fun")
 	// add a map to the context and insert all declared names.
 	// call JSHC.Check.checkDecls for each group to get the types.
-        throw new Error("fun-where not implemented in checkExp");
-	ctx.push();      
+	JSHC.Check.typeCheckTopDeclsInDepOrder(comp,ctx,ast.decls);
+
+	ctx.push();
+	// add names (with their types) from decls
+	for(var ix=0 ; ix<ast.decls.length ; ix++){
+	    var decl = ast.decls[ix];
+	    if( decl.name !== "decl-fun" )continue;
+	    ctx.add(decl.ident,decl.ident.type);
+	}
 	
-	
-	// check the expression (also in scope of the declarations)
+	// check the expression (in scope of the declarations)
 	var ty = JSHC.Check.checkExp(comp,ctx,ast.exp);
-      
+
 	// remove context with all names from the where-declaration.
 	ctx.pop();
 	return ty;
@@ -415,11 +477,6 @@ JSHC.Check.checkExp = function(comp,ctx,ast){
         }	
 	return ret_type;
     
-    case "let": // .decls .exp
-	// (as for where)
-	throw new Error("let expression not implemented");
-	return undefined;
-
     case "integer-lit":
         // should be "forall a. Num a => a"
         return new JSHC.TyCon("Int32",{},"Data.Int");
@@ -1239,6 +1296,7 @@ JSHC.Check.StarKind = {
 /*
   Return a set with all used qualified names that occur in the expression.
 */
+/*
 JSHC.Check.computeUsedQualifiedNames = function(ast){
 
     var names = {};
@@ -1332,13 +1390,188 @@ JSHC.Check.computeUsedQualifiedNames = function(ast){
     find(ast);
     return names;
 };
+*/
+////////////////////////////////////////////////////////////////////////////////
+
+JSHC.Check.computeUsedNamesInDecl = function(dnames, ast){
+    var unames = {};
+    var lspace = new JSHC.LSpace();
+
+    //JSHC.alert("dnames: ",JSHC.showAST(dnames));
+
+    JSHC.Check.computeUsedNamesIn(dnames, lspace, unames, ast);
+
+    //var used_names = [];
+    //for(var un in unames){
+    //    used_names.push(unames[un].toString());
+    //}
+
+    //JSHC.alert(ast, "\n\nuses\n\n", JSHC.showAST(used_names));
+
+    return unames;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+JSHC.Check.computeUsedNamesInPat = function(dnames, lspace, unames, ast){
+    var find = function(ast){
+	switch( ast.name ){
+        case "conpat":
+            var pats = ast.pats;
+            for(var i = 0; i < pats.length; i++){
+                find(pats[i]);
+            }
+            break;
+
+        case "tuple_pat":
+        case "tuple":
+            var mems = ast.members;
+            for(var i = 0; i < mems.length; i++){
+                find(mems[i]);
+            }
+            break;    
+
+        case "dacon":
+            // if not declared locally and is in dnames, then it is used.
+            if( ast.loc !== undefined || lspace.contains(ast) == false ){
+                if( dnames[ast] !== undefined ){
+                    unames[ast] = ast;
+                }
+            }
+            break;
+
+        case "varname":
+            // add variables to lspace
+            lspace.add(ast);
+            break;
+
+        case "integer-lit":
+            break;
+
+	default:
+            throw new JSHC.CompilerError("missing case: "+ast.name);
+	};
+    };
+
+    find(ast);
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
 /*
-  Return a set with all declared qualified names that occur in the expression.
+  Return a set with all names used (from the set of given names) that occur in
+  the expression.
+  all declarations shadow the names in the set.
 */
-JSHC.Check.computeDeclaredQualifiedNames = function(ast){
+JSHC.Check.computeUsedNamesIn = function(dnames, lspace, unames, ast){
+
+    var find = function(ast){
+	switch( ast.name ){
+
+        case "topdecl-data":
+            // no need to add ast.typ.tycon or any dacons to lspace,
+            // since they are only declared at top-level.
+            lspace.push();
+            for(var ix=0 ; ix<ast.typ.vars.length ; ix++){
+                lspace.add(ast.typ.vars[ix]);
+            }
+            var constrs = ast.constrs;
+            for(var i=0 ; i<constrs.length ; i++){
+                var dacon = constrs[i].dacon;
+                for(var j=0 ; j<constrs[i].types.length ; j++){
+                    JSHC.Check.computeUsedNamesIn(dnames, lspace, unames, constrs[i].types[j]);
+                }
+            }
+            lspace.pop();
+            break;
+
+        case "application":
+            var exps = ast.exps;
+            for(var i=0 ; i<exps.length ; i++){
+                find(exps[i]);
+            }
+            break;
+
+        case "apptype":
+            find(ast.lhs);
+            find(ast.rhs);
+            break;
+        
+        
+        case "let":
+        case "fun-where":
+            var decls = ast.decls;
+            lspace.push();
+            var where_names;
+            for (var i = 0; i < decls.length; i++) {
+                where_names = JSHC.Check.computeDeclaredNames(decls[i])
+            }
+            for (var wn in where_names) {
+                lspace.add(where_names[wn]);
+            }
+            for (var i = 0; i < decls.length; i++) {
+                find(decls[i]);
+            }
+            find(ast.exp);
+            lspace.pop();
+            break;
+        
+        case "tyvar":
+        case "integer-lit":
+        case "fixity":
+            // nothing to add.
+            break;
+
+        case "topdecl-decl":
+            find(ast.decl);
+            break;
+
+        case "case":
+            find(ast.exp);
+            ast.alts.forEach(function(a){
+                lspace.push();
+                JSHC.Check.computeUsedNamesInPat(dnames, lspace, unames, a.pat);
+                find(ast.exp);
+                lspace.pop();
+            });
+            break;
+
+        case "lambda":
+        case "decl-fun":
+            lspace.push();
+            ast.args.forEach(function(a){
+                JSHC.Check.computeUsedNamesInPat(dnames, lspace, unames, a);
+            });
+            //JSHC.alert("local space after adding params: ",lspace.toString());
+            find(ast.rhs);
+            lspace.pop();
+            break;
+
+        case "dacon":
+        case "tycon":
+        case "varname":
+            if( ast.loc !== undefined || lspace.contains(ast) == false ){
+                if( dnames[ast] !== undefined ){
+                    unames[ast] = ast;
+                }
+            }
+            break;
+
+	default:
+            throw new JSHC.CompilerError("missing case: "+ast.name);
+	};
+    };
+
+    find(ast);
+    return unames;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+/*
+  Return a set with all declared (toplevel) names that occur in the expression.
+*/
+JSHC.Check.computeDeclaredNames = function(ast){
 
     var names = {};
 

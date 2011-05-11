@@ -37,6 +37,10 @@ JSHC.LSpace.prototype.getCurrent = function(){
     return this.sets[this.sets.length-1];
 };
 
+JSHC.LSpace.prototype.contains = function(name){
+    return this.lookup(name) !== undefined;
+};
+
 /*
     Tries to find the given name in the lspace.
     Returns undefined if not found.
@@ -57,6 +61,14 @@ JSHC.LSpace.prototype.withSpace = function(fun){
     this.push();
     fun();
     this.pop();
+};
+
+JSHC.LSpace.prototype.toString = function(fun){
+    var lists = [];
+    for(var ix=this.sets.length-1 ; ix>=0 ; ix--){
+        lists.push(this.sets[ix].getKeys());
+    }
+    return JSHC.showAST(lists);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
