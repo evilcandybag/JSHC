@@ -257,7 +257,14 @@ exp // : object
   ;
 
 infixexp // : [lexp | qop | '-']
-  : infixexpLR lexp     %prec INFIXEXP          {{($1).push($2); $$ = {name:"infixexp",exps:$1,pos:@$};}}
+  : infixexpLR lexp     %prec INFIXEXP          {{
+          ($1).push($2);
+          if( $1.length == 1 && $1[0].name=="infixexp" ){
+              $$ = $1[0];
+          } else {
+              $$ = {name:"infixexp",exps:$1,pos:@$};
+          }
+      }}
   ;
 
 infixexpLR // : [lexp | qop | '-']. re-written to be left recursive.

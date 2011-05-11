@@ -160,7 +160,14 @@ case 62:this.$ = {name:"type-signature",exp:$$[$0-2],sig:$$[$0],pos:this._$};
 break;
 case 63:this.$ = $$[$0];
 break;
-case 64:($$[$0-1]).push($$[$0]); this.$ = {name:"infixexp",exps:$$[$0-1],pos:this._$};
+case 64:
+          ($$[$0-1]).push($$[$0]);
+          if( $$[$0-1].length == 1 && $$[$0-1][0].name=="infixexp" ){
+              this.$ = $$[$0-1][0];
+          } else {
+              this.$ = {name:"infixexp",exps:$$[$0-1],pos:this._$};
+          }
+      
 break;
 case 65:($$[$0-2]).push($$[$0-1],$$[$0]); this.$ = $$[$0-2];
 break;
@@ -365,6 +372,8 @@ parse: function parse(input) {
     this.lexer.setInput(input);
     this.lexer.yy = this.yy;
     this.yy.lexer = this.lexer;
+    if (typeof this.lexer.yylloc == 'undefined')
+        this.lexer.yylloc = {};
     var yyloc = this.lexer.yylloc;
     lstack.push(yyloc);
 
@@ -449,7 +458,7 @@ parse: function parse(input) {
                 popStack(1);
                 state = stack[stack.length-1];
             }
-            
+
             preErrorSymbol = symbol; // save the lookahead token
             symbol = TERROR;         // insert generic error symbol as new lookahead
             state = stack[stack.length-1];
@@ -497,7 +506,7 @@ parse: function parse(input) {
                     first_line: lstack[lstack.length-(len||1)].first_line,
                     last_line: lstack[lstack.length-1].last_line,
                     first_column: lstack[lstack.length-(len||1)].first_column,
-                    last_column: lstack[lstack.length-1].last_column,
+                    last_column: lstack[lstack.length-1].last_column
                 };
                 r = this.performAction.call(yyval, yytext, yyleng, yylineno, this.yy, action[1], vstack, lstack);
 
