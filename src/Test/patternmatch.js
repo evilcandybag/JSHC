@@ -30,5 +30,3 @@ JSHC.Test.Tests.patternmatch = function(tester){
              commands: cases[cname].commands});
     }
 };
-
-
