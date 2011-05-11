@@ -1,8 +1,17 @@
-#LyX 1.6.9 created this file. For more info see http://www.lyx.org/
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
 \textclass scrreprt
+\begin_preamble
+\pagenumbering{roman}
+\let\myTOC\tableofcontents
+\renewcommand\tableofcontents{%
+\myTOC
+\clearpage
+\pagenumbering{arabic}
+}
+\end_preamble
 \use_default_options true
 \begin_modules
 logicalmkup
@@ -67,7 +76,7 @@ Modern web applications are becoming more and more complex, with users expecting
  more and more automation of menial tasks such as spelling correction and
  autocompletion of text.
  This leads to web applications becoming larger and more complex, which
- in turn means that they are becoming more error prone.
+ in turn means that they are becoming more error prone<TODO: reference?>.
  One large source of errors in web applications is the absence of type safety
  in the form of static type checking in most scripting languages aimed at
  web development, such as JavaScript or PHP <TODO: reference?>.
@@ -773,10 +782,6 @@ Standard libraries
 
 \begin_layout Chapter
 Bibliography
-\end_layout
-
-\begin_layout Standard
-
 \end_layout
 
 \begin_layout Standard
