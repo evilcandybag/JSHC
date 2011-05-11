@@ -17,8 +17,16 @@ JSHC.Thunk = function (exp) {
 
 JSHC.Thunk.prototype = {
     get v(){
-        if (this._v instanceof Function)
+            
+        if (this._v instanceof Function) {
             this.v = this._v();
+        }
+        
+        if (this._v instanceof JSHC.Thunk) {
+            this.v = this._v.v;
+            
+        }
+        
         return this._v;
     },
     set v(val){
