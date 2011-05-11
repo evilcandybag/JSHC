@@ -18,7 +18,11 @@ JSHC.Name.prototype.equal = function(other){
 JSHC.ModName = function(id,pos){
     this.name = "modname";
     this.id = id;
-    this.pos = pos;
+    if( pos !== undefined ){
+        this.pos = pos;
+    } else {
+        this.pos = {};
+    }
 };
 JSHC.ModName.prototype = new JSHC.Name();
 JSHC.ModName.prototype.toStringN = function(){
@@ -59,7 +63,11 @@ JSHC.TyCls = function(id,pos,loc){
         }
     }
     this.id = id;
-    this.pos = pos;
+    if( pos !== undefined ){
+        this.pos = pos;
+    } else {
+        this.pos = {};
+    }
 };
 JSHC.TyCls.prototype = new JSHC.Name();
 JSHC.TyCls.prototype.toStringN = function(){
@@ -79,7 +87,11 @@ JSHC.TyCls.prototype.toString = JSHC.TyCls.prototype.toStringN;
 JSHC.TyVar = function(id,pos){
     this.name = "tyvar";
     this.id = id;
-    this.pos = pos;
+    if( pos !== undefined ){
+        this.pos = pos;
+    } else {
+        this.pos = {};
+    }
 };
 JSHC.TyVar.prototype = new JSHC.Name();
 JSHC.TyVar.prototype.toStringN = function(){
@@ -104,7 +116,11 @@ JSHC.TyCon = function(id,pos,loc){
         }
     }
     this.id = id;
-    this.pos = pos;
+    if( pos !== undefined ){
+        this.pos = pos;
+    } else {
+        this.pos = {};
+    }
 };
 JSHC.TyCon.prototype = new JSHC.Name();
 JSHC.TyCon.prototype.toStringN = function(){
@@ -131,7 +147,11 @@ JSHC.DaCon = function(id,pos,isSymbol,loc){
     }
     this.id = id;
     this.isSymbol = isSymbol;
-    this.pos = pos;
+    if( pos !== undefined ){
+        this.pos = pos;
+    } else {
+        this.pos = {};
+    }
 };
 JSHC.DaCon.prototype = new JSHC.Name();
 JSHC.DaCon.prototype.toStringN = function(){
@@ -159,7 +179,11 @@ JSHC.VarName = function(id,pos,isSymbol,loc){
     }
     this.id = id;
     this.isSymbol = isSymbol;
-    this.pos = pos;
+    if( pos !== undefined ){
+        this.pos = pos;
+    } else {
+        this.pos = {};
+    }
 };
 JSHC.VarName.prototype = new JSHC.Name();
 JSHC.VarName.prototype.toStringN = function(){
@@ -179,6 +203,8 @@ JSHC.VarName.prototype.toString = JSHC.VarName.prototype.toStringN;
 JSHC.UnitDaCon = function(pos){
     if( pos !== undefined ){
         this.pos = pos;
+    } else {
+        this.pos = {};
     }
 };
 JSHC.UnitDaCon.prototype = new JSHC.DaCon("()",{}, false);
@@ -186,6 +212,8 @@ JSHC.UnitDaCon.prototype = new JSHC.DaCon("()",{}, false);
 JSHC.ListDaCon = function(pos){
     if( pos !== undefined ){
         this.pos = pos;
+    } else {
+        this.pos = {};
     }
 };
 JSHC.ListDaCon.prototype = new JSHC.DaCon("[]",{}, false);
@@ -199,6 +227,8 @@ JSHC.TupleDaCon = function(numberOfParams,pos){
     this.id = id;
     if( pos !== undefined ){
         this.pos = pos;
+    } else {
+        this.pos = {};
     }
     this.numberOfParams = numberOfParams;
 };
@@ -215,6 +245,8 @@ JSHC.TupleTyCon = function(numberOfParams,pos){
     this.id = id;
     if( pos !== undefined ){
         this.pos = pos;
+    } else {
+        this.pos = {};
     }
     this.numberOfParams = numberOfParams;
 };
@@ -227,7 +259,11 @@ JSHC.ConPat = function(con, pats, pos){
     
     this.con = con;
     this.pats = pats;
-    this.pos = pos;
+    if( pos !== undefined ){
+        this.pos = pos;
+    } else {
+        this.pos = {};
+    }
 };
 JSHC.ConPat.prototype = new JSHC.Name();
 JSHC.ConPat.prototype.toStringN = function(){

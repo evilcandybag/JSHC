@@ -872,6 +872,24 @@ JSHC.Check.Ctx.prototype.lookupAny = function(comp,name,field){
         return int32_type;
     }
 
+    if( name.name == "dacon" && name.id == "()" ){
+        // () :: ()
+        return new TyCon("()",{});
+    }
+
+    if( name.name == "dacon" && name.id == "[]" ){
+        // []     :: ∀a. [] a
+        var tyvar = new JSHC.TyVar("a");
+        var list_tycon = new JSHC.TyCon("[]",{});
+        var inner_type = new JSHC.AppType(list_tycon,tyvar);
+        return new JSHC.ForallType([tyvar],inner_type);
+    }
+
+    if( name.name == "dacon" && name.id == ":" && name.isSymbol === true){
+        throw new Error("dacon for cons not implemented");
+        // (:)    :: ∀a. a -> [] a -> [] a
+    }
+
     if( name.name == "dacon" && name instanceof JSHC.TupleDaCon ){
         return (function(){
             var tycon_type = new JSHC.TupleTyCon(name.numberOfParams,name.pos);
