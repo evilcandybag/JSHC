@@ -321,7 +321,6 @@ JSHC.Check.checkExp = function(comp,ctx,ast){
 	ctx.constrainValue(ast.e1, t1,new JSHC.TyCon("Prelude.Bool"));
 	ctx.constrainValue(ast.e2, t2, t3);
 	return ctx.simplify(t2);
-	break;
 
     case "application": // .exps ([qvar/gcon/literal/exp/tuple])
         if( ast.exps.length == 1 ){
@@ -366,16 +365,27 @@ JSHC.Check.checkExp = function(comp,ctx,ast){
 	break;
 
     case "lambda": // .args (apat: [var/gcon/literal/tuple_pat]) .rhs (rec)
-        return JSHC.Check.checkExpPattern(comp,ctx, ast.args, ast.rhs);
+        return JSHC.Check.checkExpPattern(comp, ctx, ast.args, ast.rhs);
 
     case "case": // .exp (rec) .alts ([{pat: apat/({name: "conpat", con: gcon, pats: apats})], exp: exp}])
+        // infer type of ast.exp.
+        // for each "pat,exp" branch, check it.
+        // must constrain the LHS type to type of ast.exp.
+        // must constrain the RHS type to return type.
+/*
+	var exp_type = JSHC.Check.checkExp(comp,ctx,ast.exp);
+
+        for(var ix=0 ; ix<ast.alts.length ; ix++){
+            JSHC.Check.checkExpPattern(comp, ctx, [ast.alts[ix].pat], ast.alts[ix].exp);
+        }	
+*/
+	throw new Error("case expression not implemented");
 	return undefined;
-	break;
     
     case "let": // .decls .exp
 	// (as for where)
+	throw new Error("let expression not implemented");
 	return undefined;
-	break;
 
     case "integer-lit":
         // should be "forall a. Num a => a"
@@ -490,7 +500,7 @@ JSHC.Check.checkExpPattern = function(comp,ctx,args,rhs){
 
 	 // check RHS:
 	 var rhs_type = JSHC.Check.checkExp(comp,ctx,rhs);
-	 assert.ok( rhs_type !== undefined );
+	 assert.ok( rhs_type !== undefined, "undefined RHS when checking "+JSHC.showAST(rhs) );
 
 	 // removes the names that are no longer needed and will not be
 	 // quantified. this should free all remaining type variables in the
@@ -1250,6 +1260,17 @@ JSHC.Check.computeUsedQualifiedNames = function(ast){
             find(ast.decl);
             break;
 
+        case "alt":
+            find(ast.pat);
+            find(ast.exp);
+            break;
+
+        case "case":
+            find(ast.exp);
+            ast.alts.forEach(function(a){find(a)});
+            break;
+
+        case "lambda":
         case "decl-fun":
             ast.args.forEach(function(a){find(a)});
             find(ast.rhs);
