@@ -1,0 +1,882 @@
+#LyX 1.6.9 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass scrreprt
+\use_default_options true
+\begin_modules
+logicalmkup
+\end_modules
+\language english
+\inputencoding auto
+\font_roman lmodern
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+Introduction
+\end_layout
+
+\begin_layout Section
+Background
+\end_layout
+
+\begin_layout Standard
+Modern web applications are becoming more and more complex, with users expecting
+ more and more automation of menial tasks such as spelling correction and
+ autocompletion of text.
+ This leads to web applications becoming larger and more complex, which
+ in turn means that they are becoming more error prone.
+ One large source of errors in web applications is the absence of type safety
+ in the form of static type checking in most scripting languages aimed at
+ web development, such as JavaScript or PHP <TODO: reference?>.
+ One solution to this problem is providing an extra layer of abstraction
+ on top of these scripts, that in turn can be subject to static type checking.
+ 
+\end_layout
+
+\begin_layout Standard
+Haskell is one such language, designed with type-safety as one of the major
+ concerns <TODO:ref: ?>.
+ By compiling Haskell directly to JavaScript, we use its strong type system
+ to guarantee that <TODO: better formulation plox> 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "haskell-report"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Purpose
+\end_layout
+
+\begin_layout Standard
+The purpose of this thesis is to present an implementation of a fully JavaScript
+ Haskell-compiler (i.e.
+ a compiler written entirely in JavaScript, compiling Haskell to JavaScript).
+ Coupled with the compiler will be an interface in the form of a JavaScript-base
+d text editor with an interactive code console (in the vein of the Glasgow
+ Haskell Compiler's GHCi).
+ By writing the compiler entirely in JavaScript, all computations will be
+ performed by the client, thus greatly lightening the server load compared
+ to having the computations run server-side, while still saving the user
+ the work of downloading a compiler to their computer.
+ The compiler supports the entirety of Haskell, as described in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "haskell-report"
+
+\end_inset
+
+.<TODO: Extensions?>
+\end_layout
+
+\begin_layout Section
+Related work
+\end_layout
+
+\begin_layout Standard
+Using Haskell for web-programming is not a new concept; there are several
+ projects out there with a similar approach to the one presented here.
+ Notable ones are Yesod [6], which is a full-featured web server framework,
+ and YCR2JS [7], a JavaScript back end to the York Haskell Compiler.
+ <TODO: elaborate here>
+\end_layout
+
+\begin_layout Chapter
+Theory
+\end_layout
+
+\begin_layout Section
+Introduction to Haskell
+\end_layout
+
+\begin_layout Standard
+<TODO: this chapter; how detailed does it really need to be?> 
+\end_layout
+
+\begin_layout Standard
+This subchapter is intended as a quick but thorough introduction to Haskell
+ for readers unfamiliar with or new to Haskell, or as a quick reference
+ to specific language features for more experienced users.
+ It consists of a very general overview, followed by separate sub chapters
+ with details about specific features.
+\end_layout
+
+\begin_layout Standard
+Haskell is a lazy, purely functional programming language with strong static
+ typing.
+ A program in Haskell consists of one or more modules, interconnected by
+ their import and export specifications.
+ The contents of a module is a set of top-level declarations, which can
+ be, among others, function declarations, datatype declarations and typeclass
+ declarations.
+ Functions consist of a name, a set of arguments and an expression, that
+ expresses the result of the function when applied to its arguments.,
+\end_layout
+
+\begin_layout Subsection
+Module system
+\end_layout
+
+\begin_layout Standard
+Haskell’s module system main method of encapsulation.
+ Apart from local variables in a certain function, it is the only way to
+ determine whether something is known (i.e.
+ in scope) or not.
+ Each module has a name, a set of imports and a set of exports.
+ The specification of these is optional, with defaults being “Main”, the
+ empty import set and the export set containing all top-level declarations,
+ respectively.
+ 
+\end_layout
+
+\begin_layout Standard
+Specification of module name and exports is done by the clause 
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+module Name [(export
+\begin_inset Formula $_{\text{}}$
+\end_inset
+
+
+\begin_inset Formula $1$
+\end_inset
+
+,..
+ export
+\begin_inset Formula $_{\text{}}$
+\end_inset
+
+
+\begin_inset Formula $n$
+\end_inset
+
+)] where 
+\end_layout
+
+\begin_layout Standard
+where 
+\family typewriter
+Name
+\family default
+ is any number of identifiers starting with an uppercase letter, separated
+ by points.
+ The export specification, within square brackets, is optional and contains
+ elements of the form 
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+(f, module M, T) 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\family typewriter
+f
+\family default
+ is the name of a function, 
+\family typewriter
+M
+\family default
+ is the name of a module and 
+\family typewriter
+T
+\family default
+ is the name of an abstract datatype or typeclass.
+ In English, the first item would mean “export the function known to this
+ module with the name 
+\family typewriter
+f
+\family default
+”, the second item “export everything imported from the module 
+\family typewriter
+M
+\family default
+” and the third item “export the abstract datatype or typeclass known to
+ this module with the name 
+\family typewriter
+T
+\family default
+”.
+ Note that the third item only exports the name of the datatype or typeclass,
+ not their respective members.
+ This means that if we export a type 
+\family typewriter
+T
+\family default
+ with the definition
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+data T = U | V 
+\end_layout
+
+\begin_layout Standard
+without specifying its exports, the importing modules will not be able to
+ access the constructors 
+\family typewriter
+U
+\family default
+ and 
+\family typewriter
+V
+\family default
+, only the type itself: 
+\family typewriter
+T
+\family default
+.
+ This means that an importing module can write functions that take arguments
+ or return values of type 
+\family typewriter
+T
+\family default
+, but not directly access its values (e.g.
+ pattern matching).
+ For importing modules to be able to access members of a datatype or typeclass,
+ the exporting module can specify this in its export list like so: 
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+(T(..), A(B,c)) 
+\end_layout
+
+\begin_layout Standard
+where 
+\family typewriter
+T, A
+\family default
+ are abstract datatypes or typeclasses.
+ In English, the first item would mean “export the abstract datatype or
+ typeclass known to this module with the name 
+\family typewriter
+T
+\family default
+, as well as all of its members” and the second “export the abstract datatype
+ or typeclass known to this module with the name 
+\family typewriter
+T
+\family default
+, as well as those of its members with the names 
+\family typewriter
+B
+\family default
+ and 
+\family typewriter
+c
+\family default
+”.
+ 
+\end_layout
+
+\begin_layout Standard
+Import specification is done by clauses such as 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+import A 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+import B (f,g) 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+import C hiding (f,g) 
+\end_layout
+
+\begin_layout Standard
+where 
+\family typewriter
+A,B,C
+\family default
+ are module names.
+ In English, the first line would mean “import from 
+\family typewriter
+A
+\family default
+ everything that it exports”, the second line “import from 
+\family typewriter
+B
+\family default
+ only the exports 
+\family typewriter
+f
+\family default
+ and 
+\family typewriter
+g
+\family default
+” and the third line “import from 
+\family typewriter
+C
+\family default
+ everything that it exports, except 
+\family typewriter
+f
+\family default
+ and 
+\family typewriter
+g
+\family default
+”.
+ 
+\end_layout
+
+\begin_layout Standard
+<TODO: put relevant theory here, to unclutter other chapters>
+\end_layout
+
+\begin_layout Chapter
+Method
+\end_layout
+
+\begin_layout Standard
+The main part of this project is the development of the compiler itself.
+ This task is performed by first implementing a working compiler for a small
+ subset of Haskell.
+ This smaller compiler is then tested and expanded iteratively, until full
+ support for the Haskell specification 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "haskell-report"
+
+\end_inset
+
+ has been achieved.
+ <TODO: Common extensions are also planned>
+\end_layout
+
+\begin_layout Section
+Coding standard
+\end_layout
+
+\begin_layout Standard
+<TODO: e.g javascript namespaces, source code style, no usage of “let”, required
+ Javascript/ECMAScript version ?>
+\end_layout
+
+\begin_layout Section
+Tools and libraries used
+\end_layout
+
+\begin_layout Standard
+<TODO: describe the tools and libraries used, hows and whys>
+\end_layout
+
+\begin_layout Section
+Testing
+\end_layout
+
+\begin_layout Standard
+<TODO: how and what do we test?>
+\end_layout
+
+\begin_layout Chapter
+Implementation
+\end_layout
+
+\begin_layout Standard
+<TODO: move certain items from here to Theory chapter>
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Itemize
+Find, read and parse all modules: This part identifies the modules used,
+ performs lexical analysis on them and parses them into an abstract representati
+on of the language, the Abstract Syntax Tree (AST).
+ 
+\end_layout
+
+\begin_layout Itemize
+Type checking: This part consists of checking each module for type correctness,
+ as well as inferring general types.
+ This new inferred type information is added to the AST.
+\end_layout
+
+\begin_layout Itemize
+Simplification: Before compilation, the AST is simplified, reducing the
+ number of different constructs used, to make for easier compilation.
+\end_layout
+
+\begin_layout Itemize
+Translation to target: The simplified AST is translated into the target
+ language (JavaScript).
+\end_layout
+
+\begin_layout Section
+Compiler front-end
+\end_layout
+
+\begin_layout Subsection
+Loading modules
+\end_layout
+
+\begin_layout Standard
+The loading process will be given a set of module names to load, and will
+ search for them in a virtual file system (mapping from module names to
+ unparsed strings), a list of URLs (which can refer to files using the file://
+ or http:// protocols).
+ Each found module must be parsed in order to find what it depends upon.
+ The imported modules must then be found and parsed as well.
+ This process continues until no more modules are needed, and the minimal
+ set of modules that satisfies all the module dependencies has been found.
+ In case a module can not be found or there is a parse error, the process
+ will continue and try to satisfy more dependencies and see if there are
+ more missing modules or parse errors.
+\end_layout
+
+\begin_layout Subsection
+Lexical analysis
+\end_layout
+
+\begin_layout Standard
+Lexical analysis is the process by which the compiler takes the program
+ code in the form of an input string, and parses it into a list of separate
+ tokens, lexemes, which are the smallest significant components in a programming
+ language.
+ <TODO: reference to somewhere in >
+\end_layout
+
+\begin_layout Standard
+The lexical analysis in JSHC is performed in several steps.
+ First, the input (i.e.
+ the Haskell source code) is parsed into tokens.
+ This is done by using a parser built using a JavaScript implementation
+ of Parsing Expression Grammar [3], PEG.js [4] that was fed a translation
+ (into PEG.js-readable form) of the lexical program structure described in
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "haskell-report"
+
+\end_inset
+
+, chapter 2.2.
+ <TODO: do we need to motivate tool support?> The generated list of tokens
+ is then run through a custom-built set of functions, designed to calculate
+ and annotate the tokens with position information (i.e.
+ location in the source code), remove whitespace (i.e.
+ characters that only serve to define the position of, and separate, other
+ characters, such as spaces, tabs, newlines or comments), and annotate the
+ token list with indentation and context information for use in the final
+ pass of the lexical analysis.
+ This last pass is where the layout-dependent syntax of Haskell 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "haskell-report"
+
+\end_inset
+
+, chapter 10.3, is converted into a context-free syntax [2] <TODO: pages/chapters
+?>.
+ A context-free syntax is required for the parsing step.
+ 
+\end_layout
+
+\begin_layout Subsection
+Parsing
+\end_layout
+
+\begin_layout Standard
+Parsing takes the list of lexemes and interprets it according to a grammar,
+ creating a data structure containing an abstract representation of the
+ code, called the abstract syntax tree (AST).
+ The AST is a tree (or tree-like) graph with nodes representing the application
+ of a certain rule in the grammar.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename adsgadgs.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Graphic representation of an AST of a function definition in a simple language
+ with Haskell- like syntax.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Figure <TODO>: Graphic representation of an AST of a function definition
+ in a simple language with Haskell- like syntax.
+\end_layout
+
+\begin_layout Standard
+The context free syntax is parsed using a parser implemented using the JISON
+ parser generator <TODO: ref to JISON?><TODO: more about the parser, JISON>
+ The parser and the last step of the lexical analysis work in concert, meaning
+ that the lexical analyser does not process and return all tokens in one
+ go, but only sends the parser tokens when asked to.
+ Also, the parser will inform the lexical analyser of any parse errors,
+ so that the lexer can react and send new tokens accordingly.
+ <TODO: this might be too vague? specify that this specifically has to do
+ with layout or leave this part out?>
+\end_layout
+
+\begin_layout Standard
+<TODO: create figure explaining the layout of finding/lexing/parsing>
+\end_layout
+
+\begin_layout Subsection
+Checking modules
+\end_layout
+
+\begin_layout Standard
+The module dependency groups are checked in dependency order.
+ It is necessary to be done in dependency order as the imports are needed
+ to know the complete set of available identifiers (and the type/kind) and
+ fixity declarations of operators.
+\end_layout
+
+\begin_layout Standard
+<TODO: include pseudo-code to describe the steps using the algorithms described
+ below>
+\end_layout
+
+\begin_layout Subsubsection
+Adjusting expressions using operators
+\end_layout
+
+\begin_layout Standard
+Given the available operators and their precedences, adjusts the expressions
+ in all function/operator/instance declarations so that they use the declared
+ precedence.
+\end_layout
+
+\begin_layout Subsubsection
+Kind checking
+\end_layout
+
+\begin_layout Standard
+Checks type/data/newtype/class top-level declarations in dependency group
+ order.
+\end_layout
+
+\begin_layout Standard
+It is necessary to use dependency groups and check in dependency group order
+ to give the correct kind.
+ 
+\end_layout
+
+\begin_layout Standard
+<TODO: give a good example or refer to one in the haskell report>
+\end_layout
+
+\begin_layout Standard
+Checks for missing identifiers (type variables, types), infer kind.
+\end_layout
+
+\begin_layout Subsubsection
+Type checking
+\end_layout
+
+\begin_layout Standard
+Checks instance/function top-level declarations in dependency group order.
+\end_layout
+
+\begin_layout Standard
+It is necessary to use dependency groups and check in dependency group order
+ to give the correct type.
+ 
+\end_layout
+
+\begin_layout Standard
+<TODO: give a good example or refer to one in the haskell report>
+\end_layout
+
+\begin_layout Standard
+Checks for missing identifiers (type variables, types, functions, etc..),
+ instances, and infer type.
+ Adds type information to the AST.
+\end_layout
+
+\begin_layout Subsection
+Reduction of syntax tree
+\end_layout
+
+\begin_layout Standard
+Removes some constructs from the AST.
+\end_layout
+
+\begin_layout Standard
+The following constructs disappear as they are translated into other constructs:
+ Pattern matching, Operator application, Section, Conditional, Syntactic
+ sugar for lists, Arithmetic Sequences, List Comprehensions,Let Expressions,
+ Do Expressions, Record construction, Record update.
+\end_layout
+
+\begin_layout Standard
+<TODO: make a nice table containing translations from one sentential form
+ to another similar to the report>
+\end_layout
+
+\begin_layout Section
+Compiler back end
+\end_layout
+
+\begin_layout Standard
+Is given an AST using the intermediate representation.
+\end_layout
+
+\begin_layout Subsection
+Optimization of AST
+\end_layout
+
+\begin_layout Standard
+Transformations on the AST to optimize the performance in space and time.
+ <TODO: strictness analysis, etc..>
+\end_layout
+
+\begin_layout Subsection
+Code generation
+\end_layout
+
+\begin_layout Standard
+Generates javascript code representing the compiled modules.
+ Compiles a program in the intermediate language to javascript, which can
+ then be executed by any javascript interpreter.
+\end_layout
+
+\begin_layout Standard
+Can be compiled so that all exported identifiers would use the same name
+ in javascript (under some namespace), which allows easy lookup of identifiers
+ by an interpreter, but also debugging of the compiler.
+\end_layout
+
+\begin_layout Subsection
+Interpretation
+\end_layout
+
+\begin_layout Standard
+Interpret the AST by re-writing the AST while producing the required side-effect
+s.
+\end_layout
+
+\begin_layout Section
+Standard libraries
+\end_layout
+
+\begin_layout Standard
+<TODO: describe how the code from the Haskell report was used to construct
+ the standard libraries for the compiler>
+\end_layout
+
+\begin_layout Chapter
+Bibliography
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+bibfiles "jshc"
+options "plain"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+\start_of_appendix
+Dependency groups
+\end_layout
+
+\begin_layout Standard
+The Haskell standard 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "haskell-report"
+
+\end_inset
+
+ mentions dependency groups in Chapters 4.5.1, 4.5.2, and 4.6, related to different
+ topics.
+\end_layout
+
+\begin_layout Standard
+The dependency groups are the SCC (strongly connected components) in a directed
+ graph.
+ After they have been computed, the resulting graph is a DAG (directed acyclic
+ graph) where nodes are dependency groups, and the edges are the dependencies
+ between the graphs describing the dependency order.
+\end_layout
+
+\begin_layout Standard
+This concept is used in several places of the compiler.
+ It is needed to describe sets of modules that mutually depend on each other,
+ sets of type declarations (see kind checking) that refer to each other,
+ and also sets of function declarations (see type checking) that refer to
+ each other.
+\end_layout
+
+\begin_layout Standard
+The algorithm created for this is a implementation that can be used for
+ all places in the compiler where dependency groups are needed.
+ Given a graph, it merges the minimal amount of nodes to create a DAG.
+ This takes O(|E|+|V|) time.
+\end_layout
+
+\begin_layout Standard
+<TODO: pseudo code here>
+\end_layout
+
+\begin_layout Standard
+<TODO: time and space analysis>
+\end_layout
+
+\begin_layout Section
+Dependency order 
+\end_layout
+
+\begin_layout Standard
+The dependency order is a reverse topological ordering of the graph of dependenc
+y groups.
+\end_layout
+
+\begin_layout Standard
+<TODO: image of a few modules as an example>
+\end_layout
+
+\begin_layout Section
+Dependency order traversal 
+\end_layout
+
+\begin_layout Standard
+The compiler needs to traverse the dependency groups in dependency order.
+\end_layout
+
+\begin_layout Standard
+The algorithm created for this computes the ordering lazily, similar to
+ an iterator, but allows for concurrency by producing a set of nodes at
+ each step.
+\end_layout
+
+\begin_layout Standard
+<TODO: pseudo code here, with interface and comments>
+\end_layout
+
+\begin_layout Chapter
+Code etc 
+\end_layout
+
+\begin_layout Standard
+<TODO: some significant pieces of the source code, test cases, etc..
+ probably an example of how the compiler can be used on a web page>
+\end_layout
+
+\end_body
+\end_document
