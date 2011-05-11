@@ -31,40 +31,40 @@ JSHC.Test.Tests.codegen = function(tester){
                    }
     }
     
-    cases.wheres = {
-        fileSystem: {"Wheres": "module Wheres where\n"+
-           "a = x where x = 1\n"+
-           "b = x 1 where x z = 1 + z\n"+
-           "c = x + y where\n x = 1\n y = 2\n"+
-           "d = x + y where x = 1\n                y = 2\n"+
-           "e = x + y\n where\n  x = 1\n  y = 2\n"
-           },
-        commands: {
-            "a": "1",
-            "b": "2",
-            "c": "3",
-            "d": "3",
-            "e": "3",
-        }
-    }
-       
-    cases.lets = {
-        fileSystem: { "Lets": "module Lets where\n"+
-           "a = let x = 1 in x\n"+
-           "b = let x z = 1 + z in x 1\n"+
-           "c = let\n x = 1\n y = 2\n in x + y\n"+
-           "d = let x = 1\n        y = 2\n        in x + y\n"+
-           "e =\n let x = 1\n     y = 2\n  in x + y\n"
-        },
-        commands: {
-            "a": "1",
-            "b": "2",
-            "c": "3",
-            "d": "3",
-            "e": "3",
-        }
-    
-    }
+//    cases.wheres = {
+//        fileSystem: {"Wheres": "module Wheres where\n"+
+//           "a = x where x = 1\n"+
+//           "b = x 1 where x z = 1 + z\n"+
+//           "c = x + y where\n x = 1\n y = 2\n"+
+//           "d = x + y where x = 1\n                y = 2\n"+
+//           "e = x + y\n where\n  x = 1\n  y = 2\n"
+//           },
+//        commands: {
+//            "a": "1",
+//            "b": "2",
+//            "c": "3",
+//            "d": "3",
+//            "e": "3",
+//        }
+//    }
+//       
+//    cases.lets = {
+//        fileSystem: { "Lets": "module Lets where\n"+
+//           "a = let x = 1 in x\n"+
+//           "b = let x z = 1 + z in x 1\n"+
+//           "c = let\n x = 1\n y = 2\n in x + y\n"+
+//           "d = let x = 1\n        y = 2\n        in x + y\n"+
+//           "e =\n let x = 1\n     y = 2\n  in x + y\n"
+//        },
+//        commands: {
+//            "a": "1",
+//            "b": "2",
+//            "c": "3",
+//            "d": "3",
+//            "e": "3",
+//        }
+//    
+//    }
     cases.lambda = {
         fileSystem: {"Lambda": "module Lambda where\n"+
         "a = \\ a -> g a\ng = \\ a -> a + 1\n"+
@@ -78,9 +78,9 @@ JSHC.Test.Tests.codegen = function(tester){
         "a 1": "2",
         "b 1": "2",
         "c 1 1": "2",
-        "d 1 2": "1",
+        "d 1 2": "2",
         "e 1 1 3": "3",
-        "f 1 4 1": "1"
+        "f 1 4 1": "2"
         }
     }
        
