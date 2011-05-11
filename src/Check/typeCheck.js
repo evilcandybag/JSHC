@@ -33,43 +33,7 @@ JSHC.Check.typeCheckModules = function(comp,modules){
 
         var topdecls = module.body.topdecls;
 
-        for(var j=0 ; j<topdecls.length ; j++){
-            var topdecl = topdecls[j];
-            //if the declaration is a fixity declaration, no typechecking needs to be done.
-            if (topdecl.name === "topdecl-decl" && topdecl.decl.name === "fixity")
-                continue;
-                
-            var deps = JSHC.Check.computeUsedQualifiedNames(topdecl);
-            for(var dep in deps){
-                var loc = deps[dep].loc;
-                // remove all used names which are NOT referring to any topdecl
-                // in any of the modules being checked.
-                if( locations[loc] === undefined ){
-                    delete deps[dep];
-                }
-            }
-            var names = JSHC.Check.computeDeclaredQualifiedNames(topdecl);
-
-            var entry = new JSHC.Dep.Entry([topdecl],names,deps);
-            for( var k in names ){
-                var current_entry = entrymap[names[k]];
-                //JSHC.alert("current keys: "+JSHC.showKeys(entrymap),"\ncurrent entry("+names[k]+"): ",current_entry);
-                if( current_entry === undefined ){
-                    assert.ok( entry !== undefined );
-                    entrymap[names[k]] = entry;
-                } else {
-                    // add declared names, used names, and values to the
-                    // existing entry.
-                    for( var l in names ){
-                        current_entry.addName(names[l]);
-                    }
-                    for( var l in deps ){
-                        current_entry.addIncoming(deps[l]);
-                    }
-                    current_entry.addValue(topdecl);
-                }
-            }
-        }
+        JSHC.Check.typeCheckDeclsDep(topdecls,entrymap,locations);
     }
 
     // create action for each group
@@ -82,6 +46,66 @@ JSHC.Check.typeCheckModules = function(comp,modules){
 
     // create and traverse groups in dependency order
     JSHC.Dep.check(entrymap,action);
+};
+
+JSHC.Check.typeCheckDeclsDep = function(topdecls,entrymap,locations) {
+
+    for(var j=0 ; j<topdecls.length ; j++){
+        var topdecl = topdecls[j];
+        //if the declaration is a fixity declaration, no typechecking needs to be done.
+        if (topdecl.name === "topdecl-decl" && topdecl.decl.name === "fixity")
+           continue;
+            
+        var deps = JSHC.Check.computeUsedQualifiedNames(topdecl);
+        for(var dep in deps){
+            var loc = deps[dep].loc;
+            // remove all used names which are NOT referring to any topdecl
+            // in any of the modules being checked.
+            if( locations[loc] === undefined ){
+                delete deps[dep];
+            }
+        }
+        var names = JSHC.Check.computeDeclaredQualifiedNames(topdecl);
+
+        var entry = new JSHC.Dep.Entry([topdecl],names,deps);
+        for( var k in names ){
+            var current_entry = entrymap[names[k]];
+            //JSHC.alert("current keys: "+JSHC.showKeys(entrymap),"\ncurrent entry("+names[k]+"): ",current_entry);
+            if( current_entry === undefined ){
+                assert.ok( entry !== undefined );
+                entrymap[names[k]] = entry;
+            } else {
+                // add declared names, used names, and values to the
+                // existing entry.
+                for( var l in names ){
+                    current_entry.addName(names[l]);
+                }
+                for( var l in deps ){
+                    current_entry.addIncoming(deps[l]);
+                }
+                current_entry.addValue(topdecl);
+            }
+        }
+    }
+};
+
+JSHC.Check.typeCheckLocalDecls = function (comp, decls) {
+    
+    var entrymap = {};
+    
+    JSHC.Check.typeCheckDeclsDep(topdecls,entrymap);
+    
+    // create action for each group
+    var action = function(entry){
+        //JSHC.alert("type group (topdecls):",entry);
+
+        // read module name from entry and pass along.
+        JSHC.Check.typeCheckTopdecls(comp,entry.name.loc,entry.values);
+    }
+
+    // create and traverse groups in dependency order
+    JSHC.Dep.check(entrymap,action);
+
 };
 
 JSHC.Check.typeCheckTopdecls = function(comp,module,topdecls){
@@ -301,7 +325,9 @@ JSHC.Check.checkExp = function(comp,ctx,ast){
 	// check ast.decls (create dep groups of list of "decl-fun")
 	// add a map to the context and insert all declared names.
 	// call JSHC.Check.checkDecls for each group to get the types.
+        throw new Error("fun-where not implemented in checkExp");
 	ctx.push();      
+	
 	
 	// check the expression (also in scope of the declarations)
 	var ty = JSHC.Check.checkExp(comp,ctx,ast.exp);
@@ -1248,6 +1274,15 @@ JSHC.Check.computeUsedQualifiedNames = function(ast){
         case "apptype":
             find(ast.lhs);
             find(ast.rhs);
+            break;
+        
+        
+        case "fun-where":
+            var decls = ast.decls;
+            for (var i = 0; i < decls.length; i++) {
+                find(decls[i]);
+            }
+            find(ast.exp);
             break;
         
         case "tyvar":
