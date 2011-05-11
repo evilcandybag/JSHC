@@ -148,7 +148,7 @@ JSHC.Check.checkTopdecl = function(comp,ctx,ast){
 	     //ctx.pop();
 	 //}
 
-         ctx.constrain(ident_tv, rhs_type);
+         ctx.constrainValue(ast.ident, ident_tv, rhs_type);
          ident.type = ctx.quantify(ident);
 	 ctx.pop();
 	 break;
@@ -186,7 +186,7 @@ JSHC.Check.checkTopdecl = function(comp,ctx,ast){
              for(var ty_ix=0 ; ty_ix<constr.types.length ; ty_ix++){
                  var ty = constr.types[ty_ix];
                  var kind = JSHC.Check.checkType(comp,ctx,ty);
-                 ctx.constrain(kind,JSHC.Check.StarKind);
+                 ctx.constrainValue(ty, kind,JSHC.Check.StarKind);
              }
          }
 
@@ -198,7 +198,7 @@ JSHC.Check.checkTopdecl = function(comp,ctx,ast){
 	     ctx.pop();
 	 }
 
-         ctx.constrain(tycon.kind, rhs_kind);
+         ctx.constrainValue(tycon, tycon.kind, rhs_kind);
 
          // replace all remaining type variables with "*".
          tycon.kind = ctx.simplify(tycon.kind);
@@ -276,7 +276,7 @@ JSHC.Check.checkType = function(comp,ctx,ast){
         var ret_type = ctx.newUnboundTyVar();
 
         var fun_type = new JSHC.FunType([rhs_kind, ret_type]);
-        ctx.constrain(lhs_kind,fun_type);
+        ctx.constrainValue(ast.lhs, lhs_kind, fun_type);
         return ret_type;
 
     default:
@@ -318,8 +318,8 @@ JSHC.Check.checkExp = function(comp,ctx,ast){
 	var t3 = JSHC.Check.checkExp(comp,ctx,ast.e3);
 	
 	// enforce "t1 = Prelude.Bool" and "t2 = t3". return t2.
-	ctx.constrain(t1,new JSHC.TyCon("Prelude.Bool"));
-	ctx.constrain(t2,t3);
+	ctx.constrainValue(ast.e1, t1,new JSHC.TyCon("Prelude.Bool"));
+	ctx.constrainValue(ast.e2, t2, t3);
 	return ctx.simplify(t2);
 	break;
 
@@ -341,20 +341,13 @@ JSHC.Check.checkExp = function(comp,ctx,ast){
 	    exp_types.push(ret_type);
             var inferred_type = new JSHC.FunType(exp_types);
             //JSHC.alert("constraining ",fun_type.toString()," to ",inferred_type.toString());
-            try{
-                ctx.constrain(fun_type,inferred_type);
-            } catch(err){
-                if( err instanceof JSHC.TypeError ){
-                    err.value = ast.exps[0];
-                }
-                throw err;
-            }
+            ctx.constrainValue(ast.exps[0],fun_type,inferred_type);
 	    return ret_type;
         }
 	//if( ! (fun_type instanceof JSHC.FunType) ){
 	//    throw new Error("non-function can not be applied to arguments");
 	//}
-	//ctx.constrain(fun_type,new JSHC.FunType([arg_type,ret_type]));
+	//ctx.constrainValue(...,fun_type,new JSHC.FunType([arg_type,ret_type]));
 /*
 	// when NOT applying too many arguments
         if( fun_type.types.length >= ast.exps.length ){
@@ -390,6 +383,22 @@ JSHC.Check.checkExp = function(comp,ctx,ast){
 
     case "dacon": case "varname":
         return ctx.lookupType(comp,ast);
+    
+    case "tuple":
+        // the tuple constructor is chosen based on the expressions in the
+        // tuple construction expression.
+        var tycon_type = new JSHC.TupleTyCon(ast.members.length);
+
+        var arg_types = [];
+        for(var ix=0 ; ix<ast.members.length ; ix++){
+            arg_types.push(JSHC.Check.checkExp(comp,ctx,ast.members[ix]));
+        }
+
+        var ret_type = tycon_type;
+        for(var ix=0 ; ix<arg_types.length ; ix++){
+            ret_type = new JSHC.AppType(ret_type,arg_types[ix]);
+        }
+	return ret_type;
 
     default:
 	throw new Error("missing case for "+ast.name);
@@ -406,32 +415,77 @@ JSHC.Check.checkExp = function(comp,ctx,ast){
 };
 
 /*
+*/
+JSHC.Check.checkPatternEnter = function(comp,ctx,ast){
+    switch( ast.name ){
+    case "varname":
+        ctx.push();
+        return ctx.add(ast);   // automatically get a new tyvar
+
+    case "integer-lit":
+    case "dacon":
+        return ctx.lookupType(comp,ast);
+
+    case "conpat":
+        // check constructor. check patterns.
+        // build up a function type of the pattern types and then constrain it
+        // to the dacon type.
+        var con_type = JSHC.Check.checkPatternEnter(comp,ctx,ast.con);
+        var arg_types = [];
+        for(var ix=0 ; ix<ast.pats.length ; ix++){
+            arg_types.push(JSHC.Check.checkPatternEnter(comp,ctx,ast.pats[ix]));
+        }
+
+	var ret_type = ctx.newUnboundTyVar();
+	arg_types.push(ret_type);
+        var inferred_type = new JSHC.FunType(arg_types);
+        //JSHC.alert("constraining ",fun_type.toString()," to ",inferred_type.toString());
+        ctx.constrainValue(ast.con,con_type,inferred_type);
+	return ret_type;
+
+    case "tuple_pat":
+        return JSHC.Check.checkPatternEnter(comp,ctx,{name: "conpat", con: new JSHC.TupleDaCon(ast.members.length, ast.pos), pats: ast.members});
+
+    default:
+        throw new Error("missing case for " + ast.name);
+   }
+};
+
+JSHC.Check.checkPatternExit = function(comp,ctx,ast){
+	     switch( ast.name ){
+	     case "varname":
+	         ctx.rem(ast);
+	         ctx.pop();
+	         break;
+
+	     case "dacon":
+	     case "integer-lit":
+	         break;
+
+	     case "tuple_pat":
+	         for(var ix=ast.members.length-1 ; ix>=0 ; ix--){
+	             JSHC.Check.checkPatternExit(comp,ctx,ast.members[ix]);
+	         }
+	         break;
+
+	     case "conpat":
+	         JSHC.Check.checkPatternExit(comp,ctx,ast.con);
+	         for(var ix=ast.pats.length-1 ; ix>=0 ; ix--){
+	             JSHC.Check.checkPatternExit(comp,ctx,ast.pats[ix]);
+	         }
+	         break;
+
+	     default:
+	         throw new Error("missing case for " + ast.name);
+	     }
+};
+/*
   checks an expression given some arguments.
 */
 JSHC.Check.checkExpPattern = function(comp,ctx,args,rhs){
+         var pat_types = [];
 	 for(var ix=0 ; ix<args.length ; ix++){
-	     var param = args[ix];
-	     switch( param.name ){
-	     case "varname":
-	         ctx.push();
-	         ctx.add(param);   // automatically get a new tyvar
-	         break;
-	     case "integer-lit":
-	         break;
-	     case "dacon":
-	         // look up the type. if the type is a function type, then give
-	         // type error, else do nothing and just add this type as a
-	         // parameter type when building up the function type after
-	         // checking the RHS.
-	         var dacon_type = ctx.lookupType(comp,param);
-	         if( dacon_type instanceof JSHC.FunType ){
-	             throw new JSHC.SourceError(undefined, param.pos, "data constructor "+param+"must be given arguments");
-	         }
-	         break;
-	     
-	     default:
-	         throw new Error("missing case for " + param.name);
-	     }
+	     pat_types.push(JSHC.Check.checkPatternEnter(comp,ctx,args[ix]));
 	 }
 
 	 // check RHS:
@@ -443,24 +497,10 @@ JSHC.Check.checkExpPattern = function(comp,ctx,args,rhs){
 	 // current tyvar context.
 	 for(var ix=args.length-1 ; ix>=0 ; ix--){
 	     var param = args[ix];
-	     switch( param.name ){
-	     case "varname":
-                 rhs_type = new JSHC.FunType([ctx.lookupType(comp,param),rhs_type]);
-	         ctx.rem(param);
-	         ctx.pop();
-	         break;
-	     case "dacon":
-	         // look up the type and use the type as the parameter type.
-	         rhs_type = new JSHC.FunType([ctx.lookupType(comp,param),rhs_type]);
-	         break;
-	     case "integer-lit":
-                 // should be "forall a. Num a => a"
-	         var integer_lit_type = new JSHC.TyCon("Data.Int.Int32");
-	         rhs_type = new JSHC.FunType([integer_lit_type,rhs_type]);
-	         break;
-	     default:
-	         throw new Error("missing case for " + param.name);
-	     }
+	     var arg_type = ctx.simplify(pat_types[ix]);
+             rhs_type = new JSHC.FunType([arg_type,rhs_type]);
+             
+             JSHC.Check.checkPatternExit(comp,ctx,args[ix]);
 	 }
 
 	return rhs_type;
@@ -559,23 +599,11 @@ JSHC.Check.Ctx.prototype.quantifyType = function(type){
     }
 
     var keyAmount = JSHC.numberOfKeys(used);
-    var binds = {};
-    if( keyAmount > 26 ){
-        var n=0;
-        for(var u in used){
-            var tyvar = new JSHC.TyVar("t"+n);
-            binds[tyvar] = tyvar;
-            used[u] = tyvar;
-            n++;
-        }
-    } else {
-        var c=97;
-        for(var u in used){
-            var tyvar = new JSHC.TyVar(String.fromCharCode(c));
-            binds[tyvar] = tyvar;
-            used[u] = tyvar;
-            c++;
-        }
+    var binds = JSHC.Check.generateTyVarSequence(keyAmount);
+    var ix=0;
+    for(var u in used){
+        used[u] = binds[ix];
+        ix++;
     }
 
     if( ! empty ){
@@ -629,6 +657,22 @@ JSHC.Check.Ctx.prototype.newUnboundTyVar = function(){
     var tyvar = this.freevars.next();
     return tyvar;
 };
+
+/*
+  takes a value and two types and adds appropriate constraints or throws a
+  type error for the value.
+*/
+JSHC.Check.Ctx.prototype.constrainValue = function(value,type1,type2){
+    try {
+        this.constrain(type1,type2);
+    } catch(err){
+        if( err instanceof JSHC.TypeError ){
+            err.value = value;
+        }
+        throw err;
+    }
+}
+
 /*
   takes two types and adds appropriate constraints or throws a type error
 */
@@ -822,10 +866,35 @@ JSHC.Check.Ctx.prototype.lookupAny = function(comp,name,field){
 
     //JSHC.alert("looking up: ",name);
 
+    var int32_type = new JSHC.TyCon("Int32",{},"Data.Int");
+
+    if( name.name == "integer-lit" ){
+        return int32_type;
+    }
+
+    if( name.name == "dacon" && name instanceof JSHC.TupleDaCon ){
+        return (function(){
+            var tycon_type = new JSHC.TupleTyCon(name.numberOfParams,name.pos);
+            var params = JSHC.Check.generateTyVarSequence(name.numberOfParams);
+
+            var ret_type = tycon_type;
+            for(var ix=0 ; ix<params.length ; ix++){
+                ret_type = new JSHC.AppType(ret_type,params[ix]);
+            }
+
+            var fun_params = [].concat(params);
+            fun_params.push(ret_type);
+            var fun_type = new JSHC.FunType(fun_params);
+
+            var type = new JSHC.ForallType(params,fun_type);
+
+            return type;
+        }());
+    }
+
     if( name.loc !== undefined ){
         if( name.loc == "JSHC.Internal.Prelude" ){
             // TODO: should use foreign declarations instead to specify the type.
-            var int32_type = new JSHC.TyCon("Int32",{},"Data.Int");
             var iii_type = new JSHC.FunType([int32_type,int32_type,int32_type]);
             if( field == "type" ){
                 switch( name.id ){
@@ -874,7 +943,7 @@ JSHC.Check.Ctx.prototype.lookupAny = function(comp,name,field){
 
     // only possible if error in name check or if continuing after name check
     // anyway.
-    throw new JSHC.SourceError(undefined,undefined,name + " not in scope when type checking");
+    throw new JSHC.SourceError(undefined,undefined,JSHC.showAST(name) + " not in scope when type checking");
 };
 JSHC.Check.Ctx.prototype.push = function(){
     //this.contexts.push(opt_list===undefined ? {} : opt_list);
@@ -1141,6 +1210,7 @@ JSHC.Check.computeUsedQualifiedNames = function(ast){
             break;
 
         case "tuple_pat":
+        case "tuple":
             var mems = ast.members;
             for(var i = 0; i < mems.length; i++){
                 find(mems[i]);
@@ -1276,3 +1346,22 @@ JSHC.Check.Ctx.prototype.instantiate = function(ast){
 };
 
 ////////////////////////////////////////////////////////////////////////////////
+
+JSHC.Check.generateTyVarSequence = function(amount){
+    var binds = [];
+
+    if( amount > 26 ){
+        for(var ix=0 ; ix<amount ; ix++){
+            binds.push(new JSHC.TyVar("t"+ix));
+        }
+    } else {
+        for(var ix=0 ; ix<amount ; ix++){
+            binds.push(new JSHC.TyVar(String.fromCharCode(97+ix)));
+        }
+    }
+
+    return binds;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
