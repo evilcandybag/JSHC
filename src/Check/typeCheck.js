@@ -398,15 +398,22 @@ JSHC.Check.checkExp = function(comp,ctx,ast){
         // for each "pat,exp" branch, check it.
         // must constrain the LHS type to type of ast.exp.
         // must constrain the RHS type to return type.
-/*
+
 	var exp_type = JSHC.Check.checkExp(comp,ctx,ast.exp);
+	
+	var ret_type = ctx.newUnboundTyVar();
 
         for(var ix=0 ; ix<ast.alts.length ; ix++){
-            JSHC.Check.checkExpPattern(comp, ctx, [ast.alts[ix].pat], ast.alts[ix].exp);
+            var alt = ast.alts[ix];
+	    var pat_type = JSHC.Check.checkPatternEnter(comp,ctx,alt.pat);
+	    ctx.constrainValue(alt.pat,pat_type,exp_type);
+
+	    var rhs_type = JSHC.Check.checkExp(comp,ctx,alt.exp);
+	    ctx.constrainValue(alt.exp,rhs_type,ret_type);
+
+            JSHC.Check.checkPatternExit(comp,ctx,alt.pat);
         }	
-*/
-	throw new Error("case expression not implemented");
-	return undefined;
+	return ret_type;
     
     case "let": // .decls .exp
 	// (as for where)
