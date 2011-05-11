@@ -116,6 +116,9 @@ JSHC.Check.lookupName = function(comp,module,lspace,name){
 	if( name.loc !== undefined && name.loc.substr(0,internal.length) === internal ){
 	    return undefined;
 	}
+	if( name.id == "[]" || name.id == ":" ){
+	    return undefined;
+	}
 //	JSHC.alert(lspace, nameobj, nspace, module.body.tspace)
 //	alert("LSPACE:\n\n"+JSHC.showAST(lspace))
 //	alert("name:\n\n"+JSHC.showAST(name))
@@ -123,7 +126,7 @@ JSHC.Check.lookupName = function(comp,module,lspace,name){
 //	alert("tspace:\n\n"+JSHC.showAST(module.body.tspace))
 //	alert("LSPACE:\n\n"JSHC.showAST(lspace))
         comp.onError(new JSHC.SourceError(module.modid,name.pos,name+" not in scope"));
-        JSHC.alert("failed to find: "+name);
+        JSHC.alert("failed to find: "+name.toStringQ());
     } else if( amount === 1 ){
         // declared in one location (topdecl or import)
         var matched_name = nspace.getAny();
@@ -418,11 +421,42 @@ JSHC.Check.nameCheckTopdeclData = function(comp,module,ast){
     });
 };
 
+JSHC.Check.nameCheckQType = function(comp,module,ast){
+    switch( ast.name ){
+    case "apptype":
+        JSHC.Check.nameCheckQType(comp,module,ast.lhs);
+        JSHC.Check.nameCheckQType(comp,module,ast.rhs);
+        break;
+
+    case "funtype":
+        ast.types.forEach(function(t){
+            JSHC.Check.nameCheckQType(comp,module,t);
+        });
+        break;
+
+    case "tyvar":
+        break;
+
+    case "tycon":
+        JSHC.Check.lookupName(comp,module,new JSHC.LSpace(),ast);
+        break;
+
+    default:
+        throw new JSHC.CompilerError("missing type case:"+ast);
+    }
+};
+
 JSHC.Check.nameCheckType = function(comp,module,lspace,ast){
     switch( ast.name ){
     case "apptype":
         JSHC.Check.nameCheckType(comp,module,lspace,ast.lhs);
         JSHC.Check.nameCheckType(comp,module,lspace,ast.rhs);
+        break;
+
+    case "funtype":
+        ast.types.forEach(function(t){
+            JSHC.Check.nameCheckType(comp,module,lspace,t);
+        });
         break;
 
     case "tyvar":
@@ -442,6 +476,13 @@ JSHC.Check.nameCheckTopdeclDecl = function(comp,module,ast){
         break;
     case "fixity":
         JSHC.Check.nameCheckFixity(comp,module,ast);
+        break;
+    case "type-signature":
+        var empty_lspace = new JSHC.LSpace(true)
+        for(var ix=0 ; ix<ast.vars.length ; ix++){
+           JSHC.Check.nameCheckExp(comp,module,empty_lspace,ast.vars[ix]);
+        }
+        JSHC.Check.nameCheckQType(comp,module,ast.sig);
         break;
     default:
         throw new JSHC.CompilerError("missing decl case:"+ast.name);
@@ -499,6 +540,7 @@ JSHC.Check.nameCheckDeclFun = function(comp,module,lspace,ast){
     var args = ast.args;
     lspace.push(); // add space for names in patterns
     JSHC.Check.nameCheckPatterns(comp,module,lspace,args);
+    //JSHC.alert(ast,"\n\n",ast.rhs);
     JSHC.Check.nameCheckExp(comp,module,lspace,ast.rhs);
     lspace.pop();
 };

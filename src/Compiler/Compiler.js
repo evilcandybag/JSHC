@@ -246,7 +246,7 @@ JSHC.Compiler.prototype.checkExp = function (exp){
     var res = JSHC.parseExp(exp);
 //    JSHC.alert("Parsed expr: ", res)
     res = {name: "decl-fun",
-           ident: {name: "varname", id: "Interact+", isSymbol: false},
+           ident: new JSHC.VarName("Interact+",undefined,false),
            args: [],
            rhs: res};
     res = {name: "topdecl-decl", decl: res};

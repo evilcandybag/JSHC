@@ -29,7 +29,7 @@ JSHC.addToplevelNamespace = function(module){
     for(i=0;i<ts.length;i++){
         if( ts[i].name === "topdecl-decl" ){
             //ignore fixity declarations
-            if (ts[i].decl.name === "fixity")
+            if (ts[i].decl.name === "fixity" || ts[i].decl.name === "type-signature")
                 continue;
             // qualify name and add to tspace
             var varname = ts[i].decl.ident;

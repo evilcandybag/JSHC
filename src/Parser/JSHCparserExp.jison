@@ -48,7 +48,6 @@ start_
     : "{" exp "}" EOF    { return $2; }
     ;
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // 5.1 Module Structure
 
@@ -259,8 +258,8 @@ exp // : object
 infixexp // : [lexp | qop | '-']
   : infixexpLR lexp     %prec INFIXEXP          {{
           ($1).push($2);
-          if( $1.length == 1 && $1[0].name=="infixexp" ){
-              $$ = $1[0];
+          if( ($1).length == 1 && ($1)[0].name=="infixexp" ){
+                  $$ = ($1)[0];
           } else {
               $$ = {name:"infixexp",exps:$1,pos:@$};
           }
@@ -371,12 +370,17 @@ conop // : object           TODO: something in Names instead?
     : consym                {{ $$ = new JSHC.DaCon($1, @$, true); }}
     | '`' conid '`'         {{ $$ = new JSHC.DaCon($1, @$, false); }}
     ;
-    
+
 // optionally qualified variable symbol or variable id as a symbol
 qvarop // : object
     : qvarsym           {{$$ = new JSHC.VarName($1, @$, true, yy.lexer.previous.qual);}}
     | varop             {{$$ = $1;}}
     | '`' qvarid '`'    {{$$ = new JSHC.VarName($1, @$, false, yy.lexer.previous.qual);}}
+    ;
+
+qconop // : object
+    : gconsym           {{$$ = $1;}}
+    | '`' qconid '`'    {{$$ = new JSHC.DaCon($1, @$, false, yy.lexer.previous.qual);}}
     ;
 
 // non-qualified variable symbol or variable id as a symbol
@@ -415,16 +419,16 @@ con // : JSHC.DaCon
 
 // optionally qualified data constructor id (or symbol in parentheses) name
 qcon // : JSHC.DaCon
-    : qconid        {{$$ = new JSHC.DaCon($1, @$, false, yy.lexer.previous.qual);}}
-    | gconsym       {{$$ = new JSHC.DaCon($2, @$, true, yy.lexer.previous.qual);}}
-    | con           {{$$ = $1;}}
+    : qconid           {{$$ = new JSHC.DaCon($1, @$, false, yy.lexer.previous.qual);}}
+    | '(' gconsym ')'  {{$$ = $2;}}
+    | con              {{$$ = $1;}}
     ;
 
 // optionally qualified data constructor, or a built-in data constructor
 gcon // : object
-    : "(" ")"               {{$$ = JSHC.UnitDaCon(@$);}}
-    | "[" "]"               {{$$ = JSHC.ListDaCon(@$);}}
-    | "(" list_1_comma ")"  {{$$ = JSHC.TupleDaCon($2 + 1, @$);}}
+    : "(" ")"               {{$$ = new JSHC.UnitDaCon(@$);}}
+    | "[" "]"               {{$$ = new JSHC.ListDaCon(@$);}}
+    | "(" list_1_comma ")"  {{$$ = new JSHC.TupleDaCon($2 + 1, @$);}}
     | qcon                  {{$$ = $1;}}
     ;
 
@@ -483,7 +487,7 @@ gtycon // : object
 // 3.17 Pattern Matching
 
 pat // : object
-    : lpat          {{$$ = $1;}}
+    : lpat             {{$$ = $1;}}
     // TODO: incomplete
     ;
 

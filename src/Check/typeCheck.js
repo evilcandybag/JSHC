@@ -174,8 +174,25 @@ JSHC.Check.typeCheckTopdeclsTogether = function(comp,module,ctx,topdecls){
     // not have to be pass around.
     //var freevars = new JSHC.Check.Freevars();
 
-    // TODO: add type variables to names that are visible to all declarations
-    //       in the group.
+    ctx.push();  // context with all declared names in the group
+
+    // add type variables to names that are visible to all declarations
+    // in the group.
+    for(var ix=0 ; ix<topdecls.length ; ix++){
+        var decl = topdecls[ix];
+        if( decl.name == "topdecl-decl" ){
+            decl = decl.decl;
+        }
+        if( decl.name == "decl-fun" ){
+            var ident = decl.ident;
+            // add the name once for all declarations of the same name
+            if( ctx.isNameInCurrentContext(ident) == false ){
+                ctx.add(ident);
+            }
+        }
+    }
+
+    //JSHC.alert("before checking the group:\n"+ctx.toString());
 
     for(var ix=0 ; ix<topdecls.length ; ix++){
         try {
@@ -191,6 +208,28 @@ JSHC.Check.typeCheckTopdeclsTogether = function(comp,module,ctx,topdecls){
             }
         }
     }
+
+    // quantify all decl types
+    //JSHC.alert("before quantification:\n"+ctx.toString());
+
+    for(var ix=0 ; ix<topdecls.length ; ix++){
+        var decl = topdecls[ix];
+        if( decl.name == "topdecl-decl" ){
+            decl = decl.decl;
+        }
+        if( decl.name == "decl-fun" ){
+            var ident = decl.ident;
+            if( ctx.isNameInCurrentContext(ident) ){
+                ctx.quantify(ident);
+            }
+            // for all names, write the type to each name in the decl
+            ident.type = ctx.lookupTypeUnmodified(comp,ident);
+        }
+    }
+
+    //JSHC.alert("after quantification:\n"+ctx.toString());
+
+    ctx.pop();
 };
 
 JSHC.Check.checkTopdecl = function(comp,ctx,ast){
@@ -202,9 +241,7 @@ JSHC.Check.checkTopdecl = function(comp,ctx,ast){
 
   case "decl-fun":
 
-	 ctx.push();
-	 var ident = ast.ident;
-	 var ident_tv = ctx.add(ident);
+         var ident = ast.ident;
 
          var rhs_type = JSHC.Check.checkExpPattern(comp,ctx,ast.args,ast.rhs);
 
@@ -231,9 +268,8 @@ JSHC.Check.checkTopdecl = function(comp,ctx,ast){
 	     //ctx.pop();
 	 //}
 
-         ctx.constrainValue(ast.ident, ident_tv, rhs_type);
-         ident.type = ctx.quantify(ident);
-	 ctx.pop();
+         //JSHC.alert("constraining: "+ctx.lookupType(comp,ident)+" to "+rhs_type+" for "+ast.ident+" in\n"+ctx.toString());
+         ctx.constrainValue(ast.ident, ctx.lookupTypeUnmodified(comp,ident), rhs_type);
 	 break;
 
   // skip fixity and type signature declarations
@@ -303,6 +339,7 @@ JSHC.Check.checkTopdecl = function(comp,ctx,ast){
                  dacon_type = tycon_type;
              }
              constr.dacon.type = ctx.quantifyType(dacon_type);
+             //JSHC.alert("after dacon qualification:\n",constr.dacon.type.toString(),"\n\n",ctx.toString());
              
              // debug: see if types and kinds are added
              //JSHC.alert("datatype: ",tycon.id," : ",tycon.kind.toString(),"\ndacon: ",constr.dacon.id," : ",constr.dacon.type.toString());
@@ -390,11 +427,16 @@ JSHC.Check.checkExp = function(comp,ctx,ast){
 	    if( decl.name !== "decl-fun" )continue;
 	    ctx.add(decl.ident,decl.ident.type);
 	}
-	
+
 	// check the expression (in scope of the declarations)
 	var ty = JSHC.Check.checkExp(comp,ctx,ast.exp);
-
+	
 	// remove context with all names from the where-declaration.
+	for(var ix=0 ; ix<ast.decls.length ; ix++){
+	    var decl = ast.decls[ix];
+	    if( decl.name !== "decl-fun" )continue;
+	    ctx.rem(decl.ident);
+	}
 	ctx.pop();
 	return ty;
 	break;
@@ -482,7 +524,7 @@ JSHC.Check.checkExp = function(comp,ctx,ast){
         return new JSHC.TyCon("Int32",{},"Data.Int");
 
     case "dacon": case "varname":
-        return ctx.lookupType(comp,ast);
+        return ctx.lookupTypeAndInstantiate(comp,ast);
     
     case "tuple":
         // the tuple constructor is chosen based on the expressions in the
@@ -524,7 +566,7 @@ JSHC.Check.checkPatternEnter = function(comp,ctx,ast){
 
     case "integer-lit":
     case "dacon":
-        return ctx.lookupType(comp,ast);
+        return ctx.lookupTypeAndInstantiate(comp,ast);
 
     case "conpat":
         // check constructor. check patterns.
@@ -628,17 +670,19 @@ JSHC.Check.Ctx = function(){
     this.contexts = [];  // sets of name
     this.tyvars = []; // sets of existing tyvars
     //this.unresolved = {}; // mapping from name to type
-    this.tyvar_ctx = {}; // mapping from tyvar to type
+    this.tyvar_ctx = {}; // the constraints. mapping from tyvar to type.
 };
 /*
   checks if tyvar is bound by any outer or current declaration.
 */
 JSHC.Check.Ctx.prototype.isUnboundTyVar = function(tyvar1){
-  // return true if and only if not in this.tyvars
-  for(var ix=0 ; ix<this.tyvars.length ; ix++){
+  // return true if and only if it is a type variable that is not in any
+  // context above the current one (i.e at this.tyvars.length-1), so exclude
+  // the last one.
+  for(var ix=0 ; ix<this.tyvars.length-1 ; ix++){
     var tyvar_ctx = this.tyvars[ix];
     for(var tyvar2 in tyvar_ctx){
-      if( tyvar1 === tyvar2 ){
+      if( tyvar1.id === tyvar2.id ){
         return false;
       }
     }
@@ -652,24 +696,37 @@ JSHC.Check.Ctx.prototype.toString = function(){
     m.push("declared names:\n");
     wrote = false;
     for(var c=0 ; c<this.contexts.length ; c++){
-	for(var n in this.contexts[c]){
+        m.push("in name context "+c+":\n");
+	for(var qname in this.contexts[c]){
+	    wrote = true;
+	    m.push(qname);
+	    m.push(" : ");
+	    m.push(this.contexts[c][qname].toString());
+	    m.push("\n");
+	}
+    }
+    if( wrote )m.pop();
+
+    m.push("\n\ntype variables:\n");
+    wrote = false;
+    for(var c=0 ; c<this.tyvars.length ; c++){
+        m.push("in type variable context "+c+":\n");
+	for(var n in this.tyvars[c]){
 	    wrote = true;
 	    m.push(n);
-	    m.push(" : ");
-	    m.push(this.contexts[c][n].toString());
 	    m.push(",");
 	}
     }
     if( wrote )m.pop();
 
-    m.push("\nconstraints:\n");
+    m.push("\n\nconstraints:\n");
     wrote = false;
-    for(var c=0 ; c<this.tyvar_ctx.length ; c++){
+    for(var v in this.tyvar_ctx){
 	wrote = true;
-	m.push(c);
+	m.push(v);
 	m.push(" = ");
-	m.push(this.tyvar_ctx[c].toString());
-	m.push(",");
+	m.push(this.tyvar_ctx[v].toString());
+	m.push("\n");
     }
     if( wrote )m.pop();
     return m.join("");
@@ -683,12 +740,12 @@ JSHC.Check.Ctx.prototype.quantifyKind = function(type){
 };
 
 JSHC.Check.Ctx.prototype.quantifyType = function(type){
-    // step1: compute the set of type variables in the type
+    // compute the set of USED type variables in the type
     var used = JSHC.Check.computeUsedVars(type);
 
-    // step2: compute the intersection of the result from step1 and the
-    //        current set of type variables to get the smallest possible
-    //        set that quantifies all that may be quantified.
+    // compute the intersection of the USED type variables and the
+    // current set of type variables to get the smallest possible
+    // set that quantifies all that may be quantified.
     var empty = true;
     for(var k in used){
 	if( this.isUnboundTyVar(k) ){
@@ -715,14 +772,14 @@ JSHC.Check.Ctx.prototype.quantifyType = function(type){
 
 JSHC.Check.Ctx.prototype.quantify = function(name){
 
-    // TODO: replace all occurences of tyvars in the type that are in
+    // replace all occurences of tyvars in the type that are in
     // the current (innermost) context with new type variables 't0', 't1', etc..
     // and quantify them.
 
     //var curr_tvs = this.tyvars[this.tyvars.length-1];
     var curr_ctx = this.contexts[this.contexts.length-1];
-    curr_ctx[name] = this.quantifyType(curr_ctx[name]);
-    return curr_ctx[name];
+    curr_ctx[name.toStringQ()] = this.quantifyType(curr_ctx[name.toStringQ()]);
+    return curr_ctx[name.toStringQ()];
 };
 
 
@@ -902,14 +959,14 @@ JSHC.Check.Ctx.prototype.eliminateTyVar = function(tyvar1){
   // replace all occurences of the tyvar in the RHSs of the contexts
   for(var ix=0 ; ix<this.contexts.length ; ix++ ){
     var context = this.contexts[ix];
-    for(var name in context){
-      var type2 = context[name];
+    for(var qname in context){
+      var type2 = context[qname];
 
       // replace all occurences of 'tyvar1' in 'type2' with 'type1'
       type2 = JSHC.Check.replaceTyVarWith(tyvar1,type1,type2);
 
       // replace old type with the new type
-      context[name] = type2;
+      context[qname] = type2;
     }
   }
 
@@ -928,27 +985,38 @@ JSHC.Check.Ctx.prototype.eliminateTyVar = function(tyvar1){
     }
   };
 };
+
+JSHC.Check.Ctx.prototype.isNameInCurrentContext = function(name){
+    return this.contexts[this.contexts.length-1][name.toStringQ()] !== undefined;
+};
+
 // can take specified types (signatures) for params
 JSHC.Check.Ctx.prototype.add = function(name,type){
     if( type === undefined ){
 	type = this.newBoundTyVar();
     }
     //name.type = type;
-    this.contexts[this.contexts.length-1][name] = type;
+    assert.ok( this.contexts[this.contexts.length-1][name.toStringQ()] == undefined, "trying to add "+name.toStringQ()+" twice in a context" );
+    this.contexts[this.contexts.length-1][name.toStringQ()] = type;
     return type;
 };
 JSHC.Check.Ctx.prototype.rem = function(name){
     var ctx = this.contexts[this.contexts.length-1];
-    assert.ok( ctx[name] !== undefined, "name must exist. trying to delete "+name );
-    delete ctx[name];
+    assert.ok( ctx[name.toStringQ()] !== undefined, "name must exist. trying to delete "+name );
+    delete ctx[name.toStringQ()];
 };
 /*
   lookup type and instantiate quantified type variables
 */
-JSHC.Check.Ctx.prototype.lookupType = function(comp,name){
+JSHC.Check.Ctx.prototype.lookupTypeUnmodified = function(comp,name){
+   return this.lookupAny(comp,name,"type");
+};
+
+JSHC.Check.Ctx.prototype.lookupTypeAndInstantiate = function(comp,name){
    var type = this.lookupAny(comp,name,"type");
    return this.instantiate(type);
 };
+
 JSHC.Check.Ctx.prototype.lookupKind = function(comp,name){
    return this.lookupAny(comp,name,"kind");
 };
@@ -970,6 +1038,7 @@ JSHC.Check.Ctx.prototype.lookupAny = function(comp,name,field){
     //JSHC.alert("looking up: ",name);
 
     var int32_type = new JSHC.TyCon("Int32",{},"Data.Int");
+    var bool_type = new JSHC.TyCon("Bool",{},"Prelude");
 
     if( name.name == "integer-lit" ){
         return int32_type;
@@ -989,8 +1058,12 @@ JSHC.Check.Ctx.prototype.lookupAny = function(comp,name,field){
     }
 
     if( name.name == "dacon" && name.id == ":" && name.isSymbol === true){
-        throw new Error("dacon for cons not implemented");
         // (:)    :: ∀a. a -> [] a -> [] a
+        var tyvar = new JSHC.TyVar("a");
+        var list_tycon = new JSHC.TyCon("[]",{});
+        var list_a_type = new JSHC.AppType(list_tycon,tyvar);
+        var fun_type = new JSHC.FunType([tyvar,list_a_type,list_a_type]);
+        return new JSHC.ForallType([tyvar],fun_type);
     }
 
     if( name.name == "dacon" && name instanceof JSHC.TupleDaCon ){
@@ -1013,10 +1086,20 @@ JSHC.Check.Ctx.prototype.lookupAny = function(comp,name,field){
         }());
     }
 
+    // look up name in lspace
+    for(ix=this.contexts.length-1 ; ix>=0 ; ix--){
+	n = this.contexts[ix][name.toStringQ()];
+	if( n !== undefined ){
+	    assert.ok( n !== undefined );
+	    return n;
+        }
+    }
+
     if( name.loc !== undefined ){
         if( name.loc == "JSHC.Internal.Prelude" ){
             // TODO: should use foreign declarations instead to specify the type.
             var iii_type = new JSHC.FunType([int32_type,int32_type,int32_type]);
+            var iib_type = new JSHC.FunType([int32_type,int32_type,bool_type]);
             if( field == "type" ){
                 switch( name.id ){
                 case "int32add":
@@ -1025,6 +1108,15 @@ JSHC.Check.Ctx.prototype.lookupAny = function(comp,name,field){
                 case "int32div":
                     return iii_type;
                     break;
+                case "int32lt":
+                case "int32gt":
+                case "int32le":
+                case "int32ge":
+                case "int32eq":
+                case "int32ne":
+                    return iib_type;
+                default:
+                    throw new JSHC.CompilerError("missing type for built-in function; "+name.toStringQ());
                 }
             }
         }
@@ -1047,19 +1139,6 @@ JSHC.Check.Ctx.prototype.lookupAny = function(comp,name,field){
         }
         //JSHC.alert("accessing " + name + " in espace ", comp.modules[name.loc].ast.espace);
         // return JSHC.Check.instantiate(modules[name.loc].espace[name][field]);
-    } else {
-        // if NOT qualified, then lookup in the lspace.
-        //JSHC.alert("type checking. looking up",name," in lspace");
-
-        // look up name in lspace
-        for(ix=this.contexts.length-1 ; ix>=0 ; ix--){
-	    n = this.contexts[ix][name];
-	    if( n !== undefined ){
-	        assert.ok( n !== undefined );
-	        return n;
-	    }
-        }
-        //JSHC.alert("not found");
     }
 
     // only possible if error in name check or if continuing after name check
@@ -1076,8 +1155,8 @@ JSHC.Check.Ctx.prototype.pop = function(){
     var curr_ctx = this.contexts[this.contexts.length-1];
 
     var remaining = [];
-    for(var k in curr_ctx ){
-	var used_vars = JSHC.Check.computeUsedVars(curr_ctx[k]);
+    for(var qname in curr_ctx ){
+	var used_vars = JSHC.Check.computeUsedVars(curr_ctx[qname]);
 	for(var v in used_vars){
 	    if( curr_tv[v] ){
 		remaining.push(v);
@@ -1566,6 +1645,14 @@ JSHC.Check.computeUsedNamesIn = function(dnames, lspace, unames, ast){
             }
             break;
 
+        case "type-signature":
+            ast.vars.forEach(function(v){
+                if( dnames[v] !== undefined ){
+                    unames[v] = v;
+                }
+            });
+            break;
+
 	default:
             throw new JSHC.CompilerError("missing case: "+ast.name);
 	};
@@ -1598,6 +1685,12 @@ JSHC.Check.computeDeclaredNames = function(ast){
 
         case "topdecl-decl":
             find(ast.decl);
+            break;
+
+        case "type-signature":
+            ast.vars.forEach(function(v){
+                names[v] = v;
+            });
             break;
 
         case "decl-fun":

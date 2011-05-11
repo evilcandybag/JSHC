@@ -275,5 +275,8 @@ JSHC.Fixity.translateInfixLists["fixity"] = function(info, ast){
     // nothing
 };
 
+JSHC.Fixity.translateInfixLists["type-signature"] = function(info, ast){
+    // nothing
+};
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -34,16 +34,34 @@ JSHC.Simplify.simplify["module"] = function(ast){
 
 JSHC.Simplify.simplify["body"] = function(ast){
     var i;
-    for(i=0;i<ast.topdecls.length;i++){
-	if( ast.topdecls[i].name === "topdecl-decl" ){
-	    JSHC.Simplify.simplify(ast.topdecls[i]);
+    var ts = ast.topdecls;
+    for(i=0;i<ts.length;i++){
+        if( ts[i].name === "topdecl-data" ){
+            // remove topdecl-data
+            if( i !== ts.length-1 ){
+                ts[i] = ts[ts.length-1];
+                i--;
+            }
+            ts.pop();
+        } else if( ts[i].name === "topdecl-decl" ){
+	    if( ts[i].decl.name == "type-signature" ||
+                // remove type-signature and fixity
+	        ts[i].decl.name == "fixity" ){
+                if( i !== ts.length-1 ){
+                    ts[i] = ts[ts.length-1];
+                    i--;
+                }
+                ts.pop();
+	    } else {
+	        JSHC.Simplify.simplify(ts[i].decl);
+	    }
 	}
     }
 };
 
-JSHC.Simplify.simplify["topdecl-decl"] = function(ast){
-    JSHC.Simplify.simplify(ast.decl);
-};
+//JSHC.Simplify.simplify["topdecl-decl"] = function(ast){
+//    JSHC.Simplify.simplify(ast.decl);
+//};
 
 JSHC.Simplify.simplify["decl-fun"] = function(ast){
     // take all parameters in the LHS and add as lambdas on the RHS.
@@ -64,10 +82,6 @@ JSHC.Simplify.simplify["decl-fun"] = function(ast){
 
 JSHC.Simplify.simplify["infixexp"] = function(ast) {
     return JSHC.Simplify.reduceExp(ast);
-};
-
-JSHC.Simplify.simplify["fixity"] = function(ast) {
-    
 };
 
 JSHC.Simplify.reduceExp = function (exp) {

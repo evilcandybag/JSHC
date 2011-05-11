@@ -9,7 +9,7 @@ import Data.Int
 data Bool = True | False
  -- deriving (Eq, Ord, Enum, Read, Show, Bounded)
 
--- (&&), (||) :: Bool -> Bool -> Bool
+(&&), (||) :: Bool -> Bool -> Bool
 infixr 3 &&
 infixr 2 ||
 True  && x =  x
@@ -17,11 +17,11 @@ False && x =  False
 True  || x =  True
 False || x =  x
 
---not :: Bool -> Bool
+not :: Bool -> Bool
 not True  = False
 not False = True
 
---otherwise :: Bool
+otherwise :: Bool
 otherwise = True
 
 --------------------------------------------------------------------------------
@@ -43,40 +43,36 @@ infixl 6 +, -
 (/) = JSHC.Internal.Prelude.int32div
 
 -- arithmetic comparisons
-
---infix 4 < , > , <= , >= , == , /=
---(<)  = JSHC.Internal.Prelude.int32lt
---(>)  = JSHC.Internal.Prelude.int32gt
---(<=) = JSHC.Internal.Prelude.int32le
---(>=) = JSHC.Internal.Prelude.int32ge
---(==) = JSHC.Internal.Prelude.int32eq
---(/=) = JSHC.Internal.Prelude.int32ne
+infix 4 < , > , <= , >= , == , /=
+(<)  = JSHC.Internal.Prelude.int32lt
+(>)  = JSHC.Internal.Prelude.int32gt
+(<=) = JSHC.Internal.Prelude.int32le
+(>=) = JSHC.Internal.Prelude.int32ge
+(==) = JSHC.Internal.Prelude.int32eq
+(/=) = JSHC.Internal.Prelude.int32ne
 
 --------------------------------------------------------------------------------
--- function functions
+-- functions
 
---id :: a -> a
+id :: a -> a
 id x = x
 
---(.) :: (b -> c) -> (a -> b) -> a -> c
---f . g = \ x -> f (g x)
+(.) :: (b -> c) -> (a -> b) -> a -> c
+f . g = \ x -> f (g x)
 
---flip :: (a -> b -> c) -> b -> a -> c
+flip :: (a -> b -> c) -> b -> a -> c
 flip f x y = f y x
 
 infixr 0 $
---($) :: (a -> b) -> a -> b
+($) :: (a -> b) -> a -> b
 f $ x = f x
-
-
-
 
 --------------------------------------------------------------------------------
 -- list functions
 
--- map :: (a -> b) -> [a] -> [b]
--- map f []     = []
--- map f (x:xs) = f x : map f xs
+--map :: (a -> b) -> [a] -> [b]
+--map f []     = []
+map f ((:) x xs) = f x : map f xs
 
 --infixr 5 ++
 -- (++) :: [a] -> [a] -> [a]
@@ -95,8 +91,8 @@ f $ x = f x
 --concatMap f = concat . map f
 
 --head       :: [a] -> a
---head (x:_) =x
---head []    = error "Prelude.head: empty list"
+--head ((:) x _) = x
+--head []        = error "Prelude.head: empty list"
 
 --tail        :: [a] -> [a]
 --tail (_:xs) = xs

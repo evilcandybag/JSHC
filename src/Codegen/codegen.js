@@ -45,8 +45,6 @@ JSHC.Codegen.codegen = function (input,namespace) {
                 case "topdecl-decl":
                     res += comDecl(body.topdecls[i].decl);
                     break;
-                case "topdecl-data":
-                    break;
                 default:
                     throw new Error("comBody not defined for name " + body.topdecls[i].name);
             }
@@ -61,8 +59,6 @@ JSHC.Codegen.codegen = function (input,namespace) {
         switch (decl.name) {
             case "decl-fun":
                 res = (modid + "[\"" + decl.ident.id + "\"]" + " = "  + comRhs(decl.rhs)) + ";\n";
-                break;
-            case "fixity":
                 break;
             default:
                 throw new Error("comDecl not defined for name " + decl.name);
