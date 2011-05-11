@@ -1496,7 +1496,13 @@ JSHC.Check.computeUsedNamesIn = function(dnames, lspace, unames, ast){
             find(ast.lhs);
             find(ast.rhs);
             break;
-        
+
+        case "tuple":
+            var mems = ast.members;
+            for(var i = 0; i < mems.length; i++){
+                find(mems[i]);
+            }
+            break;    
         
         case "let":
         case "fun-where":
