@@ -237,8 +237,11 @@ JSHC.Test.runData = function(tester,td){
     var commands = td.commands;
     for(var command in commands){
         tester.interpreter.execCommand(command);
+
         if( tester.interpreter.errors > 0 ){
-            info.push(tester.interpreter.messageList.join("\n"));
+            success = false;
+            info.push(tester.interpreter.errorList.join("\n"));
+            info.push(tester.interpreter.warningList.join("\n"));
             continue;
         }
         if ( tester.interpreter.messageList.length === 0 ) {
