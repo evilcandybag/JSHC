@@ -415,8 +415,15 @@ qcon // : JSHC.DaCon
 
 // optionally qualified data constructor, or a built-in data constructor
 gcon // : object
-    : qcon
-    // TODO: incomplete
+    : "(" ")"               {{$$ = JSHC.UnitDaCon(@$);}}
+    | "[" "]"               {{$$ = JSHC.ListDaCon(@$);}}
+    | "(" list_1_comma ")"  {{$$ = JSHC.TupleDaCon($2 + 1, @$);}}
+    | qcon                  {{$$ = $1;}}
+    ;
+
+list_1_comma // : integer
+    : ","                {{$$ = 1;}}
+    | list_1_comma ","   {{$$ = $1 + 1;}}
     ;
 
 // non-qualified variable id (or symbol in parentheses) name
