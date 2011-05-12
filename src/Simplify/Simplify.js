@@ -126,7 +126,7 @@ JSHC.Simplify.reduceExp = function (exp) {
                 var list = new JSHC.NilDaCon();
                 var cons = new JSHC.ConsDaCon();
                 for(var ix=0 ; ix<exp.members.length ; ix++ ){
-                    list = {name:"application",exps:[list,exp.members[ix]]};
+                    list = {name:"application",exps:[cons,exp.members[ix],list]};
                 }
                 exp = list;
                 break;

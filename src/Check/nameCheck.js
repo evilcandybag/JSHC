@@ -572,22 +572,28 @@ JSHC.Check.nameCheckPattern = function(comp,module,lspace,ast){
     case "dacon":
         JSHC.Check.lookupName(comp,module,lspace,ast);
         break;
+
     case "conpat":
         JSHC.Check.lookupName(comp,module,lspace,ast.con);
         for (var i = 0; i < ast.pats.length; i++) {
             JSHC.Check.nameCheckPattern(comp,module,lspace,ast.pats[i]);
         }
         break;
+
     case "varname":
         lspace.add(ast);
         break;
+
+    case "wildcard":
     case "integer-lit":
         break;
+
     case "tuple_pat":
         for (var i = 0; i < ast.members.length; i++) {
             JSHC.Check.nameCheckPattern(comp, module, lspace, ast.members[i]);
         }
         break;
+
     default:
         throw new JSHC.CompilerError("missing pattern case:"+ast.name);
     }

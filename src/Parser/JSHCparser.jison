@@ -512,6 +512,7 @@ apat // : object
     : var               {{$$ = $1; }}
     | gcon              {{$$ = $1; }}
     | literal           {{$$ = $1; }}
+    | '_'               {{$$ = {name:"wildcard", pos: @$}; }}
     | tuple_pat         {{$$ = $1; }}
     | "(" pat ")"       {{$$ = $2; }}
     ;
