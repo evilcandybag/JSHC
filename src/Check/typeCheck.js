@@ -5,11 +5,7 @@ JSHC.Check.typeCheck = function(comp,modules){
     try{
         JSHC.Check.typeCheckModules(comp,modules);
     }catch(err){
-        if( err instanceof JSHC.TypeError ){
-            comp.onError("type error: "+err.toString());
-        } else {
-            JSHC.alert("error in type checking\n",JSHC.showError(err));
-        }
+        JSHC.alert("error in type checking\n",JSHC.showError(err));
     }
 };
 
@@ -167,7 +163,7 @@ JSHC.Check.typeCheckLocalDecls = function (comp, decls) {
 
 };
 */
-JSHC.Check.typeCheckTopdeclsTogether = function(comp,module,ctx,topdecls){
+JSHC.Check.typeCheckTopdeclsTogether = function(comp,modid,ctx,topdecls){
 
     // created for each group of topdecls, but could just as well be created
     // once and used for all modules. doing it like this means that it does
@@ -198,9 +194,12 @@ JSHC.Check.typeCheckTopdeclsTogether = function(comp,module,ctx,topdecls){
         try {
 	    JSHC.Check.checkTopdecl(comp,ctx,topdecls[ix]);
         } catch( err ){
-            if( err instanceof JSHC.SourceError ){
+            if( err instanceof JSHC.TypeConstraintError ){
+                if( err.pos === undefined ){
+                   err.pos = topdecls[ix].pos;
+                }
                 if( err.mname === undefined ){
-                   //err.mname = module.modid.id;
+                   err.mname = modid.id;
                 }
                 comp.onError(err);
             } else {
@@ -235,7 +234,6 @@ JSHC.Check.typeCheckTopdeclsTogether = function(comp,module,ctx,topdecls){
 };
 
 JSHC.Check.checkTopdecl = function(comp,ctx,ast){
-    try {
   switch( ast.name ){
   case "topdecl-decl":
      JSHC.Check.checkTopdecl(comp,ctx,ast.decl);
@@ -364,18 +362,6 @@ JSHC.Check.checkTopdecl = function(comp,ctx,ast){
   default:
       throw new JSHC.CompilerError("topdecl: missing case: "+ast.name);
   };
-  // ...
-  // Q:return new constraints ?
-  // return inferred_type;
-  
-        } catch( err ){
-            if( err instanceof JSHC.SourceError ){
-                if( err.pos === undefined ){
-                   err.pos = ast.pos;
-                }
-            }
-            throw err;
-        }
 };
 
 JSHC.Check.checkType = function(comp,ctx,ast){
@@ -564,7 +550,7 @@ JSHC.Check.checkExp = function(comp,ctx,ast){
   };
 
         } catch( err ){
-            if( err instanceof JSHC.SourceError ){
+            if( err instanceof JSHC.TypeConstraintError ){
                 if( err.pos === undefined ){
                    err.pos = ast.pos;
                 }
@@ -842,7 +828,8 @@ JSHC.Check.Ctx.prototype.constrainValue = function(value,type1,type2){
     try {
         this.constrain(type1,type2);
     } catch(err){
-        if( err instanceof JSHC.TypeError ){
+        if( err instanceof JSHC.TypeConstraintError ){
+            // add value in which the error occured
             err.value = value;
         }
         throw err;
@@ -894,7 +881,7 @@ JSHC.Check.Ctx.prototype.constrain = function(type1,type2){
     } else if( type1.toStringQ() == type2.toStringQ() ) {
         return;
     } else {
-	throw new JSHC.TypeError(type1, type2);
+	throw new JSHC.TypeConstraintError(type1, type2);
     }
 };
 /*
@@ -921,7 +908,7 @@ JSHC.Check.Ctx.prototype.insertConstraint = function(tyvar,type1){
 
       // check for occurences of "tyvar" in "type1". if so, fail.
       if( JSHC.Check.isVarInType(tyvar,type1) ){
-          throw new JSHC.SourceError(undefined, undefined, "infinite type (1)");
+          throw new JSHC.TypeConstraintError(tyvar,type1,"infinite type");
       }
 
       // insert into constraint mapping
@@ -1000,7 +987,7 @@ JSHC.Check.Ctx.prototype.eliminateTyVar = function(tyvar1){
     this.tyvar_ctx[tyvar2] = type2;
 
     if( type1_vars[tyvar2] && JSHC.Check.isVarInType(tyvar2,type2) ){
-      throw new JSHC.SourceError(undefined, undefined, "infinite type (2)");
+      throw new JSHC.TypeConstraintError(tyvar2,type2,"infinite type");
     }
   };
 };
