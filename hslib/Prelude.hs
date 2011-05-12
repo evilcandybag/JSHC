@@ -57,15 +57,23 @@ infix 4 < , > , <= , >= , == , /=
 id :: a -> a
 id x = x
 
+const :: a -> b -> a
+const x _ = x
+
+infixr 9 .
 (.) :: (b -> c) -> (a -> b) -> a -> c
 f . g = \ x -> f (g x)
 
 flip :: (a -> b -> c) -> b -> a -> c
 flip f x y = f y x
 
-infixr 0 $
-($) :: (a -> b) -> a -> b
-f $ x = f x
+seq :: a -> b -> b
+seq a b = JSHC.Internal.seq a b
+
+infixr 0 $, $!, `seq`
+($), ($!) :: (a -> b) -> a -> b
+f $ x     = f x
+f $! x    = x `seq` f x
 
 --------------------------------------------------------------------------------
 -- list functions
@@ -270,3 +278,25 @@ foldr f z ((:) x xs) = f x (foldr f z xs)
 --                ([],[],[])
 
 --------------------------------------------------------------------------------
+-- tuples
+
+--fst :: (a,b) -> a
+--fst (x,y) = x
+
+--snd :: (a,b) -> b
+--snd (x,y) = y
+
+--curry :: ((a, b) -> c) -> a -> b -> c
+--curry f x y = f (x, y)
+
+--uncurry :: (a -> b -> c) -> ((a, b) -> c)
+--uncurry f p = f (fst p) (snd p)
+
+--------------------------------------------------------------------------------
+-- miscellaneous
+
+--until            :: (a -> Bool) -> (a -> a) -> a -> a
+--until p f x
+--  | p x        = x
+--  | otherwise  = until p f (f x)
+
