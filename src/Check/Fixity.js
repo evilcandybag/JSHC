@@ -10,18 +10,15 @@ JSHC.Fixity = {};  // Fixity module
 */
 JSHC.Fixity.fixityResolution = function(module_ast){
 //        JSHC.alert(module_ast)
-    JSHC.Fixity.translateInfixLists(module_ast.body.fspace,module_ast);
+    JSHC.Fixity.translateInfixLists(module_ast);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 
-
-
-
 /*
   looks up fixity information and defaults to infixl 9 if missing.
 */
-JSHC.Fixity.fixityLookup = function(info,name){
+JSHC.Fixity.fixityLookup = function(name){
         
     var r = name.id.fixity;
     if( r === undefined ){
@@ -37,7 +34,7 @@ JSHC.Fixity.fixityLookup = function(info,name){
   operators.
   throws exceptions if anything goes wrong, such as precedence errors.
  */
-JSHC.Fixity.resolve = function(info,exps) {
+JSHC.Fixity.resolve = function(exps) {
     assert.ok( exps instanceof Array );
     for(var i=0;i<exps.length;i++){
 	assert.ok(exps[i]!==undefined);
@@ -71,7 +68,7 @@ JSHC.Fixity.resolve = function(info,exps) {
 //	JSHC.alert("resolve_parse args\nprec1:",prec1,"fix1:",fix1,"\nexp1:",exp1);
 	var exp2 = exps[0];
 	if( exp2.name === "qop" ){
-	    var exp2_fixity = JSHC.Fixity.fixityLookup(info,exp2);
+	    var exp2_fixity = JSHC.Fixity.fixityLookup(exp2);
 	    prec2 = exp2_fixity.prec;
 	    fix2 = exp2_fixity.fix;
 //	    JSHC.alert("prec2:",prec2,"fix2:",fix2,"\nexp2:",exp2);
@@ -109,11 +106,11 @@ JSHC.Fixity.resolve = function(info,exps) {
   given an AST and a member name, check if the sub-tree referred to by the member
   name is an infix list, and if so, replaces it by using the 'resolve' function.
 */
-JSHC.Fixity.translateInfixMember = function(info, ast, member){
+JSHC.Fixity.translateInfixMember = function(ast, member){
     assert.ok( ast !== undefined && ast.name !== undefined, "param 'ast' must be an AST" );
     assert.ok(typeof member === "string", "type of member is not string but: " + typeof member );
     if( ast[member].name === "infixexp" ){
-	ast[member] = JSHC.Fixity.resolve(info, ast[member].exps);
+	ast[member] = JSHC.Fixity.resolve(ast[member].exps);
 	assert.ok( ast[member] !== undefined );
     }
 };
@@ -124,10 +121,10 @@ JSHC.Fixity.translateInfixMember = function(info, ast, member){
   given an AST, check if it is an infix list, and if so, apply the 'resolve'
   function and return the result.
 */
-JSHC.Fixity.translateInfixExp = function(info, ast){
+JSHC.Fixity.translateInfixExp = function(ast){
 //        JSHC.alert("translate:", ast)
     if( ast.name === "infixexp" ){
-	return JSHC.Fixity.resolve(info, ast.exps);
+	return JSHC.Fixity.resolve(ast.exps);
     } else {
 	return ast;
     }
@@ -138,7 +135,7 @@ JSHC.Fixity.translateInfixExp = function(info, ast){
 /*
   replaces all infix lists in an AST.
 */
-JSHC.Fixity.translateInfixLists = function(info, ast){
+JSHC.Fixity.translateInfixLists = function(ast){
     assert.ok( ast !== undefined && ast.name !== undefined, "param 'ast' must be an AST" );
 //    alert("translateInfixLists: " + ast.name);
     var f = JSHC.Fixity.translateInfixLists[ast.name];
@@ -146,136 +143,136 @@ JSHC.Fixity.translateInfixLists = function(info, ast){
 	throw new Error("no definition for " + JSHC.showAST(ast) ); //+ast.name);
     }
     assert.ok( f instanceof Function, ast.name+" <: Function." )
-    f(info, ast);
+    f(ast);
 };
 
-JSHC.Fixity.translateInfixLists["module"] = function(info, ast){
+JSHC.Fixity.translateInfixLists["module"] = function(ast){
     // ignoring exports as there are no expressions to translate there
-    JSHC.Fixity.translateInfixLists(info, ast.body);
+    JSHC.Fixity.translateInfixLists(ast.body);
 };
 
-JSHC.Fixity.translateInfixLists["body"] = function(info, ast){
+JSHC.Fixity.translateInfixLists["body"] = function(ast){
     var i;
     
     // ignoring imports as there are no expressions to translate there
     
     for(i=0;i<ast.topdecls.length;i++){
-	JSHC.Fixity.translateInfixLists(info, ast.topdecls[i]);
+	JSHC.Fixity.translateInfixLists(ast.topdecls[i]);
     }
 };
 
-JSHC.Fixity.translateInfixLists["topdecl-decl"] = function(info, ast){
-    JSHC.Fixity.translateInfixLists(info, ast.decl);
+JSHC.Fixity.translateInfixLists["topdecl-decl"] = function(ast){
+    JSHC.Fixity.translateInfixLists(ast.decl);
 };
 
-JSHC.Fixity.translateInfixLists["topdecl-data"] = function(info, ast){
+JSHC.Fixity.translateInfixLists["topdecl-data"] = function(ast){
     // no expressions to translate here
 };
 
-JSHC.Fixity.translateInfixLists["decl-fun"] = function(info, ast){
+JSHC.Fixity.translateInfixLists["decl-fun"] = function(ast){
     // TODO: currently nothing to do for the LHS.
     //       adding constructor operators will make infix expressions in patterns.
-    JSHC.Fixity.translateInfixMember(info, ast, "rhs");
-    JSHC.Fixity.translateInfixLists(info, ast.rhs);
+    JSHC.Fixity.translateInfixMember(ast, "rhs");
+    JSHC.Fixity.translateInfixLists(ast.rhs);
 };
 
-JSHC.Fixity.translateInfixLists["fun-where"] = function (info,ast) {
-    JSHC.Fixity.translateInfixMember(info, ast, "exp");
-    JSHC.Fixity.translateInfixLists(info, ast.exp);
+JSHC.Fixity.translateInfixLists["fun-where"] = function (ast) {
+    JSHC.Fixity.translateInfixMember(ast, "exp");
+    JSHC.Fixity.translateInfixLists(ast.exp);
     
     for (var i = 0; i < ast.decls.length; i++) {
-        JSHC.Fixity.translateInfixLists(info,ast.decls[i]);
+        JSHC.Fixity.translateInfixLists(ast.decls[i]);
     }
 };
 
-JSHC.Fixity.translateInfixLists["let"] = function (info,ast) {
-    JSHC.Fixity.translateInfixMember(info, ast, "exp");
-    JSHC.Fixity.translateInfixLists(info, ast.exp);
+JSHC.Fixity.translateInfixLists["let"] = function (ast) {
+    JSHC.Fixity.translateInfixMember(ast, "exp");
+    JSHC.Fixity.translateInfixLists(ast.exp);
     
     for (var i = 0; i < ast.decls.length; i++) {
-        JSHC.Fixity.translateInfixLists(info,ast.decls[i]);
+        JSHC.Fixity.translateInfixLists(ast.decls[i]);
     }
 };
 
-JSHC.Fixity.translateInfixLists["constrained-exp"] = function(info, ast){
+JSHC.Fixity.translateInfixLists["constrained-exp"] = function(ast){
     // no infix expressions in type signatures.
     
-    JSHC.Fixity.translateInfixMember(info, ast, "exp");
+    JSHC.Fixity.translateInfixMember(ast, "exp");
     // handle sub-expressions afterwards
-    JSHC.Fixity.translateInfixLists(info, ast.exp);
+    JSHC.Fixity.translateInfixLists(ast.exp);
 };
 
 /*
-JSHC.Fixity.translateInfixLists["infix-app"] = function(info, ast){
-    JSHC.Fixity.translateInfixMember(info, ast, "lhs");
-    JSHC.Fixity.translateInfixMember(info, ast, "rhs");
+JSHC.Fixity.translateInfixLists["infix-app"] = function(ast){
+    JSHC.Fixity.translateInfixMember(ast, "lhs");
+    JSHC.Fixity.translateInfixMember(ast, "rhs");
     // handle sub-expressions afterwards
-    JSHC.Fixity.translateInfixLists(info, ast.lhs);
-    JSHC.Fixity.translateInfixLists(info, ast.rhs);
+    JSHC.Fixity.translateInfixLists(ast.lhs);
+    JSHC.Fixity.translateInfixLists(ast.rhs);
 };
 */
 
-JSHC.Fixity.translateInfixLists["case"] = function(info, ast) {
-    JSHC.Fixity.translateInfixMember(info, ast, "exp");
-    JSHC.Fixity.translateInfixLists(info, ast.exp);
+JSHC.Fixity.translateInfixLists["case"] = function(ast) {
+    JSHC.Fixity.translateInfixMember(ast, "exp");
+    JSHC.Fixity.translateInfixLists(ast.exp);
     
     for (var i = 0; i < ast.alts.length; i++) {
-        JSHC.Fixity.translateInfixMember(info, ast.alts[i], "exp");
-        JSHC.Fixity.translateInfixLists(info, ast.alts[i].exp);
+        JSHC.Fixity.translateInfixMember(ast.alts[i], "exp");
+        JSHC.Fixity.translateInfixLists(ast.alts[i].exp);
     }
 };
 
-JSHC.Fixity.translateInfixLists["negate"] = function(info, ast){
-    JSHC.Fixity.translateInfixMember(info, ast, "exp");
-    JSHC.Fixity.translateInfixLists(info, ast.exp);
+JSHC.Fixity.translateInfixLists["negate"] = function(ast){
+    JSHC.Fixity.translateInfixMember(ast, "exp");
+    JSHC.Fixity.translateInfixLists(ast.exp);
 };
 
-JSHC.Fixity.translateInfixLists["application"] = function(info, ast){
+JSHC.Fixity.translateInfixLists["application"] = function(ast){
     var i;
 //    alert("App contains: " + JSHC.showAST(ast));
     for(i=0;i<ast.exps.length;i++){
-	ast.exps[i] = JSHC.Fixity.translateInfixExp(info, ast.exps[i]);
-	JSHC.Fixity.translateInfixLists(info, ast.exps[i]);
+	ast.exps[i] = JSHC.Fixity.translateInfixExp(ast.exps[i]);
+	JSHC.Fixity.translateInfixLists(ast.exps[i]);
     }
 };
 
-JSHC.Fixity.translateInfixLists["tuple"] = function(info, ast){
+JSHC.Fixity.translateInfixLists["tuple"] = function(ast){
     var i;
 //    alert("App contains: " + JSHC.showAST(ast));
     for(i=0;i<ast.members.length;i++){	
 //        JSHC.alert("translating this tuple member;", ast.members[i]);    
-	ast.members[i] = JSHC.Fixity.translateInfixExp(info, ast.members[i]);
+	ast.members[i] = JSHC.Fixity.translateInfixExp(ast.members[i]);
 //	JSHC.alert("translated this tuple member;", ast.members[i]);
-	JSHC.Fixity.translateInfixLists(info, ast.members[i]);
+	JSHC.Fixity.translateInfixLists(ast.members[i]);
     }
 };
 
-JSHC.Fixity.translateInfixLists["lambda"] = function(info, ast) {
-    JSHC.Fixity.translateInfixMember(info, ast, "rhs");
-    JSHC.Fixity.translateInfixLists(info, ast.rhs);
+JSHC.Fixity.translateInfixLists["lambda"] = function(ast) {
+    JSHC.Fixity.translateInfixMember(ast, "rhs");
+    JSHC.Fixity.translateInfixLists(ast.rhs);
 };
 
-JSHC.Fixity.translateInfixLists["varname"] = function(info, ast){
+JSHC.Fixity.translateInfixLists["varname"] = function(ast){
     // nothing
 };
 
-JSHC.Fixity.translateInfixLists["dacon"] = function(info, ast){
+JSHC.Fixity.translateInfixLists["dacon"] = function(ast){
     // nothing
 };
 
-JSHC.Fixity.translateInfixLists["integer-lit"] = function(info, ast){
+JSHC.Fixity.translateInfixLists["integer-lit"] = function(ast){
     // nothing
 };
 
-JSHC.Fixity.translateInfixLists["qop"] = function(info, ast){
+JSHC.Fixity.translateInfixLists["qop"] = function(ast){
     // nothing
 };
 
-JSHC.Fixity.translateInfixLists["fixity"] = function(info, ast){
+JSHC.Fixity.translateInfixLists["fixity"] = function(ast){
     // nothing
 };
 
-JSHC.Fixity.translateInfixLists["type-signature"] = function(info, ast){
+JSHC.Fixity.translateInfixLists["type-signature"] = function(ast){
     // nothing
 };
 
