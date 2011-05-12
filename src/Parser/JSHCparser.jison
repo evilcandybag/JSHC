@@ -371,27 +371,27 @@ op // : object
     | conop {{ $$ = $1; }}
     ;
 
-conop // : object           TODO: something in Names instead?
+conop // : object
     : consym                {{ $$ = new JSHC.DaCon($1, @$, true); }}
-    | '`' conid '`'         {{ $$ = new JSHC.DaCon($1, @$, false); }}
+    | '`' conid '`'         {{ $$ = new JSHC.DaCon($2, @$, false); }}
     ;
 
 // optionally qualified variable symbol or variable id as a symbol
 qvarop // : object
     : qvarsym           {{$$ = new JSHC.VarName($1, @$, true, yy.lexer.previous.qual);}}
     | varop             {{$$ = $1;}}
-    | '`' qvarid '`'    {{$$ = new JSHC.VarName($1, @$, false, yy.lexer.previous.qual);}}
+    | '`' qvarid '`'    {{$$ = new JSHC.VarName($2, @$, false, yy.lexer.previous.qual);}}
     ;
 
 qconop // : object
     : gconsym           {{$$ = $1;}}
-    | '`' qconid '`'    {{$$ = new JSHC.DaCon($1, @$, false, yy.lexer.previous.qual);}}
+    | '`' qconid '`'    {{$$ = new JSHC.DaCon($2, @$, false, yy.lexer.previous.qual);}}
     ;
 
 // non-qualified variable symbol or variable id as a symbol
 varop // : object
     : varsym            {{$$ = new JSHC.VarName($1, @$, true);}}
-    | '`' varid '`'     {{$$ = new JSHC.VarName($1, @$, false)}}
+    | '`' varid '`'     {{$$ = new JSHC.VarName($2, @$, false)}}
     ;
 
 // list of 0 or more tyvars without separator
