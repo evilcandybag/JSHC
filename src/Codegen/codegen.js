@@ -69,7 +69,7 @@ JSHC.Codegen.codegen = function (input,namespace) {
 
     var comRhs = function(rhs) {
 
-        return "function() {return " + comExp(rhs) + "}";
+        return /*"function() {return " +*/ comExp(rhs) /*+ "}"*/;
     }
 
     var comExp = function(exp) {
@@ -298,9 +298,9 @@ JSHC.Codegen.codegen = function (input,namespace) {
                     res += (strict)? "" : "JSHC.TC(function(){return ";
                     //filter out references to our internal libraries
                     if (r.substr(0,13) === "JSHC.Internal")
-                        res += r + "[\"" + x + "\"]()";
+                        res += r + "[\"" + x + "\"]";
                     else
-                        res += namespace + "." + r + "[\"" + x + "\"]()";
+                        res += namespace + "." + r + "[\"" + x + "\"]";
                     res += (strict)? "" : "})"; 
                 } else {
                     if (strict) 

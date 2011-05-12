@@ -20,50 +20,50 @@ JSHC.Internal.Prelude = {
 //  "-": function(a,b){return JSHC.int32sub(JSHC.TR(a),JSHC.TR(b))},
 //  "*": function(a,b){return JSHC.int32mul(JSHC.TR(a),JSHC.TR(b))},
 //  "/": function(a,b){return JSHC.int32div(JSHC.TR(a),JSHC.TR(b))},
-  int32add: function () {return function(a) {
-    return function (b) {
+  int32add: /*function () {return*/ function(a) {
+    return function (b) { /*JSHC.alert("add: ", a, b);*/
         return JSHC.int32add((a instanceof JSHC.Thunk)? a.v : a,(b instanceof JSHC.Thunk)? b.v : b)
-        }}},
-  int32sub: function () { return function(a) {
+        }}/*}*/,
+  int32sub: /*function () {return*/ function(a) {
     return function (b) {
         return JSHC.int32sub((a instanceof JSHC.Thunk)? a.v : a,(b instanceof JSHC.Thunk)? b.v : b)
-        }}},
-  int32mul: function () { return function(a) {
+        }}/*}*/,
+  int32mul: /*function () {return*/ function(a) {
     return function (b) {
         return JSHC.int32mul((a instanceof JSHC.Thunk)? a.v : a,(b instanceof JSHC.Thunk)? b.v : b)
-        }}},
-  int32div: function () {return function(a) {
+        }}/*}*/,
+  int32div: /*function () {return*/ function(a) {
     return function (b) {
         return JSHC.int32div((a instanceof JSHC.Thunk)? a.v : a,(b instanceof JSHC.Thunk)? b.v : b)
-        }}},
+        }}/*}*/,
 
-  int32lt: function () {return function(a) {
+  int32lt: /*function () {return*/ function(a) {
     return function (b) {
         return ( (a instanceof JSHC.Thunk)? a.v : a ) < ((b instanceof JSHC.Thunk)? b.v : b) 
-    }}},
-  int32gt: function () {return function(a) {
+    }}/*}*/,
+  int32gt: /*function () {return*/ function(a) {
     return function (b) {
         return ( (a instanceof JSHC.Thunk)? a.v : a ) > ((b instanceof JSHC.Thunk)? b.v : b) 
-    }}},
-  int32le: function () {return function(a) {
+    }}/*}*/,
+  int32le: /*function () {return*/ function(a) {
     return function (b) {
         return ( (a instanceof JSHC.Thunk)? a.v : a ) <= ((b instanceof JSHC.Thunk)? b.v : b) 
-    }}},
-  int32ge: function () {return function(a) {
+    }}/*}*/,
+  int32ge: /*function () {return*/ function(a) {
     return function (b) {
         return ( (a instanceof JSHC.Thunk)? a.v : a ) >= ((b instanceof JSHC.Thunk)? b.v : b) 
-    }}},
-  int32eq: function () {return function(a) {
+    }}/*}*/,
+  int32eq: /*function () {return*/ function(a) {
     return function (b) {
         return ( (a instanceof JSHC.Thunk)? a.v : a ) == ((b instanceof JSHC.Thunk)? b.v : b) 
-    }}},
-  int32ne: function () {return function(a) {
+    }}/*}*/,
+  int32ne: /*function () {return*/ function(a) {
     return function (b) {
         return ( (a instanceof JSHC.Thunk)? a.v : a ) != ((b instanceof JSHC.Thunk)? b.v : b) 
-    }}},
+    }}/*}*/,
  }
 
-JSHC.Internal.Prelude["undefined"] = undefined;
+JSHC.Internal.Prelude["undefined"] = JSHC.TC(function() {return undefined});
 
 /*
 various type classes and instances

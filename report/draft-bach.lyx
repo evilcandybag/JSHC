@@ -181,13 +181,13 @@ purely functional
 
 \end_inset
 
- programming language with
+ programming language with 
 \begin_inset Flex CharStyle:Strong
 status collapsed
 
 \begin_layout Plain Layout
 \paragraph_spacing onehalf
- strong static typing
+strong static typing
 \end_layout
 
 \end_inset
@@ -292,7 +292,8 @@ newline
 \end_layout
 
 \begin_layout Standard
-Purely functional languages do 
+Being purely functional, Haskell's functions do not have side effects.
+ <TODO: more on purity>
 \end_layout
 
 \begin_layout Standard
@@ -336,6 +337,23 @@ True
 \end_inset
 
 .
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+<TODO: type system>
 \end_layout
 
 \begin_layout Standard
@@ -598,7 +616,18 @@ Introduction to Compilation
 
 \begin_layout Standard
 This chapter is intended as an introduction to the general concepts of compilati
-on for readers who have no experience with the inner workings of compilers.
+on for readers who have little or no experience with the inner workings
+ of compilers.
+ The approach to compilation described here is not the only one, and only
+ describes the compilation steps used in JSHC.
+ For a more general and in-depth view of compilers and compilation, 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "dragon-book"
+
+\end_inset
+
+ is recommended.
  
 \end_layout
 
@@ -615,7 +644,11 @@ target language
 \end_inset
 
 .
- <TODO: more on target language>
+ Common examples of compilers' target languages are machine code in the
+ case of the GNU C Compiler <TODO: ref>, bytecode to be run in a virtual
+ machine in the case of Java or another high level programming language
+ in the case of the Glasgow Haskell Compiler.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -643,34 +676,33 @@ back-end
  The front-end takes the program code and creates an abstract representation
  of it, and the back-end takes that representation and converts it into
  the target language.
- 
 \end_layout
 
 \begin_layout Section
-Front-end
-\end_layout
-
-\begin_layout Standard
-The front-end <TODO>
-\end_layout
-
-\begin_layout Subsection
 Lexical analysis
 \end_layout
 
 \begin_layout Standard
-Lexical analysis is the process by which the compiler takes the program
- code in the form of an input string, and parses it into a list of separate
- tokens, lexemes, which are the smallest significant components in a programming
- language.
- <TODO: reference to somewhere in 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "dragon-book"
+Lexical analysis is the first part of the front-end, and is the process
+ by which the compiler takes the program code in the form of an input string,
+ and parses it into a list of separate tokens, 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+lexemes
+\end_layout
 
 \end_inset
 
->
+, which are the smallest significant components in a programming language
+\begin_inset CommandInset citation
+LatexCommand cite
+key "dragon-book1.2.1"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -708,7 +740,7 @@ status collapsed
 
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Parsing
 \end_layout
 
@@ -753,11 +785,11 @@ Graphic representation of an AST of a function definition in a simple language
 
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Checking
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Simplification
 \end_layout
 
@@ -765,11 +797,11 @@ Simplification
 Back-end
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Code generation
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Optimization
 \end_layout
 
