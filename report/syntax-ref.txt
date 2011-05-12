@@ -1,0 +1,111 @@
+module 	→ 	module modid [exports] where body 
+	| 	body
+	
+body 	→ 	{ impdecls ; topdecls }
+	| 	{ impdecls }
+	| 	{ topdecls }
+ 
+impdecls 	→ 	impdecl1 ; … ; impdecln 	    (n ≥ 1)
+ 
+exports 	→ 	( export1 , … , exportn [ , ] ) 	    (n ≥ 0)
+ 
+export 	→ 	qvar
+	| 	qtycon [(..) | ( cname1 , … , cnamen )] 	    (n ≥ 0)
+	| 	qtycls [(..) | ( qvar1 , … , qvarn )] 	    (n ≥ 0)
+	| 	module modid
+ 
+impdecl 	→ 	import modid [impspec]
+	| 		    (empty declaration)
+ 
+impspec 	→ 	( import1 , … , importn [ , ] ) 	    (n ≥ 0)
+	| 	hiding ( import1 , … , importn [ , ] ) 	    (n ≥ 0)
+ 
+import 	→ 	var
+	| 	tycon [ (..) | ( cname1 , … , cnamen )] 	    (n ≥ 0)
+
+cname 	→ 	var | con
+ 
+topdecls 	→ 	topdecl1 ; … ; topdecln 	    (n ≥ 0)
+topdecl 	→ 	type simpletype = type
+	| 	data simpletype [= constrs]
+	| 	decl
+ 
+decls 	→ 	{ decl1 ; … ; decln } 	    (n ≥ 0)
+decl 	→ 	gendecl
+	| 	(funlhs | pat) rhs
+ 
+gendecl 	→ 	vars :: type 	    (type signature)
+	| 	fixity [integer] ops 	    (fixity declaration)
+	| 		    (empty declaration)
+ 
+ops 	→ 	op1 , … , opn 	    (n ≥ 1)
+vars 	→ 	var1 , …, varn 	    (n ≥ 1)
+fixity 	→ 	infixl | infixr | infix
+ 
+type 	→ 	btype [-> type] 	    (function type)
+ 
+btype 	→ 	[btype] atype 	    (type application)
+ 
+atype 	→ 	gtycon
+	| 	tyvar
+	| 	( type1 , … , typek ) 	    (tuple type, k ≥ 2)
+	| 	[ type ] 	    (list type)
+	| 	( type ) 	    (parenthesized constructor)
+ 
+gtycon 	→ 	qtycon
+ 
+simpletype 	→ 	tycon tyvar1 … tyvark 	    (k ≥ 0)
+
+constrs 	→ 	constr1 | … | constrn 	    (n ≥ 1)
+constr 	→ 	con [!] atype1 … [!] atypek 	    (arity con  =  k, k ≥ 0)
+ 
+funlhs 	→ 	var apat { apat }
+	| 	pat varop pat
+	| 	( funlhs ) apat { apat }
+rhs 	→ 	= exp [where decls]
+ 
+exp 	→ 	infixexp :: type 	    (expression type signature)
+	| 	infixexp 
+infixexp 	→ 	lexp qop infixexp 	    (infix operator application)
+	| 	- infixexp 	    (prefix negation)
+	| 	lexp
+lexp 	→ 	\ apat1 … apatn -> exp 	    (lambda abstraction, n ≥ 1)
+	| 	let decls in exp 	    (let expression)
+	| 	if exp [;] then exp [;] else exp 	    (conditional)
+	| 	case exp of { alts } 	    (case expression)
+	| 	fexp
+	
+fexp 	→ 	[fexp] aexp 	    (function application)
+aexp 	→ 	qvar 	    (variable)
+	| 	gcon 	    (general constructor)
+	| 	literal
+	| 	( exp ) 	    (parenthesized expression)
+	| 	( exp1 , … , expk ) 	    (tuple, k ≥ 2)
+	| 	[ exp1 , … , expk ] 	    (list, k ≥ 1)
+ 
+alts 	→ 	alt1 ; … ; altn 	    (n ≥ 1)
+alt 	→ 	pat -> exp [where decls]
+ 
+pat 	→ 	lpat
+ 
+lpat 	→ 	apat
+	| 	gcon apat1 … apatk 	    (arity gcon  =  k, k ≥ 1)
+ 
+apat 	→ 	var [ @ apat] 	    (as pattern)
+	| 	gcon 	    (arity gcon  =  0)
+	| 	literal
+	| 	_ 	    (wildcard)
+	| 	( pat ) 	    (parenthesized pattern)
+	| 	( pat1 , … , patk ) 	    (tuple pattern, k ≥ 2)
+ 
+var 	→ 	varid | ( varsym ) 	    (variable)
+qvar 	→ 	qvarid | ( qvarsym ) 	    (qualified variable)
+con 	→ 	conid | ( consym ) 	    (constructor)
+qcon 	→ 	qconid | ( gconsym ) 	    (qualified constructor)
+varop 	→ 	varsym | `  varid ` 	    (variable operator)
+qvarop 	→ 	qvarsym | `  qvarid ` 	    (qualified variable operator)
+conop 	→ 	consym | `  conid ` 	    (constructor operator)
+qconop 	→ 	gconsym | `  qconid ` 	    (qualified constructor operator)
+op 	→ 	varop | conop 	    (operator)
+qop 	→ 	qvarop | qconop 	    (qualified operator)
+gconsym 	→ 	: | qconsym 
