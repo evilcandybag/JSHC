@@ -1279,6 +1279,352 @@ Code etc
 \end_layout
 
 \begin_layout Standard
+module → module modid [exports] where body 
+\end_layout
+
+\begin_layout Standard
+| body
+\end_layout
+
+\begin_layout Standard
+body → { impdecls ; topdecls }
+\end_layout
+
+\begin_layout Standard
+| { impdecls }
+\end_layout
+
+\begin_layout Standard
+| { topdecls }
+\end_layout
+
+\begin_layout Standard
+impdecls → impdecl1 ; … ; impdecln (n ≥ 1)
+\end_layout
+
+\begin_layout Standard
+exports → ( export1 , … , exportn [ , ] ) (n ≥ 0)
+\end_layout
+
+\begin_layout Standard
+export → qvar
+\end_layout
+
+\begin_layout Standard
+| qtycon [(..) | ( cname1 , … , cnamen )] (n ≥ 0)
+\end_layout
+
+\begin_layout Standard
+| qtycls [(..) | ( qvar1 , … , qvarn )] (n ≥ 0)
+\end_layout
+
+\begin_layout Standard
+| module modid
+\end_layout
+
+\begin_layout Standard
+impdecl → import modid [impspec]
+\end_layout
+
+\begin_layout Standard
+| (empty declaration)
+\end_layout
+
+\begin_layout Standard
+impspec → ( import1 , … , importn [ , ] ) (n ≥ 0)
+\end_layout
+
+\begin_layout Standard
+| hiding ( import1 , … , importn [ , ] ) (n ≥ 0)
+\end_layout
+
+\begin_layout Standard
+import → var
+\end_layout
+
+\begin_layout Standard
+| tycon [ (..) | ( cname1 , … , cnamen )] (n ≥ 0)
+\end_layout
+
+\begin_layout Standard
+cname → var | con
+\end_layout
+
+\begin_layout Standard
+topdecls → topdecl1 ; … ; topdecln (n ≥ 0)
+\end_layout
+
+\begin_layout Standard
+topdecl → type simpletype = type
+\end_layout
+
+\begin_layout Standard
+| data simpletype [= constrs]
+\end_layout
+
+\begin_layout Standard
+| decl
+\end_layout
+
+\begin_layout Standard
+decls → { decl1 ; … ; decln } (n ≥ 0)
+\end_layout
+
+\begin_layout Standard
+decl → gendecl
+\end_layout
+
+\begin_layout Standard
+| (funlhs | pat) rhs
+\end_layout
+
+\begin_layout Standard
+gendecl → vars :: type (type signature)
+\end_layout
+
+\begin_layout Standard
+| fixity [integer] ops (fixity declaration)
+\end_layout
+
+\begin_layout Standard
+| (empty declaration)
+\end_layout
+
+\begin_layout Standard
+ops → op1 , … , opn (n ≥ 1)
+\end_layout
+
+\begin_layout Standard
+vars → var1 , …, varn (n ≥ 1)
+\end_layout
+
+\begin_layout Standard
+fixity → infixl | infixr | infix
+\end_layout
+
+\begin_layout Standard
+type → btype [-> type] (function type)
+\end_layout
+
+\begin_layout Standard
+btype → [btype] atype (type application)
+\end_layout
+
+\begin_layout Standard
+atype → gtycon
+\end_layout
+
+\begin_layout Standard
+| tyvar
+\end_layout
+
+\begin_layout Standard
+| ( type1 , … , typek ) (tuple type, k ≥ 2)
+\end_layout
+
+\begin_layout Standard
+| [ type ] (list type)
+\end_layout
+
+\begin_layout Standard
+| ( type ) (parenthesized constructor)
+\end_layout
+
+\begin_layout Standard
+gtycon → qtycon
+\end_layout
+
+\begin_layout Standard
+simpletype → tycon tyvar1 … tyvark (k ≥ 0)
+\end_layout
+
+\begin_layout Standard
+constrs → constr1 | … | constrn (n ≥ 1)
+\end_layout
+
+\begin_layout Standard
+constr → con [!] atype1 … [!] atypek (arity con = k, k ≥ 0)
+\end_layout
+
+\begin_layout Standard
+funlhs → var apat { apat }
+\end_layout
+
+\begin_layout Standard
+| pat varop pat
+\end_layout
+
+\begin_layout Standard
+| ( funlhs ) apat { apat }
+\end_layout
+
+\begin_layout Standard
+rhs → = exp [where decls]
+\end_layout
+
+\begin_layout Standard
+exp → infixexp :: type (expression type signature)
+\end_layout
+
+\begin_layout Standard
+| infixexp 
+\end_layout
+
+\begin_layout Standard
+infixexp → lexp qop infixexp (infix operator application)
+\end_layout
+
+\begin_layout Standard
+| - infixexp (prefix negation)
+\end_layout
+
+\begin_layout Standard
+| lexp
+\end_layout
+
+\begin_layout Standard
+lexp → 
+\backslash
+ apat1 … apatn -> exp (lambda abstraction, n ≥ 1)
+\end_layout
+
+\begin_layout Standard
+| let decls in exp (let expression)
+\end_layout
+
+\begin_layout Standard
+| if exp [;] then exp [;] else exp (conditional)
+\end_layout
+
+\begin_layout Standard
+| case exp of { alts } (case expression)
+\end_layout
+
+\begin_layout Standard
+| fexp
+\end_layout
+
+\begin_layout Standard
+fexp → [fexp] aexp (function application)
+\end_layout
+
+\begin_layout Standard
+aexp → qvar (variable)
+\end_layout
+
+\begin_layout Standard
+| gcon (general constructor)
+\end_layout
+
+\begin_layout Standard
+| literal
+\end_layout
+
+\begin_layout Standard
+| ( exp ) (parenthesized expression)
+\end_layout
+
+\begin_layout Standard
+| ( exp1 , … , expk ) (tuple, k ≥ 2)
+\end_layout
+
+\begin_layout Standard
+| [ exp1 , … , expk ] (list, k ≥ 1)
+\end_layout
+
+\begin_layout Standard
+alts → alt1 ; … ; altn (n ≥ 1)
+\end_layout
+
+\begin_layout Standard
+alt → pat -> exp [where decls]
+\end_layout
+
+\begin_layout Standard
+pat → lpat
+\end_layout
+
+\begin_layout Standard
+lpat → apat
+\end_layout
+
+\begin_layout Standard
+| gcon apat1 … apatk (arity gcon = k, k ≥ 1)
+\end_layout
+
+\begin_layout Standard
+apat → var [ @ apat] (as pattern)
+\end_layout
+
+\begin_layout Standard
+| gcon (arity gcon = 0)
+\end_layout
+
+\begin_layout Standard
+| literal
+\end_layout
+
+\begin_layout Standard
+| _ (wildcard)
+\end_layout
+
+\begin_layout Standard
+| ( pat ) (parenthesized pattern)
+\end_layout
+
+\begin_layout Standard
+| ( pat1 , … , patk ) (tuple pattern, k ≥ 2)
+\end_layout
+
+\begin_layout Standard
+var → varid | ( varsym ) (variable)
+\end_layout
+
+\begin_layout Standard
+qvar → qvarid | ( qvarsym ) (qualified variable)
+\end_layout
+
+\begin_layout Standard
+con → conid | ( consym ) (constructor)
+\end_layout
+
+\begin_layout Standard
+qcon → qconid | ( gconsym ) (qualified constructor)
+\end_layout
+
+\begin_layout Standard
+varop → varsym | ` varid ` (variable operator)
+\end_layout
+
+\begin_layout Standard
+qvarop → qvarsym | ` qvarid ` (qualified variable operator)
+\end_layout
+
+\begin_layout Standard
+conop → consym | ` conid ` (constructor operator)
+\end_layout
+
+\begin_layout Standard
+qconop → gconsym | ` qconid ` (qualified constructor operator)
+\end_layout
+
+\begin_layout Standard
+op → varop | conop (operator)
+\end_layout
+
+\begin_layout Standard
+qop → qvarop | qconop (qualified operator)
+\end_layout
+
+\begin_layout Standard
+gconsym → : | qconsym 
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Standard
 <TODO: some significant pieces of the source code, test cases, etc..
  probably an example of how the compiler can be used on a web page>
 \end_layout
