@@ -646,8 +646,9 @@ target language
 .
  Common examples of compilers' target languages are machine code in the
  case of the GNU C Compiler <TODO: ref>, bytecode to be run in a virtual
- machine in the case of Java or another high level programming language
- in the case of the Glasgow Haskell Compiler.
+ machine in the case of Java <TODO: ref> or another high level programming
+ language in the case of the Glasgow Haskell Compiler, which compiles to
+ C <TODO: ref>.
  
 \end_layout
 
@@ -745,11 +746,21 @@ Parsing
 \end_layout
 
 \begin_layout Standard
-Parsing takes the list of lexemes and interprets it according to a grammar,
- creating a data structure containing an abstract representation of the
- code, called the abstract syntax tree (AST).
- The AST is a tree (or tree-like) graph with nodes representing the application
- of a certain rule in the grammar.
+Parsing is the second part of the front-end and takes the list of lexemes
+ and interprets it according to a grammar, creating a data structure containing
+ an abstract representation of the code, called the 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+abstract syntax tree
+\end_layout
+
+\end_inset
+
+.
+ The abstract syntax tree is a tree (or tree-like) graph with nodes representing
+ the application of a certain rule in the grammar.
 \end_layout
 
 \begin_layout Standard
@@ -786,15 +797,45 @@ Graphic representation of an AST of a function definition in a simple language
 \end_layout
 
 \begin_layout Section
-Checking
+Semantic analysis
 \end_layout
 
-\begin_layout Section
-Simplification
+\begin_layout Standard
+Semantic analysis gathers various semantic properties of the source program,
+ to check for errors and to use later on in the compilation process.
+ One common part of semantic analysis is 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+type checking
 \end_layout
 
-\begin_layout Section
-Back-end
+\end_inset
+
+, where the compiler searches the abstract syntax tree for type inconsistencies.
+ For example, in many languages, adding a boolean to an integer is not a
+ valid expression, an error which would be caught by the type checker.
+ Another common part of the semantic analysis is 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+name checking
+\end_layout
+
+\end_inset
+
+, where the compiler checks whether there are any ambiguities in variable
+ names used, and whether used variables are in scope where they are used.
+\end_layout
+
+\begin_layout Standard
+Other operations on the syntax tree, such as reduction of complex constructs
+ into simpler, more general constructs can also be done as part of the semantic
+ analysis.
+ This is done to simplify the code generation process.
+ <TODO: not done> 
 \end_layout
 
 \begin_layout Section
@@ -822,7 +863,7 @@ key "haskell-report"
 \end_inset
 
  has been achieved.
- <TODO: Common extensions are also planned>
+ <TODO: redo this completely as this is simply not true>
 \end_layout
 
 \begin_layout Section
@@ -830,12 +871,28 @@ Coding standard
 \end_layout
 
 \begin_layout Standard
-<TODO: e.g javascript namespaces, source code style, no usage of “let”, required
- Javascript/ECMAScript version ?>
+In 
 \end_layout
 
 \begin_layout Section
 Tools and libraries used
+\end_layout
+
+\begin_layout Standard
+Several external tools were used to facilitate the development of JSHC.
+ 3
+\end_layout
+
+\begin_layout Subsection
+PEG.js
+\end_layout
+
+\begin_layout Standard
+PEG.js is an implementation of Parsing Expression Grammars 
+\end_layout
+
+\begin_layout Subsection
+Jison
 \end_layout
 
 \begin_layout Standard
@@ -894,14 +951,6 @@ Translation to target: The simplified AST is translated into the target
 \end_layout
 
 \begin_layout Section
-Graphical Interface
-\end_layout
-
-\begin_layout Section
-Interpreter
-\end_layout
-
-\begin_layout Section
 Compiler front-end
 \end_layout
 
@@ -950,14 +999,14 @@ key "peg-js"
  structure described in 
 \begin_inset CommandInset citation
 LatexCommand cite
-key "haskell-report"
+key "haskell-report2.2"
 
 \end_inset
 
-, chapter 2.2.
- <TODO: do we need to motivate tool support?> The generated list of tokens
- is then run through a custom-built set of functions, designed to calculate
- and annotate the tokens with position information (i.e.
+.
+ The generated list of tokens is then run through a custom-built set of
+ functions, designed to calculate and annotate the tokens with position
+ information (i.e.
  location in the source code), remove whitespace (i.e.
  characters that only serve to define the position of, and separate, other
  characters, such as spaces, tabs, newlines or comments), and annotate the
@@ -966,19 +1015,12 @@ key "haskell-report"
  This last pass is where the layout-dependent syntax of Haskell 
 \begin_inset CommandInset citation
 LatexCommand cite
-key "haskell-report"
+key "haskell-report10.3"
 
 \end_inset
 
-, chapter 10.3, is converted into a context-free syntax 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "dragon-book"
-
-\end_inset
-
- <TODO: pages/chapters?>.
- A context-free syntax is required for the parsing step.
+, is converted into a context-free syntax, which is required for the parsing
+ step.
  
 \end_layout
 
@@ -987,15 +1029,41 @@ Parsing
 \end_layout
 
 \begin_layout Standard
-The context free syntax is parsed using a parser implemented using the JISON
- parser generator <TODO: ref to JISON?><TODO: more about the parser, JISON>
- The parser and the last step of the lexical analysis work in concert, meaning
- that the lexical analyser does not process and return all tokens in one
- go, but only sends the parser tokens when asked to.
- Also, the parser will inform the lexical analyser of any parse errors,
- so that the lexer can react and send new tokens accordingly.
- <TODO: this might be too vague? specify that this specifically has to do
- with layout or leave this part out?>
+The context-free syntax is parsed by a parser implemented using the JISON
+ parser generator 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "jison"
+
+\end_inset
+
+<TODO: more about the parser, JISON> The parser and the last step of the
+ lexical analysis work in concert, meaning that the lexical analyser does
+ not process and return all tokens in one go, but only sends the parser
+ tokens when asked to.
+ To handle certain features of the layout dependent syntax of Haskell, that
+ cannot be handled by the lexical analyser alone, the parser will inform
+ the lexical analyser of any such parse errors, so that the lexer can react
+ and send new tokens that solve the problem (c.f.
+ the description of the 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+parse-error
+\end_layout
+
+\end_inset
+
+ function in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "haskell-report10.3"
+
+\end_inset
+
+).
+ 
 \end_layout
 
 \begin_layout Standard
@@ -1237,352 +1305,3673 @@ The algorithm created for this computes the ordering lazily, similar to
 \end_layout
 
 \begin_layout Chapter
-Code etc 
+Syntax reference
 \end_layout
 
 \begin_layout Standard
+Detailed in this appendix is a reference to the subset of the Haskell syntax
+ supported by JSHC, as well as the intermediate representation used by the
+ code generation.
+ 
+\end_layout
+
+\begin_layout Section
+Context-free syntax
+\end_layout
+
+\begin_layout Standard
+The same notational convention used in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "haskell-report"
+
+\end_inset
+
+ is used here, i.e:
+\end_layout
+
+\begin_layout Standard
+[pattern] : optional
+\end_layout
+
+\begin_layout Standard
+{pattern} : zero or more repetitions
+\end_layout
+
+\begin_layout Standard
+(pattern) : grouping
+\end_layout
+
+\begin_layout Standard
+pat
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ | pat
+\begin_inset Formula $_{\text{2}}$
+\end_inset
+
+ : choice
+\end_layout
+
+\begin_layout Standard
+nonterm -> alt
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ | alt
+\begin_inset Formula $_{\text{2}}$
+\end_inset
+
+ | … | alt
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+ : production
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 module → module modid [exports] where body 
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | body
 \end_layout
 
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 body → { impdecls ; topdecls }
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | { impdecls }
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | { topdecls }
 \end_layout
 
-\begin_layout Standard
-impdecls → impdecl1 ; … ; impdecln (n ≥ 1)
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-exports → ( export1 , … , exportn [ , ] ) (n ≥ 0)
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+impdecls → impdecl
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ ; … ; impdecl
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+ (n ≥ 1)
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+exports → ( export
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ , … , export
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+ [ , ] ) (n ≥ 0)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 export → qvar
 \end_layout
 
-\begin_layout Standard
-| qtycon [(..) | ( cname1 , … , cnamen )] (n ≥ 0)
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-| qtycls [(..) | ( qvar1 , … , qvarn )] (n ≥ 0)
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+| qtycon [(..) | ( cname
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ , … , cname
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+ )] (n ≥ 0)
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+| qtycls [(..) | ( qvar
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+, … , qvar
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+ )] (n ≥ 0)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | module modid
 \end_layout
 
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 impdecl → import modid [impspec]
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | (empty declaration)
 \end_layout
 
-\begin_layout Standard
-impspec → ( import1 , … , importn [ , ] ) (n ≥ 0)
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-| hiding ( import1 , … , importn [ , ] ) (n ≥ 0)
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+impspec → ( import
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ , … , import
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+ [ , ] ) (n ≥ 0)
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+| hiding ( import
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ , … , import
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+ [ , ] ) (n ≥ 0)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 import → var
 \end_layout
 
-\begin_layout Standard
-| tycon [ (..) | ( cname1 , … , cnamen )] (n ≥ 0)
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+| tycon [ (..) | ( cname
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ , … , cname
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+)] (n ≥ 0)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 cname → var | con
 \end_layout
 
-\begin_layout Standard
-topdecls → topdecl1 ; … ; topdecln (n ≥ 0)
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+topdecls → topdecl
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ ; … ; topdecl
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+ (n ≥ 0)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 topdecl → type simpletype = type
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | data simpletype [= constrs]
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | decl
 \end_layout
 
-\begin_layout Standard
-decls → { decl1 ; … ; decln } (n ≥ 0)
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+decls → { decl
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ ; … ; decl
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+ } (n ≥ 0)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 decl → gendecl
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | (funlhs | pat) rhs
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 gendecl → vars :: type (type signature)
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | fixity [integer] ops (fixity declaration)
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | (empty declaration)
 \end_layout
 
-\begin_layout Standard
-ops → op1 , … , opn (n ≥ 1)
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-vars → var1 , …, varn (n ≥ 1)
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+ops → op
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ , … , op
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+ (n ≥ 1)
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+vars → var
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ , …, var
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+ (n ≥ 1)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 fixity → infixl | infixr | infix
 \end_layout
 
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 type → btype [-> type] (function type)
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 btype → [btype] atype (type application)
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 atype → gtycon
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | tyvar
 \end_layout
 
-\begin_layout Standard
-| ( type1 , … , typek ) (tuple type, k ≥ 2)
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+| ( type
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ , … , type
+\begin_inset Formula $_{\text{k}}$
+\end_inset
+
+ ) (tuple type, k ≥ 2)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | [ type ] (list type)
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | ( type ) (parenthesized constructor)
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 gtycon → qtycon
 \end_layout
 
-\begin_layout Standard
-simpletype → tycon tyvar1 … tyvark (k ≥ 0)
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-constrs → constr1 | … | constrn (n ≥ 1)
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+simpletype → tycon tyvar
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ … tyvar
+\begin_inset Formula $_{\text{k}}$
+\end_inset
+
+ (k ≥ 0)
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-constr → con [!] atype1 … [!] atypek (arity con = k, k ≥ 0)
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+constrs → constr
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ | … | constr
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+ (n ≥ 1)
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+constr → con [!] atype
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ … [!] atype
+\begin_inset Formula $_{\text{k}}$
+\end_inset
+
+ (arity con = k, k ≥ 0)
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 funlhs → var apat { apat }
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | pat varop pat
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | ( funlhs ) apat { apat }
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 rhs → = exp [where decls]
 \end_layout
 
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 exp → infixexp :: type (expression type signature)
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | infixexp 
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 infixexp → lexp qop infixexp (infix operator application)
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | - infixexp (prefix negation)
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | lexp
 \end_layout
 
-\begin_layout Standard
-lexp → 
-\backslash
- apat1 … apatn -> exp (lambda abstraction, n ≥ 1)
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+lexp → 
+\backslash
+ apat
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ … apat
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+ -> exp (lambda abstraction, n ≥ 1)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | let decls in exp (let expression)
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | if exp [;] then exp [;] else exp (conditional)
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | case exp of { alts } (case expression)
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | fexp
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 fexp → [fexp] aexp (function application)
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 aexp → qvar (variable)
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | gcon (general constructor)
 \end_layout
 
-\begin_layout Standard
-| literal
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+| literal
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | ( exp ) (parenthesized expression)
 \end_layout
 
-\begin_layout Standard
-| ( exp1 , … , expk ) (tuple, k ≥ 2)
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-| [ exp1 , … , expk ] (list, k ≥ 1)
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+| ( exp
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ , … , exp
+\begin_inset Formula $_{\text{k}}$
+\end_inset
+
+ ) (tuple, k ≥ 2)
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-alts → alt1 ; … ; altn (n ≥ 1)
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+| [ exp
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ , … , exp
+\begin_inset Formula $_{\text{k}}$
+\end_inset
+
+ ] (list, k ≥ 1)
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+alts → alt
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ ; … ; alt
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+ (n ≥ 1)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 alt → pat -> exp [where decls]
 \end_layout
 
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 pat → lpat
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 lpat → apat
 \end_layout
 
-\begin_layout Standard
-| gcon apat1 … apatk (arity gcon = k, k ≥ 1)
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-apat → var [ @ apat] (as pattern)
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+| gcon apat
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ … apat
+\begin_inset Formula $_{\text{k}}$
+\end_inset
+
+ (arity gcon = k, k ≥ 1)
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+apat → var
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | gcon (arity gcon = 0)
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | literal
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | _ (wildcard)
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 | ( pat ) (parenthesized pattern)
 \end_layout
 
-\begin_layout Standard
-| ( pat1 , … , patk ) (tuple pattern, k ≥ 2)
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+| ( pat
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ , … , pat
+\begin_inset Formula $_{\text{k}}$
+\end_inset
+
+ ) (tuple pattern, k ≥ 2)
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 var → varid | ( varsym ) (variable)
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 qvar → qvarid | ( qvarsym ) (qualified variable)
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 con → conid | ( consym ) (constructor)
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 qcon → qconid | ( gconsym ) (qualified constructor)
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 varop → varsym | ` varid ` (variable operator)
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 qvarop → qvarsym | ` qvarid ` (qualified variable operator)
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 conop → consym | ` conid ` (constructor operator)
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 qconop → gconsym | ` qconid ` (qualified constructor operator)
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 op → varop | conop (operator)
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 qop → qvarop | qconop (qualified operator)
 \end_layout
 
-\begin_layout Standard
-gconsym → : | qconsym 
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+gconsym → : | qconsym 
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+pagebreak
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Intermediate representation
+\end_layout
+
+\begin_layout Standard
+For detailing the intermediate representation, these notational conventions
+ are used:
+\end_layout
+
+\begin_layout Standard
+node → { item
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ , … , item
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+}
+\end_layout
+
+\begin_layout Standard
+item → name: value | [name: value]
+\end_layout
+
+\begin_layout Standard
+rule
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ | rule
+\begin_inset Formula $_{\text{2}}$
+\end_inset
+
+ : choice
+\end_layout
+
+\begin_layout Standard
+name : the name of a n item inside a node
+\end_layout
+
+\begin_layout Standard
+value : the value of an item inside a node, values can be both terminals
+ and nonterminals
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+module -> {name: "module",modid: <modname>, body: <body>}
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+body -> {name: "body", topdecls: <topdecls>}
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+topdecls -> <topdecl>
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ ...
+ <topdecl>
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+topdecl -> {name: "topdecl-decl", decl: <decl>}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+decl -> {name: "decl-fun", ident: <varname>, rhs: exp}
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+exps -> <exp>
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ ...
+ <exp>
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+exp -> {name: "lambda", args: <args>, rhs: <exp>}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+| {name: "case", exp: <exp>, alts: <alts>}
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+| {name: "application", exps: <exps>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+| {name: "tuple", members: <exps>}
+\end_layout
+
+\end_inset
+
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+At this stage, it is legal for a 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+tuple
+\end_layout
+
+\end_inset
+
+ or 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+tuple-pat
+\end_layout
+
+\end_inset
+
+ to have 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+members.length == 1
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+| {name: "negate", exp: <exp>}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+| literal
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+| dacon
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+| varname
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+alts -> <alt>
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ ...
+ <alt>
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+alt -> {name: "alt", pat <pat> exp: <exp>}
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+pats -> <pat>
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ ...
+ <pat>
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+pat -> {name: "conpat", con: dacon, pats: <pats>}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+| {name: "tuple-pat", members: <pats>} 
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula $^{\text{1}}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+| {name: "wildcard"}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+| varname
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+| dacon
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+| literal
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+modname -> {name: "modname", id: dacon}
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+dacon -> {name: "dacon", id: <STRING>, [loc: <string>]} 
+\end_layout
+
+\end_inset
+
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+loc
+\end_layout
+
+\end_inset
+
+ is used to determine whether a 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+dacon
+\end_layout
+
+\end_inset
+
+ or 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+varname
+\end_layout
+
+\end_inset
+
+ is qualified, and what that qualification is.
+ At this stage, anything that is not qualified is a local variable.
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+varname -> {name: "varname", id: <STRING>, [loc: <string>]} 
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula $^{\text{2}}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+literal -> {name: "integer-lit", val: <STRING>} 
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+STRING -> a javascript String
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+NUMBER -> a javascript Number
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
 
 \end_layout
 
