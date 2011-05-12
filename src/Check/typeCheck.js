@@ -891,7 +891,7 @@ JSHC.Check.Ctx.prototype.constrain = function(type1,type2){
         }
     } else if( type1 == JSHC.Check.StarKind && type2 == JSHC.Check.StarKind ) {
         return;
-    } else if( type1.toString() == type2.toString() ) {
+    } else if( type1.toStringQ() == type2.toStringQ() ) {
         return;
     } else {
 	throw new JSHC.TypeError(type1, type2);
@@ -1128,6 +1128,9 @@ JSHC.Check.Ctx.prototype.lookupAny = function(comp,name,field){
                     case "int32eq":
                     case "int32ne":
                         return iib_type;
+                    case "undefined":
+                        var tyvar_a = new JSHC.TyVar("a");
+                        return new JSHC.ForallType([tyvar_a],tyvar_a);
                     default:
                         throw new JSHC.CompilerError("missing type for built-in function; "+name.toStringQ());
                     }
@@ -1603,6 +1606,12 @@ JSHC.Check.computeUsedNamesIn = function(dnames, lspace, unames, ast){
         case "apptype":
             find(ast.lhs);
             find(ast.rhs);
+            break;
+
+        case "ite":
+            find(ast.e1);
+            find(ast.e2);
+            find(ast.e3);
             break;
 
         case "listexp":
