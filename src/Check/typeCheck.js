@@ -212,6 +212,7 @@ JSHC.Check.typeCheckTopdeclsTogether = function(comp,module,ctx,topdecls){
     // quantify all decl types
     //JSHC.alert("before quantification:\n"+ctx.toString());
 
+    var typemap = {};
     for(var ix=0 ; ix<topdecls.length ; ix++){
         var decl = topdecls[ix];
         if( decl.name == "topdecl-decl" ){
@@ -220,10 +221,11 @@ JSHC.Check.typeCheckTopdeclsTogether = function(comp,module,ctx,topdecls){
         if( decl.name == "decl-fun" ){
             var ident = decl.ident;
             if( ctx.isNameInCurrentContext(ident) ){
-                ctx.quantify(ident);
+                typemap[ident] = ctx.quantify(ident);
+                ctx.rem(ident);
             }
             // for all names, write the type to each name in the decl
-            ident.type = ctx.lookupTypeUnmodified(comp,ident);
+            ident.type = typemap[ident];
         }
     }
 
