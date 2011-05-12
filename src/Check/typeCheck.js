@@ -5,11 +5,7 @@ JSHC.Check.typeCheck = function(comp,modules){
     try{
         JSHC.Check.typeCheckModules(comp,modules);
     }catch(err){
-        if( err instanceof JSHC.TypeError ){
-            comp.onError("type error: "+err.toString());
-        } else {
-            JSHC.alert("error in type checking\n",JSHC.showError(err));
-        }
+        JSHC.alert("error in type checking\n",JSHC.showError(err));
     }
 };
 
@@ -167,7 +163,7 @@ JSHC.Check.typeCheckLocalDecls = function (comp, decls) {
 
 };
 */
-JSHC.Check.typeCheckTopdeclsTogether = function(comp,module,ctx,topdecls){
+JSHC.Check.typeCheckTopdeclsTogether = function(comp,modid,ctx,topdecls){
 
     // created for each group of topdecls, but could just as well be created
     // once and used for all modules. doing it like this means that it does
@@ -198,9 +194,12 @@ JSHC.Check.typeCheckTopdeclsTogether = function(comp,module,ctx,topdecls){
         try {
 	    JSHC.Check.checkTopdecl(comp,ctx,topdecls[ix]);
         } catch( err ){
-            if( err instanceof JSHC.SourceError ){
+            if( err instanceof JSHC.TypeConstraintError ){
+                if( err.pos === undefined ){
+                   err.pos = topdecls[ix].pos;
+                }
                 if( err.mname === undefined ){
-                   //err.mname = module.modid.id;
+                   err.mname = modid.id;
                 }
                 comp.onError(err);
             } else {
@@ -235,7 +234,6 @@ JSHC.Check.typeCheckTopdeclsTogether = function(comp,module,ctx,topdecls){
 };
 
 JSHC.Check.checkTopdecl = function(comp,ctx,ast){
-    try {
   switch( ast.name ){
   case "topdecl-decl":
      JSHC.Check.checkTopdecl(comp,ctx,ast.decl);
@@ -364,18 +362,6 @@ JSHC.Check.checkTopdecl = function(comp,ctx,ast){
   default:
       throw new JSHC.CompilerError("topdecl: missing case: "+ast.name);
   };
-  // ...
-  // Q:return new constraints ?
-  // return inferred_type;
-  
-        } catch( err ){
-            if( err instanceof JSHC.SourceError ){
-                if( err.pos === undefined ){
-                   err.pos = ast.pos;
-                }
-            }
-            throw err;
-        }
 };
 
 JSHC.Check.checkType = function(comp,ctx,ast){
@@ -564,7 +550,7 @@ JSHC.Check.checkExp = function(comp,ctx,ast){
   };
 
         } catch( err ){
-            if( err instanceof JSHC.SourceError ){
+            if( err instanceof JSHC.TypeConstraintError ){
                 if( err.pos === undefined ){
                    err.pos = ast.pos;
                 }
@@ -842,7 +828,8 @@ JSHC.Check.Ctx.prototype.constrainValue = function(value,type1,type2){
     try {
         this.constrain(type1,type2);
     } catch(err){
-        if( err instanceof JSHC.TypeError ){
+        if( err instanceof JSHC.TypeConstraintError ){
+            // add value in which the error occured
             err.value = value;
         }
         throw err;
@@ -891,10 +878,10 @@ JSHC.Check.Ctx.prototype.constrain = function(type1,type2){
         }
     } else if( type1 == JSHC.Check.StarKind && type2 == JSHC.Check.StarKind ) {
         return;
-    } else if( type1.toString() == type2.toString() ) {
+    } else if( type1.toStringQ() == type2.toStringQ() ) {
         return;
     } else {
-	throw new JSHC.TypeError(type1, type2);
+	throw new JSHC.TypeConstraintError(type1, type2);
     }
 };
 /*
@@ -921,7 +908,7 @@ JSHC.Check.Ctx.prototype.insertConstraint = function(tyvar,type1){
 
       // check for occurences of "tyvar" in "type1". if so, fail.
       if( JSHC.Check.isVarInType(tyvar,type1) ){
-          throw new JSHC.SourceError(undefined, undefined, "infinite type (1)");
+          throw new JSHC.TypeConstraintError(tyvar,type1,"infinite type");
       }
 
       // insert into constraint mapping
@@ -1000,7 +987,7 @@ JSHC.Check.Ctx.prototype.eliminateTyVar = function(tyvar1){
     this.tyvar_ctx[tyvar2] = type2;
 
     if( type1_vars[tyvar2] && JSHC.Check.isVarInType(tyvar2,type2) ){
-      throw new JSHC.SourceError(undefined, undefined, "infinite type (2)");
+      throw new JSHC.TypeConstraintError(tyvar2,type2,"infinite type");
     }
   };
 };
@@ -1109,54 +1096,69 @@ JSHC.Check.Ctx.prototype.lookupAny = function(comp,name,field){
             }
         }
 
-        if( name.loc !== undefined && name.loc == "JSHC.Internal.Prelude" ){
-            // TODO: should use foreign declarations instead to specify the type.
-            var iii_type = new JSHC.FunType([int32_type,int32_type,int32_type]);
-            var iib_type = new JSHC.FunType([int32_type,int32_type,bool_type]);
-            if( field == "type" ){
+        if( name.loc !== undefined ){
+            if( name.loc == "JSHC.Internal.Prelude" ){
+                // TODO: should use foreign declarations instead to specify the type.
+                var iii_type = new JSHC.FunType([int32_type,int32_type,int32_type]);
+                var iib_type = new JSHC.FunType([int32_type,int32_type,bool_type]);
+                if( field == "type" ){
+                    switch( name.id ){
+                    case "int32add":
+                    case "int32sub":
+                    case "int32mul":
+                    case "int32div":
+                        return iii_type;
+                    case "int32lt":
+                    case "int32gt":
+                    case "int32le":
+                    case "int32ge":
+                    case "int32eq":
+                    case "int32ne":
+                        return iib_type;
+                    case "undefined":
+                        var tyvar_a = new JSHC.TyVar("a");
+                        return new JSHC.ForallType([tyvar_a],tyvar_a);
+                    default:
+                        throw new JSHC.CompilerError("missing type for built-in function; "+name.toStringQ());
+                    }
+                }
+            } else if( name.loc == "JSHC.Internal" ) {
                 switch( name.id ){
-                case "int32add":
-                case "int32sub":
-                case "int32mul":
-                case "int32div":
-                    return iii_type;
-                    break;
-                case "int32lt":
-                case "int32gt":
-                case "int32le":
-                case "int32ge":
-                case "int32eq":
-                case "int32ne":
-                    return iib_type;
+                case "seq":
+                    var tyvar_a = new JSHC.TyVar("a");
+                    var tyvar_b = new JSHC.TyVar("b");
+                    var fun_type = new JSHC.FunType([tyvar_a,tyvar_b,tyvar_b]);
+                    return new JSHC.ForallType([tyvar_a,tyvar_b],fun_type);
                 default:
                     throw new JSHC.CompilerError("missing type for built-in function; "+name.toStringQ());
                 }
             }
-        }
 
-        //if( name.loc !== "Prelude" ){
-        //    JSHC.alert("looking up (qualified): ",name);
-        //    for( var xxcm in comp.modules ){
-        //        JSHC.alert(xxcm);
-        //    }
-        //    JSHC.alert(comp.modules[name.loc].ast.espace);
-        //}
-        var espace = comp.modules[name.loc].ast.espace;
-        var expo = espace[name];
-        //if( name.loc !== "Prelude" )JSHC.alert("found ",expo);
-        var info = espace[name][field];
-        if( info === undefined ){
-            comp.onError("type information missing for "+name.toStringQ());
-        } else {
-            return info;
+            //if( name.loc !== "Prelude" ){
+            //    JSHC.alert("looking up (qualified): ",name);
+            //    for( var xxcm in comp.modules ){
+            //        JSHC.alert(xxcm);
+            //    }
+            //    JSHC.alert(comp.modules[name.loc].ast.espace);
+            //}
+        
+            var espace = comp.modules[name.loc].ast.espace;
+            var expo = espace[name];
+            //if( name.loc !== "Prelude" )JSHC.alert("found ",expo);
+            var info = espace[name][field];
+            if( info === undefined ){
+                comp.onError("type information missing for "+name.toStringQ());
+            } else {
+                return info;
+            }
+            //JSHC.alert("accessing " + name + " in espace ", comp.modules[name.loc].ast.espace);
+            // return JSHC.Check.instantiate(modules[name.loc].espace[name][field]);
         }
-        //JSHC.alert("accessing " + name + " in espace ", comp.modules[name.loc].ast.espace);
-        // return JSHC.Check.instantiate(modules[name.loc].espace[name][field]);
     }
 
     // only possible if error in name check or if continuing after name check
     // anyway.
-    throw new JSHC.SourceError(undefined,undefined,JSHC.showAST(name) + " not in scope when type checking");
+    throw new JSHC.SourceError(undefined,undefined,"type error: "+JSHC.showAST(name));
 };
 JSHC.Check.Ctx.prototype.push = function(){
     //this.contexts.push(opt_list===undefined ? {} : opt_list);
@@ -1591,6 +1593,12 @@ JSHC.Check.computeUsedNamesIn = function(dnames, lspace, unames, ast){
         case "apptype":
             find(ast.lhs);
             find(ast.rhs);
+            break;
+
+        case "ite":
+            find(ast.e1);
+            find(ast.e2);
+            find(ast.e3);
             break;
 
         case "listexp":

@@ -81,7 +81,12 @@ JSHC.deepCopy = function(obj){
 ////////////////////////////////////////////////////////////////////////////////
 
 JSHC.showPos = function(pos){
-    return JSHC.showAST(pos);
+    if( pos === undefined ){
+        return "unknown position";
+    }
+
+    return "line "+pos.first_line+"-"+pos.last_line+", "
+           "column "+pos.first_column+"-"+pos.last_column;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

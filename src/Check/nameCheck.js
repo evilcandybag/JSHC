@@ -623,6 +623,12 @@ JSHC.Check.nameCheckExp = function(comp,module,lspace,ast){
         }
         break;
 
+    case "ite":
+        JSHC.Check.nameCheckExp(comp,module,lspace,ast.e1);
+        JSHC.Check.nameCheckExp(comp,module,lspace,ast.e2);
+        JSHC.Check.nameCheckExp(comp,module,lspace,ast.e3);
+        break;
+
     case "case":
         JSHC.Check.nameCheckExp(comp,module,lspace,ast.exp);
         for (var i = 0; i < ast.alts.length; i++) {

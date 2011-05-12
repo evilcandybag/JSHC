@@ -65,24 +65,23 @@ JSHC.Simplify.simplify["body"] = function(ast){
 
 JSHC.Simplify.simplify["decl-fun"] = function(ast){
     // take all parameters in the LHS and add as lambdas on the RHS.
+
     var i;
     var old_rhs = (ast.rhs.name === "fun-where")? 
                         JSHC.Simplify.reduceWhere(ast.rhs) :
                             JSHC.Simplify.reduceExp(ast.rhs);
     
-    // TODO: should remove position information recursively from ast.args.
     if(ast.args.length > 0) {
-        old_rhs = {name:"lambda", args: ast.args, rhs: old_rhs, pos: ast.pos};
-        ast.rhs = {name: "infixexp", exps: [old_rhs], pos: ast.pos};
+        ast.rhs = {name:"lambda", args: ast.args, rhs: old_rhs, pos: ast.pos};
         ast.args = [];
     } else {
         ast.rhs = old_rhs;
     }
 };
 
-JSHC.Simplify.simplify["infixexp"] = function(ast) {
-    return JSHC.Simplify.reduceExp(ast);
-};
+//JSHC.Simplify.simplify["infixexp"] = function(ast) {
+//    return JSHC.Simplify.reduceExp(ast);
+//};
 
 JSHC.Simplify.reduceExp = function (exp) {
 //        var exp = e.exps[0];
@@ -117,22 +116,63 @@ JSHC.Simplify.reduceExp = function (exp) {
                     }
                 }
                 new_exp = {name:"application", exps: [new_exp], pos: new_exp.pos}
-                new_exp = {name:"infixexp", exps:[new_exp], pos: new_exp.pos};
+                //new_exp = {name:"infixexp", exps:[new_exp], pos: new_exp.pos};
                 exp = {name:"case", exp: new_exp, 
                              alts: [{name:"alt", pat: new_pat, exp: exp.exp}]};
+                break;
+
+            case "conpat":
+                var new_pats = [];
+                for(var ix=0 ; ix<exp.pats.length ; ix++ ){
+                    new_pats.push(JSHC.Simplify.reduceExp(exp.pats[ix]));
+                }
+                exp = {name: exp.name,
+                       con: JSHC.Simplify.reduceExp(exp.con),
+                       pats: new_pats};
+                break;
+
+            case "tuple_pat":
+            case "tuple":
+                var new_members = [];
+                for(var ix=exp.members.length-1 ; ix>=0 ; ix-- ){
+                    new_members.push(JSHC.Simplify.reduceExp(exp.members[ix]));
+                }
+                exp = {name:exp.name,members:new_members};
                 break;
 
             case "listexp":
                 var list = new JSHC.NilDaCon();
                 var cons = new JSHC.ConsDaCon();
-                for(var ix=0 ; ix<exp.members.length ; ix++ ){
-                    list = {name:"application",exps:[cons,exp.members[ix],list]};
+                for(var ix=exp.members.length-1 ; ix>=0 ; ix-- ){
+                    list = {name:"application",exps:[cons,JSHC.Simplify.reduceExp(exp.members[ix]),list]};
                 }
                 exp = list;
                 break;
 
             case "case":
+                var new_exp = JSHC.Simplify.reduceExp(exp.exp);
+                var new_alts = [];
+                for(var ix=0 ; ix<exp.alts.length ; ix++ ){
+                    new_alts.push(JSHC.Simplify.reduceExp(exp.alts[ix]));
+                }
+                exp = {name:"case",exp:new_exp,alts:new_alts};
+                break;
+
+            case "alt":
+                exp = {name: "alt",
+                       exp: JSHC.Simplify.reduceExp(exp.exp),
+                       pat: JSHC.Simplify.reduceExp(exp.pat)};
+                break;
+
             case "application":
+                var new_exps = [];
+                for(var ix=0 ; ix<exp.exps.length ; ix++ ){
+                    new_exps.push(JSHC.Simplify.reduceExp(exp.exps[ix]));
+                }
+                exp = {name:"application",exps:new_exps};
+                break;
+
+            case "wildcard":
             case "varname":
             case "dacon":
             case "integer-lit":
@@ -161,12 +201,12 @@ JSHC.Simplify.reduceWhere = function (e) {
         }
     }
     new_exp = {name:"application", exps: [new_exp], pos: new_exp.pos};
-    new_exp = {name:"infixexp", exps:[new_exp], pos: new_exp.pos};
+    //new_exp = {name:"infixexp", exps:[new_exp], pos: new_exp.pos};
                 
     var new_case = {name:"case", exp: new_exp, 
                              alts: [{name:"alt", pat: new_pat, exp: e.exp}]};
 
-    return {name: "infixexp", exps: [new_case], pos: e.pos}
+    return new_case; //{name: "infixexp", exps: [new_case], pos: e.pos}
 };
 
 JSHC.Simplify.patSimplify = function (ast) {

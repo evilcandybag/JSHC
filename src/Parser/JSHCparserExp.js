@@ -247,21 +247,21 @@ case 102: this.$ = $$[$0];
 break;
 case 103: this.$ = new JSHC.DaCon($$[$0], this._$, true); 
 break;
-case 104: this.$ = new JSHC.DaCon($$[$0-2], this._$, false); 
+case 104: this.$ = new JSHC.DaCon($$[$0-1], this._$, false); 
 break;
 case 105:this.$ = new JSHC.VarName($$[$0], this._$, true, yy.lexer.previous.qual);
 break;
 case 106:this.$ = $$[$0];
 break;
-case 107:this.$ = new JSHC.VarName($$[$0-2], this._$, false, yy.lexer.previous.qual);
+case 107:this.$ = new JSHC.VarName($$[$0-1], this._$, false, yy.lexer.previous.qual);
 break;
 case 108:this.$ = $$[$0];
 break;
-case 109:this.$ = new JSHC.DaCon($$[$0-2], this._$, false, yy.lexer.previous.qual);
+case 109:this.$ = new JSHC.DaCon($$[$0-1], this._$, false, yy.lexer.previous.qual);
 break;
 case 110:this.$ = new JSHC.VarName($$[$0], this._$, true);
 break;
-case 111:this.$ = new JSHC.VarName($$[$0-2], this._$, false)
+case 111:this.$ = new JSHC.VarName($$[$0-1], this._$, false)
 break;
 case 112:$$[$0-1].push($$[$0]); this.$ = $$[$0-1];
 break;

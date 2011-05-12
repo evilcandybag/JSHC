@@ -227,6 +227,15 @@ JSHC.Fixity.translateInfixLists["negate"] = function(ast){
     JSHC.Fixity.translateInfixLists(ast.exp);
 };
 
+JSHC.Fixity.translateInfixLists["ite"] = function(ast){
+    JSHC.Fixity.translateInfixMember(ast, "e1");
+    JSHC.Fixity.translateInfixLists(ast.e1);
+    JSHC.Fixity.translateInfixMember(ast, "e2");
+    JSHC.Fixity.translateInfixLists(ast.e2);
+    JSHC.Fixity.translateInfixMember(ast, "e3");
+    JSHC.Fixity.translateInfixLists(ast.e3);
+};
+
 JSHC.Fixity.translateInfixLists["application"] = function(ast){
     var i;
 //    alert("App contains: " + JSHC.showAST(ast));

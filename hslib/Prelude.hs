@@ -26,6 +26,10 @@ otherwise = True
 
 --------------------------------------------------------------------------------
 
+undefined = JSHC.Internal.Prelude.undefined
+
+--------------------------------------------------------------------------------
+
 data Maybe a = Nothing | Just a
  -- deriving (Eq, Ord, Read, Show)
 
@@ -57,15 +61,23 @@ infix 4 < , > , <= , >= , == , /=
 id :: a -> a
 id x = x
 
+const :: a -> b -> a
+const x _ = x
+
+infixr 9 .
 (.) :: (b -> c) -> (a -> b) -> a -> c
 f . g = \ x -> f (g x)
 
 flip :: (a -> b -> c) -> b -> a -> c
 flip f x y = f y x
 
-infixr 0 $
-($) :: (a -> b) -> a -> b
-f $ x = f x
+seq :: a -> b -> b
+seq a b = JSHC.Internal.seq a b
+
+infixr 0 $, $!, `seq`
+($), ($!) :: (a -> b) -> a -> b
+f $ x     = f x
+f $! x    = x `seq` f x
 
 --------------------------------------------------------------------------------
 -- list functions
@@ -80,28 +92,30 @@ infixr 5 ++
 ((:) x xs) ++ ys = x : (xs ++ ys)
 
 --filter :: (a -> Bool) -> [a] -> [a]
---filter p []                 = []
---filter p (x:xs) | p x       = x : filter p xs
---                | otherwise = filter p xs
+filter p []     = []
+filter p ((:) x xs) =
+  if p x
+    then x : filter p xs
+    else filter p xs
 
 --concat :: [[a]] -> [a]
 concat xss = foldr (++) [] xss
 
 --concatMap :: (a -> [b]) -> [a] -> [b]
---concatMap f = concat . map f
+concatMap f = concat . map f
 
 --head       :: [a] -> a
---head ((:) x _) = x
---head []        = error "Prelude.head: empty list"
+head ((:) x _) = x
+head []        = undefined -- error "Prelude.head: empty list"
 
 --tail        :: [a] -> [a]
---tail (_:xs) = xs
---tail []     = error "Prelude.tail: empty list"
+tail ((:) _ xs) = xs
+tail []         = undefined -- error "Prelude.tail: empty list"
 
 --last        :: [a] -> a
---last [x]    =  x
---last (_:xs) =  last xs
---last []     =  error "Prelude.last: empty list"
+--last ((:) x []) = x
+--last ((:) _ xs) = last xs
+--last []         = undefined -- error "Prelude.last: empty list"
 
 --init        :: [a] -> [a]
 --init [x]    =  []
@@ -270,3 +284,25 @@ foldr f z ((:) x xs) = f x (foldr f z xs)
 --                ([],[],[])
 
 --------------------------------------------------------------------------------
+-- tuples
+
+--fst :: (a,b) -> a
+--fst (x,y) = x
+
+--snd :: (a,b) -> b
+--snd (x,y) = y
+
+--curry :: ((a, b) -> c) -> a -> b -> c
+--curry f x y = f (x, y)
+
+--uncurry :: (a -> b -> c) -> ((a, b) -> c)
+--uncurry f p = f (fst p) (snd p)
+
+--------------------------------------------------------------------------------
+-- miscellaneous
+
+--until            :: (a -> Bool) -> (a -> a) -> a -> a
+--until p f x
+--  | p x        = x
+--  | otherwise  = until p f (f x)
+
