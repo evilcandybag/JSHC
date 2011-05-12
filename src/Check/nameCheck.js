@@ -116,7 +116,11 @@ JSHC.Check.lookupName = function(comp,module,lspace,name){
 	if( name.loc !== undefined && name.loc.substr(0,internal.length) === internal ){
 	    return undefined;
 	}
-	if( name.id == "[]" || name.id == ":" ){
+	if( name.id == "[]" ){
+	    return undefined;
+	}
+	if( name.id == ":" && name.isSymbol === true ){
+	    name.fixity = {fix: "rightfix", prec: 5};
 	    return undefined;
 	}
 //	JSHC.alert(lspace, nameobj, nspace, module.body.tspace)
