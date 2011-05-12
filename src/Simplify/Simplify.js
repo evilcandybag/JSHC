@@ -95,10 +95,12 @@ JSHC.Simplify.reduceExp = function (exp) {
                 exp = {name: "case", exp: JSHC.Simplify.reduceExp(exp.e1), 
                              alts: [tru,fals]};
                 break;
+
             case "lambda":
                 var rhs_new = JSHC.Simplify.reduceExp(exp.rhs)
                 exp = {name: "lambda", args: exp.args, rhs: rhs_new, pos: exp.pos};
                 break;
+
             case "let":
                 var new_exp = {name:"tuple",members: [],pos: exp.pos};
                 var new_pat = {name:"tuple_pat", members: [],pos: exp.pos};
@@ -111,15 +113,33 @@ JSHC.Simplify.reduceExp = function (exp) {
                             new_pat.members.push(exp.decls[i].ident);
                             break;
                         default:
-                            throw new Error("Simplify.reduceExp not defined for " + exp.decls[i].name);
+                            throw new JSHC.CompilerError("Simplify.reduceExp not defined for " + exp.decls[i].name);
                     }
                 }
                 new_exp = {name:"application", exps: [new_exp], pos: new_exp.pos}
                 new_exp = {name:"infixexp", exps:[new_exp], pos: new_exp.pos};
                 exp = {name:"case", exp: new_exp, 
                              alts: [{name:"alt", pat: new_pat, exp: exp.exp}]};
-                
+                break;
+
+            case "listexp":
+                var list = new JSHC.NilDaCon();
+                var cons = new JSHC.ConsDaCon();
+                for(var ix=0 ; ix<exp.members.length ; ix++ ){
+                    list = {name:"application",exps:[list,exp.members[ix]]};
+                }
+                exp = list;
+                break;
+
+            case "case":
+            case "application":
+            case "varname":
+            case "dacon":
+            case "integer-lit":
+                break;
+
             default:
+                throw new JSHC.CompilerError("Simplify.reduceExp not defined for " + exp.name);
         }
     return exp;
 };

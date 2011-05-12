@@ -634,7 +634,8 @@ JSHC.Check.nameCheckExp = function(comp,module,lspace,ast){
         JSHC.Check.nameCheckExp(comp,module,lspace,ast.rhs);
         lspace.pop();
         break;
-        
+
+    case "listexp":
     case "tuple":
         for(var i=0 ; i<ast.members.length ; i++){
             JSHC.Check.nameCheckExp(comp,module,lspace,ast.members[i]);

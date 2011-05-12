@@ -209,14 +209,23 @@ JSHC.UnitDaCon = function(pos){
 };
 JSHC.UnitDaCon.prototype = new JSHC.DaCon("()",{}, false);
 
-JSHC.ListDaCon = function(pos){
+JSHC.NilDaCon = function(pos){
     if( pos !== undefined ){
         this.pos = pos;
     } else {
         this.pos = {};
     }
 };
-JSHC.ListDaCon.prototype = new JSHC.DaCon("[]",{}, false);
+JSHC.NilDaCon.prototype = new JSHC.DaCon("[]",{}, false);
+
+JSHC.ConsDaCon = function(pos){
+    if( pos !== undefined ){
+        this.pos = pos;
+    } else {
+        this.pos = {};
+    }
+};
+JSHC.ConsDaCon.prototype = new JSHC.DaCon(":",{}, true);
 
 JSHC.TupleDaCon = function(numberOfParams,pos){
     var id = "(";

@@ -247,6 +247,8 @@ JSHC.Fixity.translateInfixLists["tuple"] = function(ast){
     }
 };
 
+JSHC.Fixity.translateInfixLists["listexp"] = JSHC.Fixity.translateInfixLists["tuple"];
+
 JSHC.Fixity.translateInfixLists["lambda"] = function(ast) {
     JSHC.Fixity.translateInfixMember(ast, "rhs");
     JSHC.Fixity.translateInfixLists(ast.rhs);

@@ -544,6 +544,21 @@ JSHC.Check.checkExp = function(comp,ctx,ast){
         }
 	return ret_type;
 
+    case "listexp":
+        // the tuple constructor is chosen based on the expressions in the
+        // tuple construction expression.
+        var tycon_type = new JSHC.TupleTyCon(ast.members.length);
+
+        var arg_types = [];
+        for(var ix=0 ; ix<ast.members.length ; ix++){
+            arg_types.push(JSHC.Check.checkExp(comp,ctx,ast.members[ix]));
+        }
+
+        for(var ix=1 ; ix<arg_types.length ; ix++){
+            ctx.constrain(arg_types[0],arg_types[ix]);
+        }
+        return new JSHC.AppType(new JSHC.TyCon("[]",{}),arg_types[0]);
+
     default:
 	throw new Error("missing case for "+ast.name);
   };
@@ -1581,6 +1596,7 @@ JSHC.Check.computeUsedNamesIn = function(dnames, lspace, unames, ast){
             find(ast.rhs);
             break;
 
+        case "listexp":
         case "tuple":
             var mems = ast.members;
             for(var i = 0; i < mems.length; i++){

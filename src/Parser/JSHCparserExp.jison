@@ -333,6 +333,7 @@ aexp // : object
   | literal             {{$$ = $1;}}
   | "(" exp ")"         {{$$ = $2;}}
   | tuple               {{$$ = $1;}}
+  | listexp             {{$$ = $1;}}
   // TODO: incomplete
   ;
 
@@ -340,9 +341,13 @@ tuple // : object
     : "(" exp "," list_exp_1_comma ")" {{$4.unshift($2); $$ = {name: "tuple", members: $4, pos: @$}; }}
     ;
 
+listexp // : object
+    : "[" list_exp_1_comma "]" {{ $$ = {name: "listexp", members: $2, pos: @$}; }}
+    ;
+
 list_exp_1_comma
     : list_exp_1_comma ',' exp   {{$1.push($3); $$ = $1; }}
-    | exp                          {{$$ = [$1];}}
+    | exp                        {{$$ = [$1];}}
     ;
 
 modid // : object # {conid .} conid
@@ -427,7 +432,7 @@ qcon // : JSHC.DaCon
 // optionally qualified data constructor, or a built-in data constructor
 gcon // : object
     : "(" ")"               {{$$ = new JSHC.UnitDaCon(@$);}}
-    | "[" "]"               {{$$ = new JSHC.ListDaCon(@$);}}
+    | "[" "]"               {{$$ = new JSHC.NilDaCon(@$);}}
     | "(" list_1_comma ")"  {{$$ = new JSHC.TupleDaCon($2 + 1, @$);}}
     | qcon                  {{$$ = $1;}}
     ;
@@ -451,7 +456,7 @@ qvar // : JSHC.VarName
     ;
 
 gconsym // : object
-    : ':'           {{$$ = new JSHC.DaCon($1, @$, true, yy.lexer.previous.qual);}}
+    : ':'           {{$$ = new JSHC.ConsDaCon(@$);}}
     | qconsym       {{$$ = new JSHC.DaCon($1, @$, true, yy.lexer.previous.qual);}}
     ;
 
