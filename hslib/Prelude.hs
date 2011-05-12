@@ -71,13 +71,13 @@ f $ x = f x
 -- list functions
 
 --map :: (a -> b) -> [a] -> [b]
---map f []     = []
+map f []     = []
 map f ((:) x xs) = f x : map f xs
 
---infixr 5 ++
--- (++) :: [a] -> [a] -> [a]
--- []     ++ ys = ys
--- (x:xs) ++ ys = x : (xs ++ ys)
+infixr 5 ++
+--(++) :: [a] -> [a] -> [a]
+[]         ++ ys = ys
+((:) x xs) ++ ys = x : (xs ++ ys)
 
 --filter :: (a -> Bool) -> [a] -> [a]
 --filter p []                 = []
@@ -85,7 +85,7 @@ map f ((:) x xs) = f x : map f xs
 --                | otherwise = filter p xs
 
 --concat :: [[a]] -> [a]
---concat xss = foldr (++) [] xss
+concat xss = foldr (++) [] xss
 
 --concatMap :: (a -> [b]) -> [a] -> [b]
 --concatMap f = concat . map f
@@ -145,8 +145,8 @@ map f ((:) x xs) = f x : map f xs
 
 
 --foldr             :: (a -> b -> b) -> b -> [a] -> b
---foldr f z []      = z
---foldr f z (x:xs) = f x (foldr f z xs)
+foldr f z []         = z
+foldr f z ((:) x xs) = f x (foldr f z xs)
 
 --foldr1            ::  (a -> a -> a) -> [a] -> a
 --foldr1 f [x]      =   x
