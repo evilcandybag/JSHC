@@ -79,6 +79,8 @@ Modern web applications are becoming more and more complex, with users expecting
  for Dynamic Web Documents has some stuff, then the Curry stuff can be useful>.
  One solution to this problem is providing an extra layer of abstraction
  on top of these scripts, that in turn can be subject to static type checking.
+ For example another, already existing, programming language that has these
+ features can be used.
  
 \end_layout
 
@@ -86,7 +88,10 @@ Modern web applications are becoming more and more complex, with users expecting
 Haskell is one such language, designed with type-safety as one of the major
  concerns <TODO:ref: ?>.
  By compiling Haskell directly to JavaScript, we use its strong type system
- to guarantee that <TODO: better formulation plox> 
+ to guard against some of the errors that are hard to avoid when writing
+ large and complex application with a dynamically typed language such as
+ JavaScript.
+ <TODO: better formulation plox> 
 \begin_inset CommandInset citation
 LatexCommand cite
 key "haskell-report"
@@ -880,7 +885,7 @@ Tools and libraries used
 
 \begin_layout Standard
 Several external tools were used to facilitate the development of JSHC.
- 3
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -888,7 +893,8 @@ PEG.js
 \end_layout
 
 \begin_layout Standard
-PEG.js is an implementation of Parsing Expression Grammars 
+PEG.js is a JavaScript implementation of Parsing Expression Grammars, which
+ is a 
 \end_layout
 
 \begin_layout Subsection
