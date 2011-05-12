@@ -51,13 +51,16 @@ JSHC.Internal.match = function(exp, alts) {
             case "varname":
                 binds.push(exp);
                 return true;
-                break;
+
             case "integer-lit":
                 return exp === pat.p;
-                break;
+
+            case "wildcard":
+                return true;
+
             case "dacon":
                 return (pat.p[0] === exp[0] && pat.p.length === exp.length);
-                break;
+
             case "conpat":
                 var res = pat.p.length === exp.length
                 var res = res && (pat.p[0] === exp[0])
@@ -68,7 +71,7 @@ JSHC.Internal.match = function(exp, alts) {
                         res = res && match_(exp[i],pat.p[i]);
                 }
                 return res;
-                break;
+
             case "tuple_pat":
                 var res = pat.p.length === exp.length
                 for (var i = 0; i < pat.p.length; i++) {
@@ -78,7 +81,7 @@ JSHC.Internal.match = function(exp, alts) {
                         res = res && match_(exp[i],pat.p[i]);
                 }
                 return res;
-                break;
+
             default: 
                 throw new Error("match_ needs definition for: " + pat.name);
         }

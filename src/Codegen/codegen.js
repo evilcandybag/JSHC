@@ -250,6 +250,9 @@ JSHC.Codegen.codegen = function (input,namespace) {
             case "integer-lit":
                 res += pat.value;
                 break;
+            case "wildcard":
+                res += "\"_\"";
+                break;
             default:
                 throw new Error("comCasePat not defined for name " + pat.name);
         }

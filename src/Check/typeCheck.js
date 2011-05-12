@@ -581,6 +581,7 @@ JSHC.Check.checkPatternEnter = function(comp,ctx,ast){
         ctx.push();
         return ctx.add(ast);   // automatically get a new tyvar
 
+    case "wildcard":
     case "integer-lit":
     case "dacon":
         return ctx.lookupTypeAndInstantiate(comp,ast);
@@ -617,6 +618,7 @@ JSHC.Check.checkPatternExit = function(comp,ctx,ast){
 	         ctx.pop();
 	         break;
 
+	     case "wildcard":
 	     case "dacon":
 	     case "integer-lit":
 	         break;
@@ -1059,31 +1061,26 @@ JSHC.Check.Ctx.prototype.lookupAny = function(comp,name,field){
 
     if( name.name == "integer-lit" ){
         return int32_type;
-    }
-
-    if( name.name == "dacon" && name.id == "()" ){
+    } else if( name.name == "wildcard" ){
+        var tyvar = new JSHC.TyVar("a");
+        return new JSHC.ForallType([tyvar],tyvar);
+    } else if( name.name == "dacon" && name.id == "()" ){
         // () :: ()
         return new TyCon("()",{});
-    }
-
-    if( name.name == "dacon" && name.id == "[]" ){
+    } else if( name.name == "dacon" && name.id == "[]" ){
         // []     :: ∀a. [] a
         var tyvar = new JSHC.TyVar("a");
         var list_tycon = new JSHC.TyCon("[]",{});
         var inner_type = new JSHC.AppType(list_tycon,tyvar);
         return new JSHC.ForallType([tyvar],inner_type);
-    }
-
-    if( name.name == "dacon" && name.id == ":" && name.isSymbol === true){
+    } else if( name.name == "dacon" && name.id == ":" && name.isSymbol === true){
         // (:)    :: ∀a. a -> [] a -> [] a
         var tyvar = new JSHC.TyVar("a");
         var list_tycon = new JSHC.TyCon("[]",{});
         var list_a_type = new JSHC.AppType(list_tycon,tyvar);
         var fun_type = new JSHC.FunType([tyvar,list_a_type,list_a_type]);
         return new JSHC.ForallType([tyvar],fun_type);
-    }
-
-    if( name.name == "dacon" && name instanceof JSHC.TupleDaCon ){
+    } else if( name.name == "dacon" && name instanceof JSHC.TupleDaCon ){
         return (function(){
             var tycon_type = new JSHC.TupleTyCon(name.numberOfParams,name.pos);
             var params = JSHC.Check.generateTyVarSequence(name.numberOfParams);
@@ -1101,19 +1098,18 @@ JSHC.Check.Ctx.prototype.lookupAny = function(comp,name,field){
 
             return type;
         }());
-    }
+    } else {
 
-    // look up name in lspace
-    for(ix=this.contexts.length-1 ; ix>=0 ; ix--){
-	n = this.contexts[ix][name.toStringQ()];
-	if( n !== undefined ){
-	    assert.ok( n !== undefined );
-	    return n;
+        // look up name in lspace
+        for(ix=this.contexts.length-1 ; ix>=0 ; ix--){
+	    n = this.contexts[ix][name.toStringQ()];
+            if( n !== undefined ){
+	        assert.ok( n !== undefined );
+	        return n;
+            }
         }
-    }
 
-    if( name.loc !== undefined ){
-        if( name.loc == "JSHC.Internal.Prelude" ){
+        if( name.loc !== undefined && name.loc == "JSHC.Internal.Prelude" ){
             // TODO: should use foreign declarations instead to specify the type.
             var iii_type = new JSHC.FunType([int32_type,int32_type,int32_type]);
             var iib_type = new JSHC.FunType([int32_type,int32_type,bool_type]);
@@ -1544,6 +1540,7 @@ JSHC.Check.computeUsedNamesInPat = function(dnames, lspace, unames, ast){
             lspace.add(ast);
             break;
 
+        case "wildcard":
         case "integer-lit":
             break;
 

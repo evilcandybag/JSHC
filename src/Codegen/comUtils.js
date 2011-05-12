@@ -58,6 +58,7 @@ JSHC.comUtils.getBindStrs = function(p) {
             break;
         case "dacon":
         case "integer-lit":
+        case "wildcard":
             break;
         default:
             throw new Error ("illegal pattern in getBinds: " + pat.name)
