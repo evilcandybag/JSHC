@@ -680,6 +680,217 @@ This concept is used in two places of the compiler.
  A->B->A, C->D->E->C, C->B, F->E, D->G.>
 \end_layout
 
+\begin_layout Section
+Types
+\end_layout
+
+\begin_layout Standard
+All values in haskell have a type.
+\end_layout
+
+\begin_layout Subsection
+Polymorphic types
+\end_layout
+
+\begin_layout Standard
+All types are rank-1 polymorphic types, which means that the type given
+ to a value begins with a quantification of all the type variables that
+ occur in it, followed by the rest of the type.
+\end_layout
+
+\begin_layout Standard
+This means that the type of (:) which is "a -> [a] -> [a]" is actually "
+\backslash
+u2200a.
+ a -> [a] -> [a]", but the forall quantification is not written out as it
+ is implied.
+\end_layout
+
+\begin_layout Subsection
+Instantiation of types and type inference
+\end_layout
+
+\begin_layout Standard
+When using a data constructor such as 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[] :: ∀a.[a]
+\end_layout
+
+\end_inset
+
+, one would want to use it with lists with different element types in different
+ locations.
+\end_layout
+
+\begin_layout Standard
+This is achieved by replacing the bound type variable with new type variables
+ wherever it is used.
+\end_layout
+
+\begin_layout Standard
+If one makes a declaration 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+y = x : []
+\end_layout
+
+\end_inset
+
+ where 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+x :: Int
+\end_layout
+
+\end_inset
+
+, one will have:
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+(:) :: "a -> [a] -> [a]"
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[] :: [b]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+x :: Int
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Since 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+x
+\end_layout
+
+\end_inset
+
+ is the 1st argument to 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+(:)
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+a = Int
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Since 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[]
+\end_layout
+
+\end_inset
+
+ is the 2nd argument to 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+(:)
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[b] = [a]
+\end_layout
+
+\end_inset
+
+, which implies 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+a = b
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The inferred types are:
+\end_layout
+
+\begin_layout Itemize
+(:) :: Int -> [Int] -> [Int]
+\end_layout
+
+\begin_layout Itemize
+[] :: [Int]
+\end_layout
+
+\begin_layout Itemize
+y :: [Int]
+\end_layout
+
+\begin_layout Standard
+<TODO: Example using function application/abstraction ?>
+\end_layout
+
 \begin_layout Chapter
 Introduction to Compilation
 \end_layout
@@ -1183,27 +1394,29 @@ Implementation
 Introduction
 \end_layout
 
-\begin_layout Itemize
-Find, read and parse all modules: This part identifies the modules used,
- performs lexical analysis on them and parses them into an abstract representati
-on of the language, the Abstract Syntax Tree (AST).
- 
+\begin_layout Section
+Interface
 \end_layout
 
-\begin_layout Itemize
-Type checking: This part consists of checking each module for type correctness,
- as well as inferring general types.
- This new inferred type information is added to the AST.
+\begin_layout Subsection
+Ymacs
 \end_layout
 
-\begin_layout Itemize
-Simplification: Before compilation, the AST is simplified, reducing the
- number of different constructs used, to make for easier compilation.
+\begin_layout Standard
+<TODO: describe the changes to the standard Ymacs environment>
 \end_layout
 
-\begin_layout Itemize
-Translation to target: The simplified AST is translated into the target
- language (JavaScript).
+\begin_layout Subsection
+Interpreter
+\end_layout
+
+\begin_layout Standard
+The interpreter supports a subset of the GHCi commands, and includes a command
+ for evaluation of javascript expressions.
+\end_layout
+
+\begin_layout Standard
+<TODO: describe currently supported commands>
 \end_layout
 
 \begin_layout Section
@@ -1258,11 +1471,29 @@ The algorithm computes the ordering lazily, similar to an iterator, but
 \end_layout
 
 \begin_layout Standard
-<TODO: pseudo code here, with interface and comments>
+<TODO: pseudo code here?>
 \end_layout
 
 \begin_layout Section
 Compiler front-end
+\end_layout
+
+\begin_layout Itemize
+Find, read and parse all modules: This part identifies the modules used,
+ performs lexical analysis on them and parses them into an abstract representati
+on of the language, the Abstract Syntax Tree (AST).
+ 
+\end_layout
+
+\begin_layout Itemize
+Type checking: This part consists of checking each module for type correctness,
+ as well as inferring general types.
+ This new inferred type information is added to the AST.
+\end_layout
+
+\begin_layout Itemize
+Simplification: Before compilation, the AST is simplified, reducing the
+ number of different constructs used, to make for easier compilation.
 \end_layout
 
 \begin_layout Subsection
@@ -1459,7 +1690,7 @@ Reduction of syntax tree
 \end_layout
 
 \begin_layout Standard
-Removes some constructs from the AST.
+This translates the AST to the intermediate representation.
 \end_layout
 
 \begin_layout Standard
@@ -1470,8 +1701,8 @@ The following constructs disappear as they are translated into other constructs:
 \end_layout
 
 \begin_layout Standard
-<TODO: make a nice table containing translations from one sentential form
- to another similar to the report>
+<TODO: make a table containing translations from one sentential form to
+ another similar to the report?>
 \end_layout
 
 \begin_layout Section
@@ -1479,7 +1710,8 @@ Compiler back-end
 \end_layout
 
 \begin_layout Standard
-Is given an AST using the intermediate representation.
+Takes an AST in the intermediate representation and translates into the
+ target language (JavaScript).
 \end_layout
 
 \begin_layout Subsection
