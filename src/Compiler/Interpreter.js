@@ -38,10 +38,12 @@ JSHC.Interpreter = function(modulePrefix){
 
 ////////////////////////////////////////////////////////////////////////////////
 
+JSHC.Interpreter.commands =
+  [":kind", ":load", ":show", ":type", ":js",
+   ":show path", ":show code", ":show modules"];
+
 JSHC.Interpreter.prototype.execCommand = function(line){
     var command;
-    var commands = ["?", "help", "show-path",
-		      "show-code"];
     line = line.trim();
     var words = line.split(/\s/);
 
@@ -90,7 +92,7 @@ JSHC.Interpreter.prototype.execCommand = function(line){
 	break;
 
     case ":help": case ":?":
-	this.onMessage(commands.join("\n"));
+	this.onMessage(JSHC.Interpreter.commands.join("\n"));
 	break;
 
     case ":info":
@@ -239,9 +241,22 @@ JSHC.Interpreter.prototype.execCommand = function(line){
 
 ////////////////////////////////////////////////////////////////////////////////
 
-JSHC.Interpreter.prototype.autoComplete = function(){
-   // TODO
-   return {error: "auto-completion not implemented"};
+JSHC.Interpreter.prototype.autoComplete = function(partial_command){
+    var results = [];
+    for(var ix=0 ; ix<JSHC.Interpreter.commands.length ; ix++){
+        var cmd = JSHC.Interpreter.commands[ix];
+        if( cmd.substr(0,partial_command.length) == partial_command ){
+            results.push(cmd);
+        }
+    }
+
+    if( results.length === 0 ){
+        return {error: "auto-completion: no match"};
+    } else if( results.length === 1 ){
+        return {line: results[0].substr(partial_command.length)};
+    } else {
+        return {matches: results};
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////

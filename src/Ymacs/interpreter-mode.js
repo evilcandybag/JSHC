@@ -35,7 +35,6 @@ Ymacs_Tokenizer.define("JSHC_IB", function(stream, tok) {
 	    if (stream.col == 0 && (tmp = stream.lookingAt(JSHC.Ymacs.interpreterPrompt))) {
 		// color command prompt
 		foundToken(0, stream.col = stream.lineLength(), "keyword");
-
 	    } else if (stream.col == 0 && (tmp = stream.lookingAt("Error: "))){
 		// color error messages
 		foundToken(0, stream.col = stream.lineLength(), "error");
@@ -77,12 +76,15 @@ Ymacs_Buffer.newCommands({
 		var line = buf.code[buf.code.length-1].substr(PROMPT.length);
 		var result = buf.interpreter.autoComplete(line);
 		if( result.line !== undefined ){
-		    buf._replaceLine(buf.code.length-1, PROMPT + result.line);
-		    buf.caretMarker.setPosition(PROMPT.length + result.index);
+		    //buf._replaceLine(buf.code.length-1, PROMPT + result.line);
+		    //buf.caretMarker.setPosition(PROMPT.length + result.index);
+		    buf.__insertText(result.line);
 		} else if( result.matches !== undefined ){
+		    buf.__insertText("\n");
 		    result.matches.forEach(function(match){
-			    buf.__insertText(match.id,pos);
+			    buf.__insertText(match+"\n");
 			});
+		    buf.__insertText(JSHC.Ymacs.interpreterPrompt);
 		} else if( result.warning === undefined &&
 			   result.error === undefined ){
 		    throw new Error("bad response from interpreter auto completion");
