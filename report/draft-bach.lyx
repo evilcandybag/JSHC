@@ -615,6 +615,37 @@ g
 <TODO: put relevant theory here, to unclutter other chapters>
 \end_layout
 
+\begin_layout Section
+Dependency groups
+\end_layout
+
+\begin_layout Standard
+The Haskell standard 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "haskell-report"
+
+\end_inset
+
+ mentions dependency groups in Chapters 4.5.1, 4.5.2, and 4.6, related to different
+ topics.
+\end_layout
+
+\begin_layout Standard
+The dependency groups are the SCC (strongly connected components) in a directed
+ graph.
+ After they have been computed, the resulting graph is a DAG (directed acyclic
+ graph) where nodes are dependency groups, and the edges are the dependencies
+ between the graphs describing the dependency order.
+\end_layout
+
+\begin_layout Standard
+This concept is used in two places of the compiler.
+ It is needed to describe sets of modules that depend on each other and
+ sets of declarations that depend on each other (even between different
+ modules).
+\end_layout
+
 \begin_layout Chapter
 Introduction to Compilation
 \end_layout
@@ -957,7 +988,58 @@ status collapsed
 \end_inset
 
 .
- This means that, instead of matching any rule in the
+ This means that, instead of reducing when matching any rule in a production,
+ a parsing expression grammar always reduces on the first rule matched.
+ This means that parsing expression grammars are inherently unambiguous.
+ If there are two possible matches to a rule, simply match the one that
+ occurred first.
+ 
+\end_layout
+
+\begin_layout Standard
+Parsing expression grammars also have several operators similar to those
+ used in regular expressions.
+ There are the repetition operators 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+'*'
+\end_layout
+
+\end_inset
+
+ which matches zero or more repetitions of a rule, and 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+'+'
+\end_layout
+
+\end_inset
+
+ which matches one or more repetitions of a rule.
+ There is also the 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+'?'
+\end_layout
+
+\end_inset
+
+ operator which eiter matches a rule and returns it, or does not match it
+ and returns an empty match.
+ Just as with the ordered choice, these operators take a greedy approach,
+ i.e.
+ they always consume the maximum amount of input possible.
+ 
+\end_layout
+
+\begin_layout Standard
+
 \end_layout
 
 \begin_layout Itemize
@@ -1029,6 +1111,56 @@ Simplification: Before compilation, the AST is simplified, reducing the
 \begin_layout Itemize
 Translation to target: The simplified AST is translated into the target
  language (JavaScript).
+\end_layout
+
+\begin_layout Section
+Dependency groups
+\end_layout
+
+\begin_layout Standard
+The algorithm created for this is a implementation that can be used for
+ all places in the compiler where dependency groups are needed.
+ Given a graph, it merges the minimal amount of nodes to create a DAG.
+ This takes O(|E|+|V|) time.
+\end_layout
+
+\begin_layout Standard
+<TODO: pseudo code here>
+\end_layout
+
+\begin_layout Standard
+<TODO: time and space analysis>
+\end_layout
+
+\begin_layout Subsection
+Dependency order 
+\end_layout
+
+\begin_layout Standard
+The dependency order is a reverse topological ordering of the graph of dependenc
+y groups.
+\end_layout
+
+\begin_layout Standard
+<TODO: image of a few modules as an example>
+\end_layout
+
+\begin_layout Subsection
+Dependency order traversal 
+\end_layout
+
+\begin_layout Standard
+The compiler needs to traverse the dependency groups in dependency order.
+\end_layout
+
+\begin_layout Standard
+The algorithm created for this computes the ordering lazily, similar to
+ an iterator, but allows for concurrency by producing a set of nodes at
+ each step.
+\end_layout
+
+\begin_layout Standard
+<TODO: pseudo code here, with interface and comments>
 \end_layout
 
 \begin_layout Section
@@ -1308,81 +1440,7 @@ options "plain"
 
 \begin_layout Chapter
 \start_of_appendix
-Dependency groups
-\end_layout
-
-\begin_layout Standard
-The Haskell standard 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "haskell-report"
-
-\end_inset
-
- mentions dependency groups in Chapters 4.5.1, 4.5.2, and 4.6, related to different
- topics.
-\end_layout
-
-\begin_layout Standard
-The dependency groups are the SCC (strongly connected components) in a directed
- graph.
- After they have been computed, the resulting graph is a DAG (directed acyclic
- graph) where nodes are dependency groups, and the edges are the dependencies
- between the graphs describing the dependency order.
-\end_layout
-
-\begin_layout Standard
-This concept is used in several places of the compiler.
- It is needed to describe sets of modules that mutually depend on each other,
- sets of type declarations (see kind checking) that refer to each other,
- and also sets of function declarations (see type checking) that refer to
- each other.
-\end_layout
-
-\begin_layout Standard
-The algorithm created for this is a implementation that can be used for
- all places in the compiler where dependency groups are needed.
- Given a graph, it merges the minimal amount of nodes to create a DAG.
- This takes O(|E|+|V|) time.
-\end_layout
-
-\begin_layout Standard
-<TODO: pseudo code here>
-\end_layout
-
-\begin_layout Standard
-<TODO: time and space analysis>
-\end_layout
-
-\begin_layout Section
-Dependency order 
-\end_layout
-
-\begin_layout Standard
-The dependency order is a reverse topological ordering of the graph of dependenc
-y groups.
-\end_layout
-
-\begin_layout Standard
-<TODO: image of a few modules as an example>
-\end_layout
-
-\begin_layout Section
-Dependency order traversal 
-\end_layout
-
-\begin_layout Standard
-The compiler needs to traverse the dependency groups in dependency order.
-\end_layout
-
-\begin_layout Standard
-The algorithm created for this computes the ordering lazily, similar to
- an iterator, but allows for concurrency by producing a set of nodes at
- each step.
-\end_layout
-
-\begin_layout Standard
-<TODO: pseudo code here, with interface and comments>
+Nomenclature
 \end_layout
 
 \begin_layout Chapter
