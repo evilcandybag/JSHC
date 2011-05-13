@@ -106,8 +106,34 @@ Related work
 \end_layout
 
 \begin_layout Standard
-Using Haskell for web-programming is not a new concept; there are several
- projects out there with a similar approach to the one presented here.
+Using Haskell for type safe web-programming is not a new concept.
+ Several different approaches have been suggested; the use of Haskell to
+ model HTML
+\begin_inset CommandInset citation
+LatexCommand cite
+key "HTML-in-haskell"
+
+\end_inset
+
+ and using server-side Haskell applications to generate CGI
+\begin_inset CommandInset citation
+LatexCommand cite
+key "CGI-haskell"
+
+\end_inset
+
+ are two examples.
+ Other languages similar to Haskell have also been suggested for type safe
+ web-applications, such as the functional logic language Curry
+\begin_inset CommandInset citation
+LatexCommand cite
+key "curry-js"
+
+\end_inset
+
+.
+ <TODO: stuffe here> there are several projects out there with a similar
+ approach to the one presented here.
  Notable ones are Yesod 
 \begin_inset CommandInset citation
 LatexCommand cite
@@ -148,7 +174,8 @@ key "haskell-report"
 
 \end_inset
 
-.<TODO: Extensions?>
+.
+ <TODO; rewrite as much of this is filthy LIES!>
 \end_layout
 
 \begin_layout Chapter
@@ -696,6 +723,8 @@ Polymorphic types
 All types are rank-1 polymorphic types, which means that the type given
  to a value begins with a quantification of all the type variables that
  occur in it, followed by the rest of the type.
+ <TODO: is it reasonable to assume that the reader knows what a type variable
+ is?>
 \end_layout
 
 \begin_layout Standard
