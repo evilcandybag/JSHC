@@ -1616,17 +1616,19 @@ Loading modules
 \end_layout
 
 \begin_layout Standard
-The loading process will be given a set of module names to load, and will
- search for them in a virtual file system (mapping from module names to
- unparsed strings), a list of URLs (which can refer to files using the file://
- or http:// protocols).
- Each found module must be parsed in order to find what it depends upon.
- The imported modules must then be found and parsed as well.
+The loading begins with the module names of a set of modules to load, and
+ will search for them in a virtual file system (mapping from module names
+ to unparsed strings), a list of URLs (which can refer to files using the
+ file:// or http:// protocols).
+ Each found module must be parsed in order to find out which modules it
+ depends upon.
+ Those modules (unless already loaded) must then be found and parsed as
+ well.
  This process continues until no more modules are needed, and the minimal
  set of modules that satisfies all the module dependencies has been found.
- In case a module can not be found or there is a parse error, the process
- will continue and try to satisfy more dependencies and see if there are
- more missing modules or parse errors.
+ In case a module can not be found or there is a parse error, this process
+ will still continue and try to satisfy more dependencies and see if there
+ are more missing modules or parse errors.
 \end_layout
 
 \begin_layout Subsection
