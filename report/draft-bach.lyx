@@ -958,8 +958,134 @@ PEG.js
 \end_layout
 
 \begin_layout Standard
-PEG.js is a JavaScript implementation of Parsing Expression Grammars, which
- is a 
+PEG.js
+\begin_inset CommandInset citation
+LatexCommand cite
+key "peg-js"
+
+\end_inset
+
+ is a JavaScript implementation of parsing expression grammars, which is
+ a alternative to context free grammars and regular expressions for defining
+ formal languages
+\begin_inset CommandInset citation
+LatexCommand cite
+key "parsing-expression-grammars"
+
+\end_inset
+
+.
+ The definition of a parsing expression grammar is similar in appearance
+ to that of a context-free grammar, with a few key differences.
+ 
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+unordered choice
+\end_layout
+
+\end_inset
+
+ operator 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+'|'
+\end_layout
+
+\end_inset
+
+ is replaced by an 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+ordered choice
+\end_layout
+
+\end_inset
+
+ operator 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+'/'
+\end_layout
+
+\end_inset
+
+.
+ This means that, instead of reducing when matching any rule in a production,
+ a parsing expression grammar always reduces on the first rule matched.
+ This means that parsing expression grammars are inherently unambiguous.
+ If there are two possible matches to a rule, simply match the one that
+ occurred first.
+ 
+\end_layout
+
+\begin_layout Standard
+Parsing expression grammars also have several operators similar to those
+ used in regular expressions.
+ There are the repetition operators 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+'*'
+\end_layout
+
+\end_inset
+
+ which matches zero or more repetitions of a rule, and 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+'+'
+\end_layout
+
+\end_inset
+
+ which matches one or more repetitions of a rule.
+ There is also the 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+'?'
+\end_layout
+
+\end_inset
+
+ operator which eiter matches a rule and returns it, or does not match it
+ and returns an empty match.
+ Just as with the ordered choice, these operators take a greedy approach,
+ i.e.
+ they always consume the maximum amount of input possible.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Itemize
+Unordered vs ordered choice
+\end_layout
+
+\begin_layout Itemize
+repetition operators ? + *
+\end_layout
+
+\begin_layout Itemize
+logical predicates & and !
 \end_layout
 
 \begin_layout Subsection
@@ -1353,6 +1479,10 @@ options "plain"
 
 \begin_layout Chapter
 \start_of_appendix
+Nomenclature
+\end_layout
+
+\begin_layout Chapter
 Syntax reference
 \end_layout
 
