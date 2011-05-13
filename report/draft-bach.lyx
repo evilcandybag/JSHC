@@ -1094,19 +1094,57 @@ status collapsed
 \end_inset
 
 .
- These allow the parser to check 
+ These match their paired rule, and either fail or succeed without advancing
+ the parser position.
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+&
 \end_layout
 
-\begin_layout Itemize
-Unordered vs ordered choice
+\end_inset
+
+ returns an empty match if the match is successful and fails otherwise,
+ while 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+!
 \end_layout
 
-\begin_layout Itemize
-repetition operators ? + *
+\end_inset
+
+ returns an empty match if the match fails and succeeds otherwise.
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
 \end_layout
 
-\begin_layout Itemize
-logical predicates & and !
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+PEG.js was chosen for this project due to the suitability of parsing expression
+ grammars for writing lexical analysers 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "parsing-expression-grammars"
+
+\end_inset
+
+ in a concise and efficient way.
+ 
 \end_layout
 
 \begin_layout Subsection
