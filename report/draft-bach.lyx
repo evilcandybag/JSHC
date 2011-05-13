@@ -932,7 +932,7 @@ key "peg-js"
 \end_inset
 
  is a JavaScript implementation of parsing expression grammars, which is
- a alternative to context free grammars and regular expressions for defining
+ a alternative to context-free grammars and regular expressions for defining
  formal languages
 \begin_inset CommandInset citation
 LatexCommand cite
@@ -962,7 +962,7 @@ unordered choice
 status collapsed
 
 \begin_layout Plain Layout
-'|'
+|
 \end_layout
 
 \end_inset
@@ -982,7 +982,7 @@ ordered choice
 status collapsed
 
 \begin_layout Plain Layout
-'/'
+/
 \end_layout
 
 \end_inset
@@ -1004,7 +1004,7 @@ Parsing expression grammars also have several operators similar to those
 status collapsed
 
 \begin_layout Plain Layout
-'*'
+*
 \end_layout
 
 \end_inset
@@ -1014,7 +1014,7 @@ status collapsed
 status collapsed
 
 \begin_layout Plain Layout
-'+'
++
 \end_layout
 
 \end_inset
@@ -1025,7 +1025,7 @@ status collapsed
 status collapsed
 
 \begin_layout Plain Layout
-'?'
+?
 \end_layout
 
 \end_inset
@@ -1039,7 +1039,28 @@ status collapsed
 \end_layout
 
 \begin_layout Standard
+Lastly, parsing expression grammars feature the syntactic predicates 
+\begin_inset Flex CharStyle:Code
+status collapsed
 
+\begin_layout Plain Layout
+&
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+!
+\end_layout
+
+\end_inset
+
+.
+ These allow the parser to check 
 \end_layout
 
 \begin_layout Itemize
