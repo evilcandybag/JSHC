@@ -30,7 +30,16 @@ logicalmkup
 \graphics default
 \paperfontsize default
 \spacing single
-\use_hyperref false
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered true
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder false
+\pdf_colorlinks true
+\pdf_backref false
+\pdf_pdfusetitle true
 \papersize default
 \use_geometry false
 \use_amsmath 1
@@ -106,8 +115,34 @@ Related work
 \end_layout
 
 \begin_layout Standard
-Using Haskell for web-programming is not a new concept; there are several
- projects out there with a similar approach to the one presented here.
+Using Haskell for type safe web-programming is not a new concept.
+ Several different approaches have been suggested; the use of Haskell to
+ model HTML
+\begin_inset CommandInset citation
+LatexCommand cite
+key "HTML-in-haskell"
+
+\end_inset
+
+ and using server-side Haskell applications to generate CGI
+\begin_inset CommandInset citation
+LatexCommand cite
+key "CGI-haskell"
+
+\end_inset
+
+ are two examples.
+ Other languages similar to Haskell have also been suggested for type safe
+ web-applications, such as the functional logic language Curry
+\begin_inset CommandInset citation
+LatexCommand cite
+key "curry-js"
+
+\end_inset
+
+.
+ <TODO: stuffe here> there are several projects out there with a similar
+ approach to the one presented here.
  Notable ones are Yesod 
 \begin_inset CommandInset citation
 LatexCommand cite
@@ -141,14 +176,8 @@ d text editor with an interactive code console (in the vein of the Glasgow
  performed by the client, thus greatly lightening the server load compared
  to having the computations run server-side, while still saving the user
  the work of downloading a compiler to their computer.
- The compiler supports the entirety of Haskell, as described in 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "haskell-report"
-
-\end_inset
-
-.<TODO: Extensions?>
+ The compiler supports the a subset of Haskell, as described in .
+ <TODO; rewrite as much of this is filthy LIES!>
 \end_layout
 
 \begin_layout Chapter
@@ -579,11 +608,19 @@ where
 A,B,C
 \family default
  are module names.
- In English, the first line would mean “import from 
+ In English, the first line would mean 
+\begin_inset Quotes eld
+\end_inset
+
+import from 
 \family typewriter
 A
 \family default
- everything that it exports”, the second line “import from 
+ everything that it exports
+\begin_inset Quotes erd
+\end_inset
+
+, the second line “import from 
 \family typewriter
 B
 \family default
@@ -696,6 +733,8 @@ Polymorphic types
 All types are rank-1 polymorphic types, which means that the type given
  to a value begins with a quantification of all the type variables that
  occur in it, followed by the rest of the type.
+ <TODO: is it reasonable to assume that the reader knows what a type variable
+ is?>
 \end_layout
 
 \begin_layout Standard
@@ -1445,6 +1484,25 @@ key "state-of-haskell"
 
 .
  
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The Ymacs interface consists of a window with one or more buffers for entering
+ text.
+ <TODO: structure of Ymacs>
 \end_layout
 
 \begin_layout Section
