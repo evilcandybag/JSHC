@@ -1148,6 +1148,31 @@ Translation to target: The simplified AST is translated into the target
 \end_layout
 
 \begin_layout Section
+Interface
+\end_layout
+
+\begin_layout Subsection
+Ymacs
+\end_layout
+
+\begin_layout Standard
+<TODO: describe the changes to the standard Ymacs environment>
+\end_layout
+
+\begin_layout Subsection
+Interpreter
+\end_layout
+
+\begin_layout Standard
+The interpreter supports a subset of the GHCi commands, and includes a command
+ for evaluation of javascript expressions.
+\end_layout
+
+\begin_layout Standard
+<TODO: describe currently supported commands>
+\end_layout
+
+\begin_layout Section
 Dependency groups
 \end_layout
 
@@ -1199,7 +1224,7 @@ The algorithm computes the ordering lazily, similar to an iterator, but
 \end_layout
 
 \begin_layout Standard
-<TODO: pseudo code here, with interface and comments>
+<TODO: pseudo code here?>
 \end_layout
 
 \begin_layout Section
