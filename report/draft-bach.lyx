@@ -17,9 +17,9 @@
 logicalmkup
 \end_modules
 \language english
-\inputencoding auto
-\font_roman lmodern
-\font_sans default
+\inputencoding utf8-plain
+\font_roman default
+\font_sans cmss
 \font_typewriter default
 \font_default_family default
 \font_sc false
