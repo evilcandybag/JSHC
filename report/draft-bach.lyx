@@ -680,6 +680,217 @@ This concept is used in two places of the compiler.
  A->B->A, C->D->E->C, C->B, F->E, D->G.>
 \end_layout
 
+\begin_layout Section
+Types
+\end_layout
+
+\begin_layout Standard
+All values in haskell have a type.
+\end_layout
+
+\begin_layout Subsection
+Polymorphic types
+\end_layout
+
+\begin_layout Standard
+All types are rank-1 polymorphic types, which means that the type given
+ to a value begins with a quantification of all the type variables that
+ occur in it, followed by the rest of the type.
+\end_layout
+
+\begin_layout Standard
+This means that the type of (:) which is "a -> [a] -> [a]" is actually "
+\backslash
+u2200a.
+ a -> [a] -> [a]", but the forall quantification is not written out as it
+ is implied.
+\end_layout
+
+\begin_layout Subsection
+Instantiation of types and type inference
+\end_layout
+
+\begin_layout Standard
+When using a data constructor such as 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[] :: ∀a.[a]
+\end_layout
+
+\end_inset
+
+, one would want to use it with lists with different element types in different
+ locations.
+\end_layout
+
+\begin_layout Standard
+This is achieved by replacing the bound type variable with new type variables
+ wherever it is used.
+\end_layout
+
+\begin_layout Standard
+If one makes a declaration 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+y = x : []
+\end_layout
+
+\end_inset
+
+ where 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+x :: Int
+\end_layout
+
+\end_inset
+
+, one will have:
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+(:) :: "a -> [a] -> [a]"
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[] :: [b]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+x :: Int
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Since 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+x
+\end_layout
+
+\end_inset
+
+ is the 1st argument to 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+(:)
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+a = Int
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Since 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[]
+\end_layout
+
+\end_inset
+
+ is the 2nd argument to 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+(:)
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[b] = [a]
+\end_layout
+
+\end_inset
+
+, which implies 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+a = b
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The inferred types are:
+\end_layout
+
+\begin_layout Itemize
+(:) :: Int -> [Int] -> [Int]
+\end_layout
+
+\begin_layout Itemize
+[] :: [Int]
+\end_layout
+
+\begin_layout Itemize
+y :: [Int]
+\end_layout
+
+\begin_layout Standard
+<TODO: Example using function application/abstraction ?>
+\end_layout
+
 \begin_layout Chapter
 Introduction to Compilation
 \end_layout
