@@ -620,6 +620,43 @@ Dependency groups
 \end_layout
 
 \begin_layout Standard
+Since modules can mutually depend on each other, there can be a cycle in
+ the dependencies between modules.
+\end_layout
+
+\begin_layout Standard
+If a module A and a module B depends on each other by importing functions
+ from the other module, one can not analyse one before the other, as the
+ imported functions will be missing.
+\end_layout
+
+\begin_layout Standard
+To solve this, one must analyse A and B together.
+\end_layout
+
+\begin_layout Standard
+More generally, one creates a dependency group for any set of modules that
+ creates a dependency cycle such as A depends on B, B depends on C, and
+ C depends on A.
+\end_layout
+
+\begin_layout Standard
+The dependency groups are the strongly connected components in the directed
+ graph of dependencies between single modules.
+\end_layout
+
+\begin_layout Standard
+After they have been computed, the resulting graph is a DAG (directed acyclic
+ graph) where nodes are dependency groups, and the edges are the dependencies
+ between the groups.
+\end_layout
+
+\begin_layout Standard
+As there are no cycles in the dependencies between the groups, it is possible
+ to traverse the groups in dependency order (a reverse topological ordering).
+\end_layout
+
+\begin_layout Standard
 The Haskell standard 
 \begin_inset CommandInset citation
 LatexCommand cite
@@ -632,18 +669,15 @@ key "haskell-report"
 \end_layout
 
 \begin_layout Standard
-The dependency groups are the SCC (strongly connected components) in a directed
- graph.
- After they have been computed, the resulting graph is a DAG (directed acyclic
- graph) where nodes are dependency groups, and the edges are the dependencies
- between the graphs describing the dependency order.
+This concept is used in two places of the compiler.
+ It is needed to describe sets of modules that depend on each other, sets
+ of top-level declarations that depend on each other (even between different
+ modules), and declarations in let/where expressions.
 \end_layout
 
 \begin_layout Standard
-This concept is used in two places of the compiler.
- It is needed to describe sets of modules that depend on each other and
- sets of declarations that depend on each other (even between different
- modules).
+<TODO: perhaps an image of a few modules as an example.
+ A->B->A, C->D->E->C, C->B, F->E, D->G.>
 \end_layout
 
 \begin_layout Chapter
@@ -1139,14 +1173,33 @@ Dependency groups
 \end_layout
 
 \begin_layout Standard
-The algorithm created for this is a implementation that can be used for
- all places in the compiler where dependency groups are needed.
- Given a graph, it merges the minimal amount of nodes to create a DAG.
+The implementation for handling dependency groups takes a set of entries,
+ where each entry provides a set of names, depends on a set of names, and
+ contains a set of items, such as modules or declarations.
+\end_layout
+
+\begin_layout Standard
+These entries will have to be created from the declarations or modules that
+ one will want to create dependency groups for.
+\end_layout
+
+\begin_layout Standard
+The entries are nodes in a graph where the minimal number of entries are
+ merged such that there are no longer any cycles in the graph.
+\end_layout
+
+\begin_layout Subsection
+Condensing the graph
+\end_layout
+
+\begin_layout Standard
+Given a directed graph representing the dependencies, it merges the minimal
+ amount of nodes to create a directed acyclic graph.
  This takes O(|E|+|V|) time.
 \end_layout
 
 \begin_layout Standard
-<TODO: pseudo code here>
+<TODO: pseudo code for condensing the graph?>
 \end_layout
 
 \begin_layout Standard
@@ -1154,30 +1207,16 @@ The algorithm created for this is a implementation that can be used for
 \end_layout
 
 \begin_layout Subsection
-Dependency order 
+Dependency order traversal
 \end_layout
 
 \begin_layout Standard
-The dependency order is a reverse topological ordering of the graph of dependenc
-y groups.
+Traversing the graph of the groups in dependency order.
 \end_layout
 
 \begin_layout Standard
-<TODO: image of a few modules as an example>
-\end_layout
-
-\begin_layout Subsection
-Dependency order traversal 
-\end_layout
-
-\begin_layout Standard
-The compiler needs to traverse the dependency groups in dependency order.
-\end_layout
-
-\begin_layout Standard
-The algorithm created for this computes the ordering lazily, similar to
- an iterator, but allows for concurrency by producing a set of nodes at
- each step.
+The algorithm computes the ordering lazily, similar to an iterator, but
+ allows for concurrency by producing a set of nodes at each step.
 \end_layout
 
 \begin_layout Standard
