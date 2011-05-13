@@ -1401,11 +1401,11 @@ Interface
 \begin_layout Standard
 An interface for using the compiler has been created.
  It uses Ymacs to allow a user to create modules and then load them in an
- interpreter.
+ interpreter that uses the compiler.
 \end_layout
 
 \begin_layout Standard
-<TODO: image of the interface>
+<TODO: image of the interface with two files and the interpreter open>
 \end_layout
 
 \begin_layout Subsection
