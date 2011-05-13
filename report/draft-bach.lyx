@@ -1145,29 +1145,6 @@ Implementation
 Introduction
 \end_layout
 
-\begin_layout Itemize
-Find, read and parse all modules: This part identifies the modules used,
- performs lexical analysis on them and parses them into an abstract representati
-on of the language, the Abstract Syntax Tree (AST).
- 
-\end_layout
-
-\begin_layout Itemize
-Type checking: This part consists of checking each module for type correctness,
- as well as inferring general types.
- This new inferred type information is added to the AST.
-\end_layout
-
-\begin_layout Itemize
-Simplification: Before compilation, the AST is simplified, reducing the
- number of different constructs used, to make for easier compilation.
-\end_layout
-
-\begin_layout Itemize
-Translation to target: The simplified AST is translated into the target
- language (JavaScript).
-\end_layout
-
 \begin_layout Section
 Interface
 \end_layout
@@ -1250,6 +1227,24 @@ The algorithm computes the ordering lazily, similar to an iterator, but
 
 \begin_layout Section
 Compiler front-end
+\end_layout
+
+\begin_layout Itemize
+Find, read and parse all modules: This part identifies the modules used,
+ performs lexical analysis on them and parses them into an abstract representati
+on of the language, the Abstract Syntax Tree (AST).
+ 
+\end_layout
+
+\begin_layout Itemize
+Type checking: This part consists of checking each module for type correctness,
+ as well as inferring general types.
+ This new inferred type information is added to the AST.
+\end_layout
+
+\begin_layout Itemize
+Simplification: Before compilation, the AST is simplified, reducing the
+ number of different constructs used, to make for easier compilation.
 \end_layout
 
 \begin_layout Subsection
@@ -1446,7 +1441,7 @@ Reduction of syntax tree
 \end_layout
 
 \begin_layout Standard
-Removes some constructs from the AST.
+This translates the AST to the intermediate representation.
 \end_layout
 
 \begin_layout Standard
@@ -1457,8 +1452,8 @@ The following constructs disappear as they are translated into other constructs:
 \end_layout
 
 \begin_layout Standard
-<TODO: make a nice table containing translations from one sentential form
- to another similar to the report>
+<TODO: make a table containing translations from one sentential form to
+ another similar to the report?>
 \end_layout
 
 \begin_layout Section
@@ -1466,7 +1461,8 @@ Compiler back-end
 \end_layout
 
 \begin_layout Standard
-Is given an AST using the intermediate representation.
+Takes an AST in the intermediate representation and translates into the
+ target language (JavaScript).
 \end_layout
 
 \begin_layout Subsection
