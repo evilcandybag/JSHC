@@ -1417,7 +1417,28 @@ Several modifications has been done to the default Ymacs environment.
 \end_layout
 
 \begin_layout Subsubsection
-The haskell mode
+Setting modes automatically
+\end_layout
+
+\begin_layout Standard
+Since no mode is automatically set for new buffers, the creation of a new
+ buffer has been modified so that it sets a mode for the buffer based upon
+ what the extension of the name of the buffer is.
+ This makes it possible to create a new buffer with a 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+.hs
+\end_layout
+
+\end_inset
+
+ extension, and the haskell mode will be set.
+\end_layout
+
+\begin_layout Subsubsection
+Haskell mode
 \end_layout
 
 \begin_layout Standard
@@ -1432,11 +1453,15 @@ C-x i
 
 \end_inset
 
-to start the interpreter.
+to show the interpreter.
+ If the interpreter is visible in a frame, the focus will be changed to
+ that buffer, otherwise the current frame is split show it.
+ There can only be a single interpreter buffer, so a new interpreter buffer
+ is only created if it does not exist.
 \end_layout
 
 \begin_layout Subsubsection
-The interpreter mode
+Interpreter mode
 \end_layout
 
 \begin_layout Standard
@@ -1485,6 +1510,15 @@ Error:
 \end_inset
 
  to make output easier to read.
+\end_layout
+
+\begin_layout Standard
+When an interpreter buffer is created, the buffer object itself is modified
+ to only allow deletions of characters and selections on the user input
+ on the last line, and insertion of text is modified so that text is always
+ added at the end of the buffer.
+ These changes are achieved by replacing existing functions on the buffer
+ with new functions that calls the old ones when appropriate.
 \end_layout
 
 \begin_layout Subsection
