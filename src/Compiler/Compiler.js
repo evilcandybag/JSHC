@@ -116,7 +116,7 @@ JSHC.Compiler.prototype.recompile = function(){
     mods = this.syncLoad(names);
 
     // start with empty set of checked modules
-    var prev_modules = modules;
+    var prev_modules = this.modules;
     this.modules = {};
 
     this.errors = 0;   // clear old errors
@@ -129,24 +129,8 @@ JSHC.Compiler.prototype.recompile = function(){
     for(k in mods){ // mods : map
 	mod = mods[k];
 	if( mod.status === "success" ){
-	
-	    // if already loaded, and nothing has changed, then keep the old
-	    // module.
-	    if( mod === prev_modules[k] ){
-                compiler.onMessage("not reloading "+mod.name);
-	        this.modules[k] === prev_modules[k];
-	    }
-
-	    // compute/check top-level namespace and add it to AST body.
-	JSHC.addToplevelNamespace.call(this, mod.ast);
-        
-        // calculate operator precendencies and convert to ordinary function calls
-        
-        
-	    // produce an entry in the dependency graph
-	entries.push(new JSHC.Dep.Entry([mod],[mod.ast.modid.id],mod.deps()));
-	
-	    //document.write("success: "+mod.ast.modid.id+"<br>");
+	    // produce an entry for the dependency graph
+	    entries.push(new JSHC.Dep.Entry([mod],[mod.ast.modid.id],mod.deps()));
 	} else if( mod.status === "failure" ){
 	    this.onError("Failed to parse "+mod.name+": "+mod.err);
 	} else if( mod.status === "missing" ){
@@ -160,9 +144,41 @@ JSHC.Compiler.prototype.recompile = function(){
         return;
     }
 
-    //traverse the graph in dependency order, and for each module group:
+    // traverse the graph in dependency order, and for each module group:
     var compiler = this;
     var module_group_action = function(group){
+        // re-check all modules if not all have already been compiled
+        var all_compiled = true;
+        for(var ix=0 ; ix<group.values.length ; ix++){
+            var mod = group.values[ix];
+            if( prev_modules[mod.ast.modid.id] !== mod ){
+                all_compiled = false;
+            }
+        }
+
+        // check if already done
+        if( all_compiled ){
+            for(var ix=0 ; ix<group.values.length ; ix++){
+                var mod = group.values[ix];
+                compiler.modules[mod.ast.modid] = mod;
+            }
+            return;
+        }
+
+        // re-parse the modules that have not changed, so that they can be
+        // checked again, but together with the new or modified modules.
+        for(var ix=0 ; ix<group.values.length ; ix++){
+            var mod = group.values[ix];
+            if( prev_modules[mod.ast.modid.id] === mod ){
+                // re-parse to get new AST
+                group.values[k] = JSHC.Load.Module.done(
+                    mod.name, mod.contents, mod.source, mod.date);
+            }
+
+            // compute/check top-level namespace and add it to AST body.
+            JSHC.addToplevelNamespace.call(this, mod.ast);
+        }
+
         compiler.onMessage("checking group "+group);
 
         // export check hack to solve cycles
