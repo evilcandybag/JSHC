@@ -195,35 +195,25 @@ JSHC.Compiler.prototype.recompile = function(){
             }
         }
 
-        // name check: qualify imported names
+        // run name check on each module
         for (var i = 0; i < group.values.length; i++) {
             var module = group.values[i];
 
             compiler.onMessage("checking "+module.ast.modid);
             JSHC.Check.nameCheck(compiler, module.ast);
-            JSHC.Fixity.fixityResolution(module.ast);
         }
 
-        // errors in the name check represents reasons for the fixity and type
-        // checking to not be done (would otherwise be warnings).
-        // e.g missing or ambiguous names can be warnings.
-        // e.g anything that causes there to not be an espace must be an error.
         if( compiler.errors.length > 0 ){
             return;
         }
-        
-        // adding all modules in the group to the list of checked modules since
-        // the espaces are now valid and can be used by other modules within
-        // the same group.
-        for (var i = 0; i < group.values.length; i++) {
-            var m = group.values[i];
-            compiler.modules[m.name] = m;
-        }
-        
-        // TODO: fixity resolution should be here
 
-        // TODO: can fixity produce errors?
-        //       e.g treat precedence problems as warnings
+        // run fixity resolution on each module
+        for (var i = 0; i < group.values.length; i++) {
+            var module = group.values[i];
+
+            JSHC.Fixity.fixityResolution(module.ast);
+        }
+
         if( compiler.errors.length > 0 ){
             return;
         }
@@ -232,11 +222,17 @@ JSHC.Compiler.prototype.recompile = function(){
         var asts = [];
         group.values.forEach(function(mod){asts.push(mod.ast);});
         JSHC.Check.typeCheck(compiler,asts);
+
+        // add all the modules in the group to the set of checked modules
+        for (var i = 0; i < group.values.length; i++) {
+            var m = group.values[i];
+            compiler.modules[m.name] = m;
+        }
     };
 
     JSHC.Dep.check(entries,module_group_action);
 
-    // TODO: skip code generation if errors have occured ?
+    // skip code generation if errors have occured
     if( this.errors.length > 0 ){
         return;
     }
