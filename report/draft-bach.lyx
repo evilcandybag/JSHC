@@ -37,7 +37,7 @@ logicalmkup
 \pdf_bookmarksopenlevel 1
 \pdf_breaklinks false
 \pdf_pdfborder false
-\pdf_colorlinks true
+\pdf_colorlinks false
 \pdf_backref false
 \pdf_pdfusetitle true
 \papersize default
@@ -1772,25 +1772,26 @@ Lexical analysis
 
 \begin_layout Standard
 The lexical analysis in JSHC is performed in several steps.
+ <TODO: a good way to init this section?>
+\end_layout
+
+\begin_layout Standard
+While lexical analysis is often done by having the parser request a token
+ from the lexical analyser, match that token against a rule, request another
+ and so on
+\begin_inset CommandInset citation
+LatexCommand cite
+key "dragon-book3.1"
+
+\end_inset
+
+, the layout-dependent syntax of Haskell requires a different approach.
  First, the input (i.e.
- the Haskell source code) is parsed into tokens.
- This is done by using a parser built using a JavaScript implementation
- of Parsing Expression Grammar 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "parsing-expression-grammars"
-
-\end_inset
-
-, PEG.js 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "peg-js"
-
-\end_inset
-
- that was fed a translation (into PEG.js-readable form) of the lexical program
- structure described in 
+ the Haskell source code, including whitespace and comments) is parsed into
+ an array of tokens in one go.
+ This is done by using a parser built using PEG.js that was fed a translation
+ (into PEG.js-readable form) of the lexical program structure described in
+ 
 \begin_inset CommandInset citation
 LatexCommand cite
 key "haskell-report2.2"
@@ -1798,24 +1799,323 @@ key "haskell-report2.2"
 \end_inset
 
 .
- The generated list of tokens is then run through a custom-built set of
- functions, designed to calculate and annotate the tokens with position
- information (i.e.
- location in the source code), remove whitespace (i.e.
- characters that only serve to define the position of, and separate, other
- characters, such as spaces, tabs, newlines or comments), and annotate the
- token list with indentation and context information for use in the final
- pass of the lexical analysis.
- This last pass is where the layout-dependent syntax of Haskell 
+ Second, the generated array of tokens is run through a function that adds
+ indentation information to the array in the form of special indentation
+ tokens, and annotates tokens with position information.
+ Whitespace and comments are discarded as they are no longer needed for
+ position information.
+ Lastly, this array is fed into an object which interfaces with the parser
+ according to the Jison/Bison style API
 \begin_inset CommandInset citation
 LatexCommand cite
-key "haskell-report10.3"
+key "dragon-book3.1"
 
 \end_inset
 
-, is converted into a context-free syntax, which is required for the parsing
- step.
+, using the indentation information to generate tokens to convert Haskell's
+ layout-dependent syntax into a context-free one.
  
+\end_layout
+
+\begin_layout Standard
+As an example, the code: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+f = let
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+x = 1
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+y = 2
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+in x + y
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+generates, after the first and second stages this array of tokens (token
+ representation rewritten for readability):
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[{1},ID,
+\begin_inset Quotes erd
+\end_inset
+
+=
+\begin_inset Quotes erd
+\end_inset
+
+,
+\begin_inset Quotes erd
+\end_inset
+
+let
+\begin_inset Quotes erd
+\end_inset
+
+,{3},ID,
+\begin_inset Quotes erd
+\end_inset
+
+=
+\begin_inset Quotes erd
+\end_inset
+
+,INT,<3>,ID,
+\begin_inset Quotes erd
+\end_inset
+
+=
+\begin_inset Quotes erd
+\end_inset
+
+,INT,<3>,
+\begin_inset Quotes erd
+\end_inset
+
+in
+\begin_inset Quotes erd
+\end_inset
+
+,ID,OP,ID]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where the tokens 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+{n}
+\end_layout
+
+\end_inset
+
+ designate the start of a block after a newline and 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+<n>
+\end_layout
+
+\end_inset
+
+ representing a newline where a new block should not begin.
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+ represents the starting column of the first token on the new line.
+ Given this array as input, the last stage of the lexer will deliver to
+ the parser tokens representing a context-free version of the code which,
+ converted back into Haskell source code, would look like this:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+{f = let {x = 1;y = 2} in x + y}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection
@@ -1831,10 +2131,10 @@ key "jison"
 
 \end_inset
 
-<TODO: more about the parser, JISON> The parser and the last step of the
- lexical analysis work in concert, meaning that the lexical analyser does
- not process and return all tokens in one go, but only sends the parser
- tokens when asked to.
+.
+ The parser and the last step of the lexical analysis work in concert, meaning
+ that the lexical analyser does not process and return all tokens in one
+ go, but only sends the parser tokens when asked to.
  To handle certain features of the layout dependent syntax of Haskell, that
  cannot be handled by the lexical analyser alone, the parser will inform
  the lexical analyser of any such parse errors, so that the lexer can react
