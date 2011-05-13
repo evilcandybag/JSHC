@@ -1398,12 +1398,93 @@ Introduction
 Interface
 \end_layout
 
+\begin_layout Standard
+An interface for using the compiler has been created.
+ It uses Ymacs to allow a user to create modules and then load them in an
+ interpreter.
+\end_layout
+
+\begin_layout Standard
+<TODO: image of the interface>
+\end_layout
+
 \begin_layout Subsection
 Ymacs
 \end_layout
 
 \begin_layout Standard
-<TODO: describe the changes to the standard Ymacs environment>
+Several modifications has been done to the default Ymacs environment.
+\end_layout
+
+\begin_layout Subsubsection
+The haskell mode
+\end_layout
+
+\begin_layout Standard
+A haskell mode for buffers containing haskell code.
+ It currently only contains the command 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+C-x i
+\end_layout
+
+\end_inset
+
+to start the interpreter.
+\end_layout
+
+\begin_layout Subsubsection
+The interpreter mode
+\end_layout
+
+\begin_layout Standard
+To modify an ordinary buffer into a terminal, the 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+ENTER
+\end_layout
+
+\end_inset
+
+ key is a Ymacs command that will read the last line of the buffer send
+ the command on the line to the interpreter.
+ The 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+TAB
+\end_layout
+
+\end_inset
+
+ key is a Ymacs command that sends the command on the last line to the interpret
+er, and the buffer is modified depending on if there is none, one, or many
+ matches.
+\end_layout
+
+\begin_layout Standard
+The highlighting for the buffer is coloring lines beginning with 
+\begin_inset Quotes eld
+\end_inset
+
+Error: 
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+> 
+\begin_inset Quotes eld
+\end_inset
+
+ to make output easier to read.
 \end_layout
 
 \begin_layout Subsection

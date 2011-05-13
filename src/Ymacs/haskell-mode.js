@@ -25,7 +25,9 @@ Ymacs_Tokenizer.define("haskell", function(stream, tok) {
         };
 
         function next() {
-	    // TODO: color keywords, etc..
+	    // TODO:
+	    // color keywords, etc..
+	    // need to keep track of beginning and end of comments and strings.
 	    stream.checkStop();
 	    tok.onToken(stream.line, stream.col, ++stream.col, null);
         };

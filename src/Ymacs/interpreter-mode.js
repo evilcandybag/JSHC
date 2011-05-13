@@ -35,7 +35,6 @@ Ymacs_Tokenizer.define("JSHC_IB", function(stream, tok) {
 	    if (stream.col == 0 && (tmp = stream.lookingAt(JSHC.Ymacs.interpreterPrompt))) {
 		// color command prompt
 		foundToken(0, stream.col = stream.lineLength(), "keyword");
-
 	    } else if (stream.col == 0 && (tmp = stream.lookingAt("Error: "))){
 		// color error messages
 		foundToken(0, stream.col = stream.lineLength(), "error");
