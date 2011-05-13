@@ -37,7 +37,7 @@ logicalmkup
 \pdf_bookmarksopenlevel 1
 \pdf_breaklinks false
 \pdf_pdfborder false
-\pdf_colorlinks false
+\pdf_colorlinks true
 \pdf_backref false
 \pdf_pdfusetitle true
 \papersize default
@@ -1484,6 +1484,25 @@ key "state-of-haskell"
 
 .
  
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The Ymacs interface consists of a window with one or more buffers for entering
+ text.
+ <TODO: structure of Ymacs>
 \end_layout
 
 \begin_layout Section
