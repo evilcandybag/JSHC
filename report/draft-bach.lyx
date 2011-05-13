@@ -1811,64 +1811,61 @@ Checking dependency groups of modules
 \end_layout
 
 \begin_layout Standard
-The following steps are taken for each group of modules.
+The following steps are taken for each group of modules, which are checked
+ in dependency order.
 \end_layout
 
 \begin_layout Itemize
-Computing the export space of each module
+Export check: Computes the export space of each module
 \end_layout
 
 \begin_layout Itemize
-
+Name check: Checks if names are in scope, and qualifies names referring
+ to top-level declarations
 \end_layout
 
-\begin_layout Standard
-Each module in the group
+\begin_layout Itemize
+Fixity resolution: Replace all lists of infix applications with operator
+ application
 \end_layout
 
-\begin_layout Standard
-The module dependency groups are checked in dependency order.
- It is necessary to be done in dependency order as the imports are needed
- to know the complete set of available identifiers (and the type/kind) and
- fixity declarations of operators.
-\end_layout
-
-\begin_layout Standard
-<TODO: include pseudo-code to describe the steps using the algorithms described
- below>
+\begin_layout Itemize
+Type check: Compute types and kinds
 \end_layout
 
 \begin_layout Subsubsection
-Adjusting expressions using operators
+Export check
+\end_layout
+
+\begin_layout Standard
+The implementation gives an error if modules in the same group have a list
+ of exports, as this is currently not supported.
+ If the modules do not have a list of exports, all top-level declarations
+ are exported, which is easy to handle, and is only what is currently supported.
+ If there is only a single module in a group, then the export list may exist
+ and the exported names are resolved by looking at all top-level declarations
+ and imports.
+\end_layout
+
+\begin_layout Subsubsection
+Name check
+\end_layout
+
+\begin_layout Standard
+This is applied separately on each module in a group.
+\end_layout
+
+\begin_layout Subsubsection
+Fixity Resolution
+\end_layout
+
+\begin_layout Standard
+Applied separately on each module in a group.
 \end_layout
 
 \begin_layout Standard
 Given the available operators and their precedences, adjusts the expressions
- in all function/operator/instance declarations so that they use the declared
- precedence.
-\end_layout
-
-\begin_layout Subsubsection
-Kind checking
-\end_layout
-
-\begin_layout Standard
-Checks type/data/newtype/class top-level declarations in dependency group
- order.
-\end_layout
-
-\begin_layout Standard
-It is necessary to use dependency groups and check in dependency group order
- to give the correct kind.
- 
-\end_layout
-
-\begin_layout Standard
-<TODO: give a good example or refer to one in the haskell report>
-\end_layout
-
-\begin_layout Standard
-Checks for missing identifiers (type variables, types), infer kind.
+ in all function and operator so that they use the declared precedence.
 \end_layout
 
 \begin_layout Subsubsection
