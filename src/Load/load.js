@@ -65,11 +65,15 @@ JSHC.Load.syncLoadName = function(fileSystem, urls, prev){
 
     // try to find the module name in the file system
     if( fileSystem[modName] !== undefined ){
-	return JSHC.Load.Module.done({
+	if( prev.contents == fileSystem[modName] ){
+	    return prev;
+	} else {
+	    return JSHC.Load.Module.done({
 		name: modName,
 		contents: fileSystem[modName],
 		source: modName,
 		date: null});
+	}
     }
 
     // iterate over the search path with URL prefixes.
@@ -99,11 +103,15 @@ JSHC.Load.syncLoadName = function(fileSystem, urls, prev){
 
 	// check if using FILE protocol
 	if( prefix.substring(0,7) === "file://" ){
-	    return JSHC.Load.Module.done({
+	    if( prev.contents == req.responseText ){
+	        return prev;
+	    } else {
+	        return JSHC.Load.Module.done({
 		    name: modName,
 		    contents: req.responseText,
 		    source: url,
 		    date: date});
+	    }
 	}
 
 	// handling HTTP response
@@ -120,7 +128,7 @@ JSHC.Load.syncLoadName = function(fileSystem, urls, prev){
 	continue; // try next source
 	
 	case 304: // not modified
-	assert.ok( prev.status === "success" || prev.status === "failure", "HTML response of not modified must mean that the module has previously beed found" );
+	assert.ok( prev.status === "success" || prev.status === "failure", "HTML response of not modified must mean that the module has previously been found" );
 	return prev;
 
 	case 404: // not found

@@ -1737,7 +1737,7 @@ The loading begins with the module names of a set of modules to load, and
  are more missing modules or parse errors.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Lexical analysis
 \end_layout
 
@@ -1789,7 +1789,7 @@ key "haskell-report10.3"
  
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Parsing
 \end_layout
 
@@ -1836,7 +1836,23 @@ key "haskell-report10.3"
 \end_layout
 
 \begin_layout Subsection
-Checking modules
+Checking dependency groups of modules
+\end_layout
+
+\begin_layout Standard
+The following steps are taken for each group of modules.
+\end_layout
+
+\begin_layout Itemize
+Computing the export space of each module
+\end_layout
+
+\begin_layout Itemize
+
+\end_layout
+
+\begin_layout Standard
+Each module in the group
 \end_layout
 
 \begin_layout Standard
