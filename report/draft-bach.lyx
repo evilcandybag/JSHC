@@ -2635,6 +2635,30 @@ Takes a Javascript expression and evaluates it.
 Prints the URLs which will be used when loading Haskell modules.
 \end_layout
 
+\begin_layout Plain Layout
+The default paths are 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+hslib/
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+hsusr/
+\end_layout
+
+\end_inset
+
+ from the root of the source distribution.
+\end_layout
+
 \end_inset
 </cell>
 </row>
@@ -4306,11 +4330,232 @@ Discussion
 \end_layout
 
 \begin_layout Section
+Implementation details
+\end_layout
+
+\begin_layout Subsection
+Export checking
+\end_layout
+
+\begin_layout Standard
+It is unclear to us what is the best way of computing the set of exported
+ names within dependency groups of modules.
+\end_layout
+
+\begin_layout Standard
+Resolving exports is complicated.
+ The haskell report only explains the syntax and semantics of export lists.
+\end_layout
+
+\begin_layout Standard
+Example of a missing name:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+module A ( x ) where
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+import B
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+module B ( x ) where
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+import C
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+module C ( x ) where
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+import A
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Names could also be ambiguous.
+\end_layout
+
+\begin_layout Subsection
+Dependency checking
+\end_layout
+
+\begin_layout Standard
+The dependency checking was not expected.
+ It is something which one does not see as a Haskell user.
+ It is not needed in many other languages as they do not have cyclic dependencie
+s between language constructs together with a lack of specification.
+ It is this combination that causes the groups that need to be analysed
+ together instead of simple using an export specification of a module or
+ a declared type of a function.
+\end_layout
+
+\begin_layout Section
 Design choices
 \end_layout
 
 \begin_layout Section
 Future work on JSHC
+\end_layout
+
+\begin_layout Subsection
+Loading files asyncronuously
+\end_layout
+
+\begin_layout Standard
+This is not difficult, but since only local files or files on the same domain
+ may be accessed, there does not appear to be a reason to implement this.
+\end_layout
+
+\begin_layout Subsection
+Pretty printer
+\end_layout
+
+\begin_layout Standard
+To give good error messages related to expressions within functions, a pretty
+ printer is required.
+ Currently, only the abstract syntax tree is available.
+\end_layout
+
+\begin_layout Subsection
+Concurrency
+\end_layout
+
+\begin_layout Standard
+The dependency group traversal could run concurrently, as the implemented
+ algorithm allow for taking out many groups which do not depend on each
+ other.
+ Even though extensions for concurrency exists, speed is not important in
+ the compiler in it
+\begin_inset Quotes ers
+\end_inset
+
+s current state.
+\end_layout
+
+\begin_layout Subsection
+FFI: Foreign Function Interface
+\end_layout
+
+\begin_layout Standard
+Adding an FFI to Javascript code would simplify the writing of thePprelude,
+ as primitive operations such as addition could be described using foreign
+ imports instead of a name with a special prefix for which the type would
+ be stored in the type checker when looking up the name instead of the type
+ being written in a foreign function declaration.
+\end_layout
+
+\begin_layout Standard
+More importantly, it will also allow writing Haskell libraries that wrap
+ Javascript APIs.
+\end_layout
+
+\begin_layout Subsection
+Type classes
+\end_layout
+
+\begin_layout Subsection
+Highlighting in the Haskell mode
+\end_layout
+
+\begin_layout Section
+Issues
+\end_layout
+
+\begin_layout Subsection
+The Haskell grammar
+\end_layout
+
+\begin_layout Standard
+The grammar in the Haskell report is at least an LR(2) grammar as it requires
+ a lookahead of 2 when reading topdeclarations, and it has conflicts as
+ an LALR grammar.
+ This means that it must be rewritten for a LALR(1) parser generator such
+ as Jison.
+ The grammar is also ambiguous <TODO: for example something related to an
+ empty file?>.
+ We do not think the grammar should be ambiguous, as it makes it less clear
+ and also harder to implement a parser for.
+\end_layout
+
+\begin_layout Standard
+The conflict messages in Jison (and also Bison) are not easy to understand.
+ Better explanations of conflicts in these tools is certainly possible.
+\end_layout
+
+\begin_layout Subsection
+Bugs
+\end_layout
+
+\begin_layout Subsection
+Interpreter: accessing URLs
+\end_layout
+
+\begin_layout Standard
+The idea was that the interpreter should support adding paths.
+ Unfortunately, the most common browsers prevent getting files from domains
+ other than the one that the script is executed on.
+ If using chrome/chromium, the security policy even prevents accessing local
+ files using the file:// protocol when running scripts from local files,
+ so the Ymacs interface must be placed on a webserver to work for browsers
+ with such a restriction.
 \end_layout
 
 \begin_layout Standard
