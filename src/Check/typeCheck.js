@@ -274,7 +274,12 @@ JSHC.Check.checkTopdecl = function(comp,ctx,ast){
 
   // skip fixity and type signature declarations
   // TODO: should have been removed by the name checker.
-  case "fixity": case "type-signature":
+  case "fixity":
+      break;
+      
+  case "type-signature":
+      //var kind = JSHC.Check.checkType(comp,ctx,ast.sig);
+      //ctx.constrainValue(ast.sig, kind, JSHC.Check.StarKind);
       break;
 
   case "topdecl-data": // .constrs
@@ -301,7 +306,7 @@ JSHC.Check.checkTopdecl = function(comp,ctx,ast){
              for(var ty_ix=0 ; ty_ix<constr.types.length ; ty_ix++){
                  var ty = constr.types[ty_ix];
                  var kind = JSHC.Check.checkType(comp,ctx,ty);
-                 ctx.constrainValue(ty, kind,JSHC.Check.StarKind);
+                 ctx.constrainValue(ty, kind, JSHC.Check.StarKind);
              }
          }
 
@@ -373,7 +378,14 @@ JSHC.Check.checkType = function(comp,ctx,ast){
     case "tycon": case "tyvar":
         // lookup kind of tycon/kivar and return it
         return ctx.lookupKind(comp,ast);
-    
+
+    case "funtype":
+        var ret_type = ast.types[ast.types.length-1];
+        for(var ix=ast.types.length-2 ; ix>0 ; ix--){
+            var ret_type = new JSHC.FunType([ast.types[ix],ret_type]);
+        }
+        return ret_type;
+
     case "apptype":
         var lhs_kind = JSHC.Check.checkType(comp,ctx,ast.lhs);
         var rhs_kind = JSHC.Check.checkType(comp,ctx,ast.rhs);
