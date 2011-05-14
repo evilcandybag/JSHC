@@ -575,6 +575,19 @@ This concept is used in two places of the compiler.
 \begin_layout Standard
 The concept of dependency groups also applies to local definitions, for
  example, in the function:
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+nopagebreak
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -778,8 +791,50 @@ where
 \end_layout
 
 \begin_layout Standard
-<TODO: perhaps an image of a few modules as an example.
- A->B->A, C->D->E->C, C->B, F->E, D->G.>
+\begin_inset Float figure
+placement h
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Graphics
+	filename Dependency groups.png
+	lyxscale 15
+	width 10cm
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+<TODO: smart and super cool text about dependency groups>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -1760,14 +1815,25 @@ abstract syntax tree
 
 \begin_layout Standard
 \begin_inset Float figure
+placement h
 wide false
 sideways false
 status open
 
 \begin_layout Plain Layout
+\begin_inset space \hfill{}
+\end_inset
+
+
 \begin_inset Graphics
 	filename adsgadgs.png
+	lyxscale 50
+	width 14cm
 
+\end_inset
+
+
+\begin_inset space \hfill{}
 \end_inset
 
 
