@@ -24,6 +24,7 @@ JSHC.FunType.prototype.toString = function(){
     m.push(")");
     return m.join("");
 };
+JSHC.FunType.prototype.toStringQ = JSHC.FunType.prototype.toString;
 
 /*
   application type
@@ -41,6 +42,7 @@ JSHC.AppType = function(fun,arg,pos){
 JSHC.AppType.prototype.toString = function(){
     return "("+this.lhs+" "+this.rhs+")";
 };
+JSHC.AppType.prototype.toStringQ = JSHC.AppType.prototype.toString;
 
 /*
   forall type
@@ -68,5 +70,6 @@ JSHC.ForallType.prototype.toString = function(){
     m.push(this.type.toString());
     return m.join("");
 };
+JSHC.ForallType.prototype.toStringQ = JSHC.ForallType.prototype.toString;
 
 ////////////////////////////////////////////////////////////////////////////////

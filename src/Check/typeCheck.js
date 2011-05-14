@@ -856,6 +856,9 @@ JSHC.Check.Ctx.prototype.constrain = function(type1,type2){
     assert.ok( type2 !== undefined );
     // can get two arbitrary types. simplify as needed.
 
+    //if( !(type2.toStringQ instanceof Function) )
+    //    JSHC.alert(type1,type2);
+
     if( type1 instanceof JSHC.TyVar ){
 	if( type2 instanceof JSHC.TyVar && type1.id == type2.id ){
 	    return; // nothing to add as constraint does nothing
@@ -1393,12 +1396,12 @@ JSHC.Check.kindify = function(type){
     return replace(type);
 };
 
-JSHC.Check.StarKind = {
-    name: "starkind",
-    toString: function(){
-        return "*";
-    }
+JSHC.Check.StarKind = new JSHC.Name();
+JSHC.Check.StarKind.name = "starkind";
+JSHC.Check.StarKind.toString = function(){
+    return "*";
 };
+JSHC.Check.StarKind.toStringQ = JSHC.Check.StarKind.toString;
 
 ////////////////////////////////////////////////////////////////////////////////
 
