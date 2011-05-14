@@ -2199,6 +2199,13 @@ This is applied separately on each module in a group.
 
 \begin_layout Subsubsection
 Fixity Resolution
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Fixity-Resolution"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -3165,6 +3172,48 @@ y -> x + y
 \end_inset
 
 
+\end_layout
+
+\begin_layout Subsubsection
+List expressions
+\end_layout
+
+\begin_layout Standard
+List expressions are converted into applications of the list datatype, so
+ that the list 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[1,2,3]
+\end_layout
+
+\end_inset
+
+ is converted into 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+((:) 1 ((:) 2 ((:) 3 [])))
+\end_layout
+
+\end_inset
+
+.
+ Note that the cons operator is written in prefix notation, as an ordinary
+ data constructor, instead of as an infix constructor, as is normally done
+ when writing source code.
+ This is because at this stage operator applications have already been removed
+ from the language by the fixity resolution algorithm described in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Fixity-Resolution"
+
+\end_inset
+
+.
+ 
 \end_layout
 
 \begin_layout Section
