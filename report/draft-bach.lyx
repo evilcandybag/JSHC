@@ -725,24 +725,559 @@ Types
 All values in haskell have a type.
 \end_layout
 
+\begin_layout Standard
+The type 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Int -> Int
+\end_layout
+
+\end_inset
+
+ represents a function which takes a value of type 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Int
+\end_layout
+
+\end_inset
+
+ and produces a result of type 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Int
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+To be able to write a function that takes values that may be of more than
+ one type, one uses 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+type variables
+\end_layout
+
+\end_inset
+
+, which are written with lower-case letters.
+\end_layout
+
+\begin_layout Standard
+A function 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+id :: a -> a
+\end_layout
+
+\end_inset
+
+ (where
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+::
+\end_layout
+
+\end_inset
+
+is read as 
+\begin_inset Quotes eld
+\end_inset
+
+has type
+\begin_inset Quotes erd
+\end_inset
+
+) is therefore a function that takes a value of any type and produces a
+ result of the same type.
+\end_layout
+
+\begin_layout Standard
+This is called a 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+polymorphic type
+\end_layout
+
+\end_inset
+
+, as 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+id
+\end_layout
+
+\end_inset
+
+ can have a different type depending on how it is used, as the type variable
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+a
+\end_layout
+
+\end_inset
+
+ can be replaced with different types.
+\end_layout
+
+\begin_layout Standard
+Types can have 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+type parameters
+\end_layout
+
+\end_inset
+
+, which is necessary for collections if one wants to be able to use them
+ where all values have the same type, but be able to choose that type.
+\end_layout
+
+\begin_layout Standard
+A list of integers is written 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[Int]
+\end_layout
+
+\end_inset
+
+, and a function that computes the length of a list as an 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Int
+\end_layout
+
+\end_inset
+
+ would have type 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[a] -> Int
+\end_layout
+
+\end_inset
+
+ as it would work regardless of the type of the values in the list.
+ Note however that all the values must have the same type.
+\end_layout
+
+\begin_layout Standard
+The list type is built-in.
+ More generally, a type can be applied to any number of types as in 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Array Int Double
+\end_layout
+
+\end_inset
+
+ , which is an Array with indices of type 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Int
+\end_layout
+
+\end_inset
+
+ and stores values of type 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Double
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Subsection
-Polymorphic types
+Quantification of types
 \end_layout
 
 \begin_layout Standard
-All types are rank-1 polymorphic types, which means that the type given
- to a value begins with a quantification of all the type variables that
- occur in it, followed by the rest of the type.
- <TODO: is it reasonable to assume that the reader knows what a type variable
- is?>
+Type variables, just as ordinary variables must be declared and used variables
+ must be in scope of a declaration.
 \end_layout
 
 \begin_layout Standard
-This means that the type of (:) which is "a -> [a] -> [a]" is actually "
-\backslash
-u2200a.
- a -> [a] -> [a]", but the forall quantification is not written out as it
- is implied.
+The declaration of variables is called 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+quantification
+\end_layout
+
+\end_inset
+
+.
+ A variable that is not declared is 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+free
+\end_layout
+
+\end_inset
+
+, and a variable that is declared is 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+bound
+\end_layout
+
+\end_inset
+
+ (by the quantification).
+\end_layout
+
+\begin_layout Standard
+When writing a type signature in haskell, the quantification is implicit.
+\end_layout
+
+\begin_layout Standard
+This means that a type signature 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[a] -> [a]
+\end_layout
+
+\end_inset
+
+ is actually 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+∀a.
+ [a] -> [a]
+\end_layout
+
+\end_inset
+
+, where 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+∀
+\end_layout
+
+\end_inset
+
+ binds the type variable 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+a
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The implicit quantification of type signatures binds all type variables
+ in the signature.
+\end_layout
+
+\begin_layout Standard
+All type signatures written in a program and inferred by the compiler are
+ 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+rank-1 polymorphic types
+\end_layout
+
+\end_inset
+
+, which means that the type given to a value begins with a quantification
+ of all the type variables that occur in it, followed by the rest of the
+ type which does not contain any quantifications.
+ This makes the type system simpler.
+\end_layout
+
+\begin_layout Subsection
+Type declarations
+\end_layout
+
+\begin_layout Standard
+New types can be created.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+data Tree a = Leaf | Node a (Tree a) (Tree a)
+\end_layout
+
+\end_inset
+
+ declares a 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+type constructor
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Tree
+\end_layout
+
+\end_inset
+
+ which can be applied to any type that one wants the values in the tree
+ to have.
+ It also declares the 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+data constructor
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Leaf
+\end_layout
+
+\end_inset
+
+ which represents an empty tree, and the data constructor 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Node
+\end_layout
+
+\end_inset
+
+ which is used to construct a new tree given a value to store in the root
+ node of the tree, and the left and right sub-tree.
+\end_layout
+
+\begin_layout Standard
+The built-in lists have the special type constructor 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[]
+\end_layout
+
+\end_inset
+
+, and the data constructors 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[] :: ∀a.
+ [a]
+\end_layout
+
+\end_inset
+
+ (the empty list) and 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+(:) :: ∀a.
+ a -> [a] -> [a]
+\end_layout
+
+\end_inset
+
+ (creating a new list given a first element and the rest of the elements).
+\end_layout
+
+\begin_layout Subsection
+Kinds
+\end_layout
+
+\begin_layout Standard
+The function type 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Tree -> Tree
+\end_layout
+
+\end_inset
+
+ is invalid as the type 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Tree
+\end_layout
+
+\end_inset
+
+ has a type parameter.
+\end_layout
+
+\begin_layout Standard
+To detect these errors, all types and type constructors have a 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+kind
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The kind of all types is 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+*
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+A function type is valid if both the argument and result type have kind
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+*
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The kind of the type constructors 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Tree
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[]
+\end_layout
+
+\end_inset
+
+ is 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+* -> *
+\end_layout
+
+\end_inset
+
+, which means that they take a type and produce a type.
+ They must therefore be applied to a type which is not missing any arguments
+ (i.e have kind 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+*
+\end_layout
+
+\end_inset
+
+), and will result in a type of kind 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+*
+\end_layout
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
@@ -765,8 +1300,23 @@ status collapsed
 \end_layout
 
 \begin_layout Standard
-This is achieved by replacing the bound type variable with new type variables
- wherever it is used.
+This is achieved by replacing all bound type variables in the type with
+ new type variables wherever it is used.
+\end_layout
+
+\begin_layout Standard
+These type variables are now free, but will be bound after the type of the
+ expression that used the ...and will either be eliminated in the 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+type inference
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -833,6 +1383,39 @@ x :: Int
 \end_layout
 
 \begin_layout Standard
+where 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+a
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+b
+\end_layout
+
+\end_inset
+
+ are free type variables.
+\end_layout
+
+\begin_layout Standard
+To replace the type variables with types, one uses type inference which
+ creates type constraint based upon how
+\end_layout
+
+\begin_layout Standard
+the types are used.
+\end_layout
+
+\begin_layout Standard
 Since 
 \begin_inset Flex CharStyle:Code
 status collapsed
@@ -853,7 +1436,7 @@ status collapsed
 
 \end_inset
 
-, 
+, the constraint 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
@@ -863,7 +1446,7 @@ a = Int
 
 \end_inset
 
-.
+ is created.
 \end_layout
 
 \begin_layout Standard
@@ -887,7 +1470,7 @@ status collapsed
 
 \end_inset
 
-, 
+, the constraint 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
@@ -897,7 +1480,7 @@ status collapsed
 
 \end_inset
 
-, which implies 
+ is created, which gives the constraint 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
@@ -911,7 +1494,30 @@ a = b
 \end_layout
 
 \begin_layout Standard
-The inferred types are:
+The type inference algorithm must assign a single type to each of the free
+ type variables such that all the constraints are satisified.
+\end_layout
+
+\begin_layout Standard
+If there is more than one possible assignment, then the type is called ambiguous
+, and is an error, unless a default
+\begin_inset CommandInset citation
+LatexCommand cite
+key "haskell-report4.3.4"
+
+\end_inset
+
+ type can be chosen.
+\end_layout
+
+\begin_layout Standard
+If there is no possible assignment, then an error will arise from the constraint
+s.
+\end_layout
+
+\begin_layout Standard
+In this case, there is only a single possible assignment, and the inferred
+ types are:
 \end_layout
 
 \begin_layout Itemize
@@ -927,7 +1533,7 @@ y :: [Int]
 \end_layout
 
 \begin_layout Standard
-<TODO: Example using function application/abstraction ?>
+<TODO: Example using function application and abstraction ?>
 \end_layout
 
 \begin_layout Chapter
