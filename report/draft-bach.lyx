@@ -384,23 +384,10 @@ True
 \end_inset
 
 .
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-newline
 \end_layout
 
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-<TODO: type system>
+\begin_layout Section
+Module system
 \end_layout
 
 \begin_layout Standard
@@ -415,254 +402,114 @@ Haskell’s module system is its main method of encapsulation.
  
 \end_layout
 
-\begin_layout Section
-Module system <TODO; need not be this much>
-\end_layout
-
 \begin_layout Standard
-Haskell’s module system main method of encapsulation.
- Apart from local variables in a certain function, it is the only way to
- determine whether something is known (i.e.
- in scope) or not.
- Each module has a name, a set of imports and a set of exports.
- The specification of these is optional, with defaults being “Main”, the
- empty import set and the export set containing all top-level declarations,
- respectively.
- 
-\end_layout
-
-\begin_layout Standard
-Specification of module name and exports is done by the clause 
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-module Name [(export
-\begin_inset Formula $_{\text{}}$
-\end_inset
-
-
-\begin_inset Formula $1$
-\end_inset
-
-,..
- export
-\begin_inset Formula $_{\text{}}$
-\end_inset
-
-
-\begin_inset Formula $n$
-\end_inset
-
-)] where 
-\end_layout
-
-\begin_layout Standard
-where 
-\family typewriter
-Name
-\family default
- is any number of identifiers starting with an uppercase letter, separated
- by points.
- The export specification, within square brackets, is optional and contains
- elements of the form 
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-(f, module M, T) 
-\end_layout
-
-\begin_layout Standard
-where 
-\family typewriter
-f
-\family default
- is the name of a function, 
-\family typewriter
-M
-\family default
- is the name of a module and 
-\family typewriter
-T
-\family default
- is the name of an abstract datatype or typeclass.
- In English, the first item would mean “export the function known to this
- module with the name 
-\family typewriter
-f
-\family default
-”, the second item “export everything imported from the module 
-\family typewriter
-M
-\family default
-” and the third item “export the abstract datatype or typeclass known to
- this module with the name 
-\family typewriter
-T
-\family default
-”.
- Note that the third item only exports the name of the datatype or typeclass,
- not their respective members.
- This means that if we export a type 
-\family typewriter
-T
-\family default
- with the definition
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-data T = U | V 
-\end_layout
-
-\begin_layout Standard
-without specifying its exports, the importing modules will not be able to
- access the constructors 
-\family typewriter
-U
-\family default
- and 
-\family typewriter
-V
-\family default
-, only the type itself: 
-\family typewriter
-T
-\family default
-.
- This means that an importing module can write functions that take arguments
- or return values of type 
-\family typewriter
-T
-\family default
-, but not directly access its values (e.g.
- pattern matching).
- For importing modules to be able to access members of a datatype or typeclass,
- the exporting module can specify this in its export list like so: 
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-(T(..), A(B,c)) 
-\end_layout
-
-\begin_layout Standard
-where 
-\family typewriter
-T, A
-\family default
- are abstract datatypes or typeclasses.
- In English, the first item would mean “export the abstract datatype or
- typeclass known to this module with the name 
-\family typewriter
-T
-\family default
-, as well as all of its members” and the second “export the abstract datatype
- or typeclass known to this module with the name 
-\family typewriter
-T
-\family default
-, as well as those of its members with the names 
-\family typewriter
-B
-\family default
- and 
-\family typewriter
-c
-\family default
-”.
- 
-\end_layout
-
-\begin_layout Standard
-Import specification is done by clauses such as 
-\end_layout
-
-\begin_layout Standard
+By specifying exports, nothing defined in the module that is not in the
+ export space can be accessed by an importing module.
+ It is also allowed to specify the export of imported modules or their respectiv
+e exports.
+ This way, if module 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
 \begin_layout Plain Layout
-import A 
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-import B (f,g) 
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-import C hiding (f,g) 
-\end_layout
-
-\begin_layout Standard
-where 
-\family typewriter
-A,B,C
-\family default
- are module names.
- In English, the first line would mean 
-\begin_inset Quotes eld
-\end_inset
-
-import from 
-\family typewriter
 A
-\family default
- everything that it exports
-\begin_inset Quotes erd
+\end_layout
+
 \end_inset
 
-, the second line “import from 
-\family typewriter
+ imports module 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 B
-\family default
- only the exports 
-\family typewriter
-f
-\family default
- and 
-\family typewriter
-g
-\family default
-” and the third line “import from 
-\family typewriter
+\end_layout
+
+\end_inset
+
+ and module 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
 C
-\family default
- everything that it exports, except 
-\family typewriter
-f
-\family default
- and 
-\family typewriter
-g
-\family default
-”.
- 
+\end_layout
+
+\end_inset
+
+ imports module 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+A
+\end_layout
+
+\end_inset
+
+, it is possible for module 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+C
+\end_layout
+
+\end_inset
+
+ to also have imported some defnintions defined in module 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+B
+\end_layout
+
+\end_inset
+
+ (or even module 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+B
+\end_layout
+
+\end_inset
+
+'s entire export set), depending on what module 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+A
+\end_layout
+
+\end_inset
+
+'s export set is.
 \end_layout
 
 \begin_layout Standard
-<TODO: put relevant theory here, to unclutter other chapters>
+It is also possible for a module to specify what it will import from another
+ module, either as an inclusive specification or as an exclusive specification
+ (using the 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+hiding
+\end_layout
+
+\end_inset
+
+ keyword).
+\end_layout
+
+\begin_layout Standard
+One important feature of Haskell's module system is that unlike, for example,
+ Java, it is permitted for a group of modules to import each other.
+ 
 \end_layout
 
 \begin_layout Section
@@ -723,6 +570,211 @@ This concept is used in two places of the compiler.
  It is needed to describe sets of modules that depend on each other, sets
  of top-level declarations that depend on each other (even between different
  modules), and declarations in let/where expressions.
+\end_layout
+
+\begin_layout Standard
+The concept of dependency groups also applies to local definitions, for
+ example, in the function:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+f x = let
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+even n = n `rem` 2 == 0
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+in odd x
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+where odd = not .
+ even
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+there is a cyclic dependency between the declaration of 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+even
+\end_layout
+
+\end_inset
+
+ in the 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+let
+\end_layout
+
+\end_inset
+
+ expression and the declaration of 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+odd
+\end_layout
+
+\end_inset
+
+ in the 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+where
+\end_layout
+
+\end_inset
+
+ expression.
 \end_layout
 
 \begin_layout Standard
@@ -2334,7 +2386,6 @@ The interpreter supports a subset of the GHCi commands, and includes a command
 \end_layout
 
 \begin_layout Standard
-
 The following commands are available.
 \end_layout
 
@@ -4147,12 +4198,11 @@ Can be compiled so that all exported identifiers would use the same name
 \end_layout
 
 \begin_layout Subsection
-Interpretation
+Internal libraries
 \end_layout
 
 \begin_layout Standard
-Interpret the AST by re-writing the AST while producing the required side-effect
-s.
+To support 
 \end_layout
 
 \begin_layout Section
