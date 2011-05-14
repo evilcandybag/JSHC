@@ -1192,6 +1192,13 @@ kind
 
 \end_inset
 
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "haskell-report4.1.1"
+
+\end_inset
+
 .
 \end_layout
 
