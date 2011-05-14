@@ -2758,11 +2758,11 @@ Given a directed graph representing the dependencies, it merges the minimal
 \end_layout
 
 \begin_layout Standard
-<TODO: pseudo code for condensing the graph?>
+<TODO: pseudo code for condensing the graph>
 \end_layout
 
 \begin_layout Standard
-<TODO: time and space analysis>
+<TODO: time and space analysis ?>
 \end_layout
 
 \begin_layout Subsection
@@ -2779,7 +2779,7 @@ The algorithm computes the ordering lazily, similar to an iterator, but
 \end_layout
 
 \begin_layout Standard
-<TODO: pseudo code here?>
+<TODO: pseudo code here>
 \end_layout
 
 \begin_layout Section
