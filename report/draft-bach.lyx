@@ -4298,7 +4298,7 @@ Generates javascript code representing the compiled modules.
 Can be compiled so that all exported identifiers would use the same name
  in javascript (under some namespace), which allows easy lookup of identifiers
  by an interpreter, but also debugging of the compiler.
- <TODO: this is too short>
+ <TODO: this is too short, talk about stuff such as matching >
 \end_layout
 
 \begin_layout Subsection
@@ -4306,7 +4306,57 @@ Internal libraries
 \end_layout
 
 \begin_layout Standard
-To support some of the 
+To implement basic some functionality of the generated code which cannot
+ be efficiently defined in Haskell (or is needed for our implementation
+ to operate at all), an internal JavaScript library was developed.
+ This library contains functions for handling integer arithmetics, arithmetic
+ comparisons, laziness and pattern matching.
+ 
+\end_layout
+
+\begin_layout Standard
+Since JavaScript does not have integers built in, the arithmetics for the
+ Haskell integer types requires internal libraries that manage integer bounds
+ etc <TODO: bad formulation imho>
+\end_layout
+
+\begin_layout Standard
+Laziness is implemented by creating a JavaScript object called 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Thunk
+\end_layout
+
+\end_inset
+
+.
+ When a lazy expression is created, the strict JavaScript expression is
+ wrapped in a JavaScript closure, which is subsequently wrapped in a 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Thunk
+\end_layout
+
+\end_inset
+
+ object.
+ When the lazy value is needed, a method of the 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Thunk
+\end_layout
+
+\end_inset
+
+ object is called, which evaluates the closure and assigns the value to
+ a variable.
+ <TODO: perhaps more elaboration?>
 \end_layout
 
 \begin_layout Section
