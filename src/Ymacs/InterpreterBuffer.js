@@ -37,7 +37,7 @@ JSHC.Ymacs.switchToInterpreter = function(cbuf){
     
     //refresh the fileSystem
     for (i = 0; i < bs.length; i++) {
-        if( bs[i].name.substr(cbuf.name.lastIndexOf(".")) === ".hs" ) {
+        if( bs[i].name.substr(bs[i].name.lastIndexOf(".")) === ".hs" ) {
             ibuf.interpreter.compiler.fileSystem[bs[i].name.substr(0,bs[i].name.length-3)] = bs[i].getCode();
         }
     }
