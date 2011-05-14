@@ -4160,12 +4160,27 @@ Standard libraries
 \end_layout
 
 \begin_layout Standard
-<TODO: describe how the code from the Haskell report was used to construct
- the standard libraries for the compiler>
+The standard libraries used for JSHC are a subset of the libraries described
+ in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "haskell-report"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Chapter
 Discussion
+\end_layout
+
+\begin_layout Section
+Design choices
+\end_layout
+
+\begin_layout Section
+Future work on JSHC
 \end_layout
 
 \begin_layout Standard
@@ -4463,12 +4478,12 @@ impdecls → impdecl
 \begin_inset Formula $_{\text{n}}$
 \end_inset
 
- (n ≥ 1)
+ 
 \end_layout
 
 \end_inset
 
-
+(n ≥ 1)
 \begin_inset ERT
 status open
 
@@ -4497,12 +4512,12 @@ exports → ( export
 \begin_inset Formula $_{\text{n}}$
 \end_inset
 
- [ , ] ) (n ≥ 0)
+ [ , ] ) 
 \end_layout
 
 \end_inset
 
-
+(n ≥ 0)
 \end_layout
 
 \begin_layout Standard
@@ -4563,12 +4578,12 @@ status collapsed
 \begin_inset Formula $_{\text{n}}$
 \end_inset
 
- )] (n ≥ 0)
+ )] 
 \end_layout
 
 \end_inset
 
-
+(n ≥ 0)
 \end_layout
 
 \begin_layout Standard
@@ -4616,12 +4631,12 @@ status collapsed
 \begin_inset Formula $_{\text{n}}$
 \end_inset
 
- )] (n ≥ 0)
+ )] 
 \end_layout
 
 \end_inset
 
-
+(n ≥ 0)
 \end_layout
 
 \begin_layout Standard
@@ -4753,12 +4768,12 @@ impspec → ( import
 \begin_inset Formula $_{\text{n}}$
 \end_inset
 
- [ , ] ) (n ≥ 0)
+ [ , ] ) 
 \end_layout
 
 \end_inset
 
-
+(n ≥ 0)
 \end_layout
 
 \begin_layout Standard
@@ -4806,12 +4821,12 @@ status collapsed
 \begin_inset Formula $_{\text{n}}$
 \end_inset
 
- [ , ] ) (n ≥ 0)
+ [ , ] ) 
 \end_layout
 
 \end_inset
 
-
+(n ≥ 0)
 \end_layout
 
 \begin_layout Standard
@@ -4872,12 +4887,12 @@ status collapsed
 \begin_inset Formula $_{\text{n}}$
 \end_inset
 
-)] (n ≥ 0)
+)] 
 \end_layout
 
 \end_inset
 
-
+(n ≥ 0)
 \end_layout
 
 \begin_layout Standard
@@ -4919,12 +4934,12 @@ topdecls → topdecl
 \begin_inset Formula $_{\text{n}}$
 \end_inset
 
- (n ≥ 0)
+ 
 \end_layout
 
 \end_inset
 
-
+(n ≥ 0)
 \end_layout
 
 \begin_layout Standard
@@ -5056,12 +5071,12 @@ decls → { decl
 \begin_inset Formula $_{\text{n}}$
 \end_inset
 
- } (n ≥ 0)
+ } 
 \end_layout
 
 \end_inset
 
-
+(n ≥ 0)
 \end_layout
 
 \begin_layout Standard
@@ -5127,57 +5142,12 @@ status collapsed
 status collapsed
 
 \begin_layout Plain Layout
-gendecl → vars :: type (type signature)
+gendecl → vars :: type 
 \end_layout
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-| fixity [integer] ops (fixity declaration)
-\end_layout
-
-\end_inset
-
-
+(type signature)
 \end_layout
 
 \begin_layout Standard
@@ -5217,12 +5187,57 @@ status collapsed
 status collapsed
 
 \begin_layout Plain Layout
-| (empty declaration)
+| fixity [integer] ops 
 \end_layout
 
 \end_inset
 
+(fixity declaration)
+\end_layout
 
+\begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+| 
+\end_layout
+
+\end_inset
+
+(empty declaration)
 \begin_inset ERT
 status open
 
@@ -5251,12 +5266,12 @@ ops → op
 \begin_inset Formula $_{\text{n}}$
 \end_inset
 
- (n ≥ 1)
+ 
 \end_layout
 
 \end_inset
 
-
+(n ≥ 1)
 \end_layout
 
 \begin_layout Standard
@@ -5272,12 +5287,12 @@ vars → var
 \begin_inset Formula $_{\text{n}}$
 \end_inset
 
- (n ≥ 1)
+ 
 \end_layout
 
 \end_inset
 
-
+(n ≥ 1)
 \end_layout
 
 \begin_layout Standard
@@ -5311,12 +5326,12 @@ newline
 status collapsed
 
 \begin_layout Plain Layout
-type → btype [-> type] (function type)
+type → btype [-> type] 
 \end_layout
 
 \end_inset
 
-
+(function type)
 \end_layout
 
 \begin_layout Standard
@@ -5324,12 +5339,12 @@ type → btype [-> type] (function type)
 status collapsed
 
 \begin_layout Plain Layout
-btype → [btype] atype (type application)
+btype → [btype] atype 
 \end_layout
 
 \end_inset
 
-
+(type application)
 \end_layout
 
 \begin_layout Standard
@@ -5435,57 +5450,12 @@ status collapsed
 \begin_inset Formula $_{\text{k}}$
 \end_inset
 
- ) (tuple type, k ≥ 2)
+ ) 
 \end_layout
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-| [ type ] (list type)
-\end_layout
-
-\end_inset
-
-
+(tuple type, k ≥ 2)
 \end_layout
 
 \begin_layout Standard
@@ -5525,12 +5495,57 @@ status collapsed
 status collapsed
 
 \begin_layout Plain Layout
-| ( type ) (parenthesized constructor)
+| [ type ] 
 \end_layout
 
 \end_inset
 
+(list type)
+\end_layout
 
+\begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+| ( type ) 
+\end_layout
+
+\end_inset
+
+(parenthesized constructor)
 \end_layout
 
 \begin_layout Standard
@@ -5572,12 +5587,12 @@ simpletype → tycon tyvar
 \begin_inset Formula $_{\text{k}}$
 \end_inset
 
- (k ≥ 0)
+ 
 \end_layout
 
 \end_inset
 
-
+(k ≥ 0)
 \end_layout
 
 \begin_layout Standard
@@ -5593,12 +5608,12 @@ constrs → constr
 \begin_inset Formula $_{\text{n}}$
 \end_inset
 
- (n ≥ 1)
+ 
 \end_layout
 
 \end_inset
 
-
+(n ≥ 1)
 \end_layout
 
 \begin_layout Standard
@@ -5614,12 +5629,12 @@ constr → con [!] atype
 \begin_inset Formula $_{\text{k}}$
 \end_inset
 
- (arity con = k, k ≥ 0)
+ 
 \end_layout
 
 \end_inset
 
-
+(arity con = k, k ≥ 0)
 \begin_inset ERT
 status open
 
@@ -5769,12 +5784,12 @@ newline
 status collapsed
 
 \begin_layout Plain Layout
-exp → infixexp :: type (expression type signature)
+exp → infixexp :: type 
 \end_layout
 
 \end_inset
 
-
+(expression type signature)
 \end_layout
 
 \begin_layout Standard
@@ -5827,12 +5842,12 @@ status collapsed
 status collapsed
 
 \begin_layout Plain Layout
-infixexp → lexp qop infixexp (infix operator application)
+infixexp → lexp qop infixexp 
 \end_layout
 
 \end_inset
 
-
+(infix operator application)
 \end_layout
 
 \begin_layout Standard
@@ -5872,12 +5887,12 @@ infixexp → lexp qop infixexp (infix operator application)
 status collapsed
 
 \begin_layout Plain Layout
-| - infixexp (prefix negation)
+| - infixexp 
 \end_layout
 
 \end_inset
 
-
+(prefix negation)
 \end_layout
 
 \begin_layout Standard
@@ -5940,57 +5955,12 @@ lexp →
 \begin_inset Formula $_{\text{n}}$
 \end_inset
 
- -> exp (lambda abstraction, n ≥ 1)
+ -> exp 
 \end_layout
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-| let decls in exp (let expression)
-\end_layout
-
-\end_inset
-
-
+(lambda abstraction, n ≥ 1)
 \end_layout
 
 \begin_layout Standard
@@ -6030,12 +6000,12 @@ status collapsed
 status collapsed
 
 \begin_layout Plain Layout
-| if exp [;] then exp [;] else exp (conditional)
+| let decls in exp 
 \end_layout
 
 \end_inset
 
-
+(let expression)
 \end_layout
 
 \begin_layout Standard
@@ -6075,12 +6045,57 @@ status collapsed
 status collapsed
 
 \begin_layout Plain Layout
-| case exp of { alts } (case expression)
+| if exp [;] then exp [;] else exp 
 \end_layout
 
 \end_inset
 
+(conditional)
+\end_layout
 
+\begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+| case exp of { alts } 
+\end_layout
+
+\end_inset
+
+(case expression)
 \end_layout
 
 \begin_layout Standard
@@ -6133,12 +6148,12 @@ status collapsed
 status collapsed
 
 \begin_layout Plain Layout
-fexp → [fexp] aexp (function application)
+fexp → [fexp] aexp 
 \end_layout
 
 \end_inset
 
-
+(function application)
 \end_layout
 
 \begin_layout Standard
@@ -6146,12 +6161,12 @@ fexp → [fexp] aexp (function application)
 status collapsed
 
 \begin_layout Plain Layout
-aexp → qvar (variable)
+aexp → qvar 
 \end_layout
 
 \end_inset
 
-
+(variable)
 \end_layout
 
 \begin_layout Standard
@@ -6191,12 +6206,12 @@ aexp → qvar (variable)
 status collapsed
 
 \begin_layout Plain Layout
-| gcon (general constructor)
+| gcon 
 \end_layout
 
 \end_inset
 
-
+(general constructor)
 \end_layout
 
 \begin_layout Standard
@@ -6281,12 +6296,12 @@ status collapsed
 status collapsed
 
 \begin_layout Plain Layout
-| ( exp ) (parenthesized expression)
+| ( exp ) 
 \end_layout
 
 \end_inset
 
-
+(parenthesized expression)
 \end_layout
 
 \begin_layout Standard
@@ -6334,12 +6349,12 @@ status collapsed
 \begin_inset Formula $_{\text{k}}$
 \end_inset
 
- ) (tuple, k ≥ 2)
+ ) 
 \end_layout
 
 \end_inset
 
-
+(tuple, k ≥ 2)
 \end_layout
 
 \begin_layout Standard
@@ -6387,12 +6402,12 @@ status collapsed
 \begin_inset Formula $_{\text{k}}$
 \end_inset
 
- ] (list, k ≥ 1)
+ ] 
 \end_layout
 
 \end_inset
 
-
+(list, k ≥ 1)
 \begin_inset ERT
 status open
 
@@ -6421,12 +6436,12 @@ alts → alt
 \begin_inset Formula $_{\text{n}}$
 \end_inset
 
- (n ≥ 1)
+ 
 \end_layout
 
 \end_inset
 
-
+(n ≥ 1)
 \end_layout
 
 \begin_layout Standard
@@ -6526,12 +6541,12 @@ status collapsed
 \begin_inset Formula $_{\text{k}}$
 \end_inset
 
- (arity gcon = k, k ≥ 1)
+ 
 \end_layout
 
 \end_inset
 
-
+(arity gcon = k, k ≥ 1)
 \end_layout
 
 \begin_layout Standard
@@ -6584,12 +6599,12 @@ apat → var
 status collapsed
 
 \begin_layout Plain Layout
-| gcon (arity gcon = 0)
+| gcon 
 \end_layout
 
 \end_inset
 
-
+(arity gcon = 0)
 \end_layout
 
 \begin_layout Standard
@@ -6674,12 +6689,12 @@ status collapsed
 status collapsed
 
 \begin_layout Plain Layout
-| _ (wildcard)
+| _ 
 \end_layout
 
 \end_inset
 
-
+(wildcard)
 \end_layout
 
 \begin_layout Standard
@@ -6719,12 +6734,12 @@ status collapsed
 status collapsed
 
 \begin_layout Plain Layout
-| ( pat ) (parenthesized pattern)
+| ( pat ) 
 \end_layout
 
 \end_inset
 
-
+(parenthesized pattern)
 \end_layout
 
 \begin_layout Standard
@@ -6772,12 +6787,12 @@ status collapsed
 \begin_inset Formula $_{\text{k}}$
 \end_inset
 
- ) (tuple pattern, k ≥ 2)
+ ) 
 \end_layout
 
 \end_inset
 
-
+(tuple pattern, k ≥ 2)
 \begin_inset ERT
 status open
 
@@ -6798,12 +6813,12 @@ newline
 status collapsed
 
 \begin_layout Plain Layout
-var → varid | ( varsym ) (variable)
+var → varid | ( varsym ) 
 \end_layout
 
 \end_inset
 
-
+(variable)
 \end_layout
 
 \begin_layout Standard
@@ -6811,12 +6826,12 @@ var → varid | ( varsym ) (variable)
 status collapsed
 
 \begin_layout Plain Layout
-qvar → qvarid | ( qvarsym ) (qualified variable)
+qvar → qvarid | ( qvarsym ) 
 \end_layout
 
 \end_inset
 
-
+(qualified variable)
 \end_layout
 
 \begin_layout Standard
@@ -6824,12 +6839,12 @@ qvar → qvarid | ( qvarsym ) (qualified variable)
 status collapsed
 
 \begin_layout Plain Layout
-con → conid | ( consym ) (constructor)
+con → conid | ( consym ) 
 \end_layout
 
 \end_inset
 
-
+(constructor)
 \end_layout
 
 \begin_layout Standard
@@ -6837,12 +6852,12 @@ con → conid | ( consym ) (constructor)
 status collapsed
 
 \begin_layout Plain Layout
-qcon → qconid | ( gconsym ) (qualified constructor)
+qcon → qconid | ( gconsym ) 
 \end_layout
 
 \end_inset
 
-
+(qualified constructor)
 \end_layout
 
 \begin_layout Standard
@@ -6850,12 +6865,12 @@ qcon → qconid | ( gconsym ) (qualified constructor)
 status collapsed
 
 \begin_layout Plain Layout
-varop → varsym | ` varid ` (variable operator)
+varop → varsym | ` varid ` 
 \end_layout
 
 \end_inset
 
-
+(variable operator)
 \end_layout
 
 \begin_layout Standard
@@ -6863,12 +6878,12 @@ varop → varsym | ` varid ` (variable operator)
 status collapsed
 
 \begin_layout Plain Layout
-qvarop → qvarsym | ` qvarid ` (qualified variable operator)
+qvarop → qvarsym | ` qvarid ` 
 \end_layout
 
 \end_inset
 
-
+(qualified variable operator)
 \end_layout
 
 \begin_layout Standard
@@ -6876,12 +6891,12 @@ qvarop → qvarsym | ` qvarid ` (qualified variable operator)
 status collapsed
 
 \begin_layout Plain Layout
-conop → consym | ` conid ` (constructor operator)
+conop → consym | ` conid ` 
 \end_layout
 
 \end_inset
 
-
+(constructor operator)
 \end_layout
 
 \begin_layout Standard
@@ -6889,12 +6904,12 @@ conop → consym | ` conid ` (constructor operator)
 status collapsed
 
 \begin_layout Plain Layout
-qconop → gconsym | ` qconid ` (qualified constructor operator)
+qconop → gconsym | ` qconid ` 
 \end_layout
 
 \end_inset
 
-
+(qualified constructor operator)
 \end_layout
 
 \begin_layout Standard
@@ -6902,12 +6917,12 @@ qconop → gconsym | ` qconid ` (qualified constructor operator)
 status collapsed
 
 \begin_layout Plain Layout
-op → varop | conop (operator)
+op → varop | conop 
 \end_layout
 
 \end_inset
 
-
+(operator)
 \end_layout
 
 \begin_layout Standard
@@ -6915,12 +6930,12 @@ op → varop | conop (operator)
 status collapsed
 
 \begin_layout Plain Layout
-qop → qvarop | qconop (qualified operator)
+qop → qvarop | qconop 
 \end_layout
 
 \end_inset
 
-
+(qualified operator)
 \end_layout
 
 \begin_layout Standard
