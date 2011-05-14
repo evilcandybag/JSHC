@@ -81,22 +81,29 @@ JSHC.Load.Module.done = function(name, contents, source, date){
 	m.date = obj.date;
     }
 
-    try {
-	m.ast = JSHC.parse(m.contents);
-	m.status = "success";
-    } catch(err){
-	if( err instanceof JSHC.ParseError ){
-	    m.status = "failure";
-	    m.err = err;
-	} else {
-	    throw err;
-	}
-    }
-    
     // TODO:
     // compute flags by reading the first line or something from the file.
     m.flags = [];
 
+    try {
+	m.ast = JSHC.parse(m.contents);
+    } catch(err){
+	if( err instanceof JSHC.ParseError ){
+	    m.status = "failure";
+	    m.err = err;
+	    return m;
+	} else {
+	    throw err;
+	}
+    }
+
+    if( m.name !== m.ast.modid.id ){
+        m.status = "failure";
+        m.err = "module name \""+m.ast.modid.id+"\" does not match file name \""+m.name+"\"";
+        return m;
+    }
+
+    m.status = "success";
     return m;
 };
 
