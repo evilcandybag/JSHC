@@ -1969,7 +1969,6 @@ key "haskell-report"
 \end_inset
 
  has been achieved.
- 
 \end_layout
 
 \begin_layout Standard
@@ -1977,7 +1976,12 @@ key "haskell-report"
 \end_layout
 
 \begin_layout Standard
-<TODO: read some articles on what to put here> 
+<TODO: read some articles on what to put here>
+\end_layout
+
+\begin_layout Standard
+<TODO: Something about chosing to implement JSHC without using implementation
+ details of existing compilers for Haskell>
 \end_layout
 
 \begin_layout Section
@@ -4502,6 +4506,49 @@ Design choices
 \end_layout
 
 \begin_layout Section
+Comparison with other implementations
+\end_layout
+
+\begin_layout Subsection
+Other possible solutions to client-side Haskell
+\end_layout
+
+\begin_layout Standard
+If making a plug-in, one still required writing a back-end to javascript
+ and implementing an FFI to Javascript code.
+\end_layout
+
+\begin_layout Standard
+If compiling an existing compiler like GHC to Javascript, it would require
+ an existing Javascript back-end, and the performance of it would be important.
+ There seems like there would be issues with how I/O is used within the
+ compiler since it is not available in Javascript, which would mean that
+ the compiler need to be modified and can not just be compiled as is.
+\end_layout
+
+\begin_layout Subsection
+GHC
+\end_layout
+
+\begin_layout Standard
+<TODO: Anything to write here?>
+\end_layout
+
+\begin_layout Subsection
+HIJi (previous year
+\begin_inset Quotes ers
+\end_inset
+
+s project)
+\end_layout
+
+\begin_layout Standard
+From the report, it is unclear if one can load more than one module, and
+ if cyclies in the dependencies of module and declaration are handled as
+ it is not mentioned.
+\end_layout
+
+\begin_layout Section
 Future work on JSHC
 \end_layout
 
@@ -4583,6 +4630,19 @@ The grammar in the Haskell report is at least an LR(2) grammar as it requires
  empty file?>.
  We do not think the grammar should be ambiguous, as it makes it less clear
  and also harder to implement a parser for.
+\end_layout
+
+\begin_layout Standard
+Other issues.
+ e.g 
+\begin_inset Quotes eld
+\end_inset
+
+2=3
+\begin_inset Quotes erd
+\end_inset
+
+ should not be a valid declaration in the grammar.
 \end_layout
 
 \begin_layout Standard
