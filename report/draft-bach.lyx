@@ -1765,6 +1765,14 @@ Other operations on the syntax tree, such as reduction of complex constructs
 \end_layout
 
 \begin_layout Section
+Intermediate representation
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Section
 Code generation
 \end_layout
 
