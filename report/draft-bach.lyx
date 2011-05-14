@@ -2794,7 +2794,6 @@ Compiler front-end
 Find, read and parse all modules: This part identifies the modules used,
  performs lexical analysis on them and parses them into an abstract representati
 on of the language, the Abstract Syntax Tree (AST).
- 
 \end_layout
 
 \begin_layout Itemize
@@ -3259,6 +3258,15 @@ Name check
 This is applied separately on each module in a group.
 \end_layout
 
+\begin_layout Standard
+Errors is given for missing and ambiguous names.
+ Otherwise the name will be qualified with the qualification of what it
+ refers to so that the definition can easily be found later on when it is
+ non-local.
+ The definition needs to be found later on when fixity and type information
+ is required.
+\end_layout
+
 \begin_layout Subsubsection
 Fixity Resolution
 \begin_inset CommandInset label
@@ -3276,7 +3284,7 @@ Applied separately on each module in a group.
 
 \begin_layout Standard
 Given the available operators and their precedences, adjusts the expressions
- in all function and operator so that they use the declared precedence.
+ in all functions and operators so that they use the declared precedence.
 \end_layout
 
 \begin_layout Subsubsection
@@ -3284,17 +3292,121 @@ Type checking
 \end_layout
 
 \begin_layout Standard
-Checks instance/function top-level declarations in dependency group order.
+The monomorphism restriction (see 4.5.5 in the report) is not implemented.
+\end_layout
+
+\begin_layout Standard
+Since type classes are not implemented, the type system only implements
+ the parametric polymorphism.
+\end_layout
+
+\begin_layout Standard
+Type checking is applied on dependency groups over all declarations from
+ all modules in the group, since one can not check the top-level declarations
+ of a single module in dependency order as they may depend on types from
+ top-declarations in other modules within the same group.
+\end_layout
+
+\begin_layout Standard
+While type checking, the algorithm keeps track of local names and type variables
+, and also the constraints using a map from the type variables to types
+ to which they are contrained.
+\end_layout
+
+\begin_layout Standard
+*** The constrain map
+\end_layout
+
+\begin_layout Standard
+The constraint map maps type variables (LHS) to types (RHS).
+\end_layout
+
+\begin_layout Standard
+It simply represents the types that type variables are contrained to.
+\end_layout
+
+\begin_layout Standard
+Type variables are only given a type if they are constrained, so all new
+ type variables will not be in the map until a constraint is placed upon
+ them.
+\end_layout
+
+\begin_layout Standard
+Type variables on the LHS may not occur in their corresponding RHS as this
+ would create an infinite type, and may only occur in the RHS of other variables
+ if the other RHSs are such that there is no infinite type.
+ This invariant is maintained when new constrained are inserted.
+\end_layout
+
+\begin_layout Standard
+The reason for using a constraint map is that type errors are discovered
+ as soon as possible, so a type error in a sub-expression will be given
+ for the sub-expression instead of the expression as a whole if the constraints
+ were just gathered and then checked after computing all of them, which
+ is the usual description of solving the constraints <reference to 
+\begin_inset Quotes eld
+\end_inset
+
+Pierce, B.
+ C.
+ 2002 Types and Programming Languages.
+ MIT Press.
+\begin_inset Quotes erd
+\end_inset
+
+ chapter 22 or so>
+\end_layout
+
+\begin_layout Standard
+*** Adding constraints
+\end_layout
+
+\begin_layout Standard
+<TODO: describe what happens when adding constraints such as 
+\begin_inset Quotes eld
+\end_inset
+
+a -> b = c -> d
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Will be split into two separate constraints, which will each cause elimination
+ of a type variable as the constraint specifies that two constraints are
+ equal.>
+\end_layout
+
+\begin_layout Standard
+*** Checking a group of declared names
+\end_layout
+
+\begin_layout Standard
+Each declared name in a group is given a type variable.
+ As the declarations are checked, the type variables for the names will
+ be constrained depending on what the declaration contains.
+ After all declarations in the group have been checked, all free type variables
+ occuring in the types bound to the type variables of each declared name
+ are quantified since they only occur inside the declarations.
+\end_layout
+
+\begin_layout Standard
+*** Checking declarations
+\end_layout
+
+\begin_layout Standard
+<TODO: Probably need a few concrete examples.
+ Should be done in a similar way to as it was done in the theory chapter,
+ but need to show the constraint map.
+ need to give example of nested let-declarations to show the point of it
+ all.>
 \end_layout
 
 \begin_layout Standard
 It is necessary to use dependency groups and check in dependency group order
- to give the correct type.
- 
-\end_layout
-
-\begin_layout Standard
-<TODO: give a good example or refer to one in the haskell report>
+ to give the correct type, instead of checking all of the declarations as
+ a single group <TODO: example needed.
+ check the haskell report.
+ related to the monomorhism restriction.>
 \end_layout
 
 \begin_layout Standard
@@ -4485,11 +4597,7 @@ GHC
 \end_layout
 
 \begin_layout Subsection
-HIJi (previous year
-\begin_inset Quotes ers
-\end_inset
-
-s project)
+HIJi (project from previous year)
 \end_layout
 
 \begin_layout Standard
@@ -4556,6 +4664,21 @@ More importantly, it will also allow writing Haskell libraries that wrap
 
 \begin_layout Subsection
 Type classes
+\end_layout
+
+\begin_layout Standard
+reference to 
+\begin_inset Quotes eld
+\end_inset
+
+Type classes in Haskell Cordelia Hall, Kevin Hammond, Simon Peyton Jones,
+ and Philip Wadler.
+ European Symposium On Programming, LNCS 788, Springer Verlag, pp.
+ 241-256, April 1994.
+\begin_inset Quotes erd
+\end_inset
+
+ from http://homepages.inf.ed.ac.uk/wadler/topics/type-classes.html
 \end_layout
 
 \begin_layout Subsection
