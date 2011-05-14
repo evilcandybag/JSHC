@@ -85,7 +85,7 @@ JSHC.showPos = function(pos){
         return "unknown position";
     }
 
-    return "line "+pos.first_line+"-"+pos.last_line+", "
+    return "line "+pos.first_line+"-"+pos.last_line+", "+
            "column "+pos.first_column+"-"+pos.last_column;
 };
 

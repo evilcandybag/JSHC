@@ -140,13 +140,19 @@ JSHC.Compiler.prototype.recompile = function(){
 	}
     }
 
-    if( this.errors.length > 0 ){
+    // stop if there were parse errors
+    if( this.errors > 0 ){
         return;
     }
 
     // traverse the graph in dependency order, and for each module group:
     var compiler = this;
     var module_group_action = function(group){
+        // stop if there were errors in a previous group
+        if( compiler.errors > 0 ){
+            return;
+        }
+
         // re-check all modules if not all have already been compiled
         var all_compiled = true;
         for(var ix=0 ; ix<group.values.length ; ix++){
@@ -203,7 +209,7 @@ JSHC.Compiler.prototype.recompile = function(){
             JSHC.Check.nameCheck(compiler, module.ast);
         }
 
-        if( compiler.errors.length > 0 ){
+        if( compiler.errors > 0 ){
             return;
         }
 
@@ -214,7 +220,7 @@ JSHC.Compiler.prototype.recompile = function(){
             JSHC.Fixity.fixityResolution(module.ast);
         }
 
-        if( compiler.errors.length > 0 ){
+        if( compiler.errors > 0 ){
             return;
         }
 
@@ -233,7 +239,7 @@ JSHC.Compiler.prototype.recompile = function(){
     JSHC.Dep.check(entries,module_group_action);
 
     // skip code generation if errors have occured
-    if( this.errors.length > 0 ){
+    if( this.errors > 0 ){
         return;
     }
 
