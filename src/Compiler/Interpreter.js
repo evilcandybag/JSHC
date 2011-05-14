@@ -120,7 +120,7 @@ JSHC.Interpreter.prototype.execCommand = function(line){
         try {
             this.compiler.recompile();
         } catch (err) {
-            alert(JSHC.showError(err));
+            JSHC.alert("Compiler exception:\n",JSHC.showError(err));
         }
         break;
 

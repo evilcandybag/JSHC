@@ -26,6 +26,12 @@ JSHC.SourceError = function(mname, pos, message){
 };
 JSHC.SourceError.prototype = new Error();
 
+JSHC.SourceError.prototype.toString = function(){
+    return (this.message !== undefined ? this.message : "")
+        +(this.pos !== undefined ? " at " + JSHC.showPos(this.pos) : "")
+        +(this.mname !== undefined ? " in " + this.mname : "");
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 
 /*
@@ -73,7 +79,7 @@ JSHC.TypeConstraintError.prototype.toString = function(){
         +(this.value !== undefined ? "value: " + this.value : "")
         +", expected: " + this.type1
         +", inferred: " + this.type2
-        +(this.pos !== undefined ? ", at " + JSHC.showPos(this.value.pos) : "")
+        +(this.pos !== undefined ? ", at " + JSHC.showPos(this.pos) : "")
         +(this.mname !== undefined ? ", in " + this.mname : "");
 };
 

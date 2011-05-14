@@ -129,8 +129,7 @@ JSHC.Check.lookupName = function(comp,module,lspace,name){
 //	alert("nspace:\n\n"+JSHC.showAST(nspace))
 //	alert("tspace:\n\n"+JSHC.showAST(module.body.tspace))
 //	alert("LSPACE:\n\n"JSHC.showAST(lspace))
-        comp.onError(new JSHC.SourceError(module.modid,name.pos,name+" not in scope"));
-        JSHC.alert("failed to find: "+name.toStringQ());
+        comp.onError(new JSHC.SourceError(module.modid, name.pos, name.toStringQ()+" not in scope"));
     } else if( amount === 1 ){
         // declared in one location (topdecl or import)
         var matched_name = nspace.getAny();
