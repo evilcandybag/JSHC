@@ -1982,10 +1982,6 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
 \begin_inset Flex CharStyle:Code
 status collapsed
 
@@ -2035,10 +2031,6 @@ in
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
 
 \end_layout
 
@@ -2093,10 +2085,6 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
 \begin_inset Flex CharStyle:Code
 status collapsed
 
@@ -2106,10 +2094,6 @@ status collapsed
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
 
 \end_layout
 
@@ -2255,19 +2239,932 @@ Reduction of syntax tree
 \end_layout
 
 \begin_layout Standard
-This translates the AST to the intermediate representation.
+This step translates the AST to the intermediate representation used by
+ the back-end, see Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:B.2Intermediate-representation"
+
+\end_inset
+
+ for details.
+ Several constructs are reduced to other, simpler and more general, constructs
+ to create a kernel, which is a small subset of Haskell.
+ The constructs that can be reduced in this way syntactic sugar of the kernel
+\begin_inset CommandInset citation
+LatexCommand cite
+key "haskell-report1.2"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Subsubsection
+Conditional expressions
 \end_layout
 
 \begin_layout Standard
-The following constructs disappear as they are translated into other constructs:
- Pattern matching, Operator application, Section, Conditional, Syntactic
- sugar for lists, Arithmetic Sequences, List Comprehensions,Let Expressions,
- Do Expressions, Record construction, Record update.
+Conditional expressions are converted into 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+case
+\end_layout
+
+\end_inset
+
+expressions, with two alternatives 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+linebreak
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+True -> exp
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+False -> exp
+\end_layout
+
+\end_inset
+
+.
+ 
 \end_layout
 
 \begin_layout Standard
-<TODO: make a table containing translations from one sentential form to
- another similar to the report?>
+This means that the expression: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+nopagebreak
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+if x > y then 1 else 0
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+is equivalent to and thus results in the same intermediate representation
+ as the expression:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+case x > y of
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+True -> 1
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+False -> 2
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Let and where expressions
+\end_layout
+
+\begin_layout Standard
+Since what 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+let
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+where
+\end_layout
+
+\end_inset
+
+ expressions do is bind expressions to local variables, and 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+case
+\end_layout
+
+\end_inset
+
+ expressions have this capability as well, they are converted to 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+case
+\end_layout
+
+\end_inset
+
+ expressions.
+ The right hand sides of the local declarations are inserted into a tuple
+ expression, and the left hand sides are put in a tuple pattern.
+ The tuple expression is then matched to the tuple pattern inside a 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+case
+\end_layout
+
+\end_inset
+
+ expression, thus causing them to be bound to each other.
+\end_layout
+
+\begin_layout Standard
+As an example, the expression:
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+nopagebreak
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+let
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+x = 1
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+y = 2
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+in x + y
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+is equivalent to and thus results in the same intermediate representation
+ as the expression: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+case (1,2) of
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+(x,y) -> x + y
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Pattern matching
+\end_layout
+
+\begin_layout Standard
+Pattern matching in function definitions follows the same rules as in 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+case
+\end_layout
+
+\end_inset
+
+ expressions, so a simplification is performed here.
+ For each alternative match of the function, the arguments are wrapped in
+ a tuple pattern and paired with their corresponding right hand side to
+ create 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+case
+\end_layout
+
+\end_inset
+
+ alternatives.
+ Then, the function is given dummy arguments, to preserve its arity.
+ A 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+case
+\end_layout
+
+\end_inset
+
+ expression is then created which matches a tuple expression with the function's
+ arguments against the newly created 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+case
+\end_layout
+
+\end_inset
+
+ alternatives.
+ 
+\end_layout
+
+\begin_layout Standard
+For example, the function: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+nopagebreak
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+f True x = x + 1
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+f False x = x - 1
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+is equivalent to and thus results in the same intermediate representation
+ as this function:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+f a1 a2 = case (a1,a2) of 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+(True, x) -> x + 1
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+(False, x) -> x - 1
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Function declarations
+\end_layout
+
+\begin_layout Standard
+Function declarations with arguments are converted into a binding from the
+ function name to a sequence of lambda expressions corresponding to the
+ arity of the function.
+\end_layout
+
+\begin_layout Standard
+For example, the function:
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+nopagebreak
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+f x y = x + y
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+is equivalent to and thus results in the same intermediate representation
+ as the function:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+f = 
+\backslash
+x -> 
+\backslash
+y -> x + y
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -5105,6 +6002,13 @@ pagebreak
 
 \begin_layout Section
 Intermediate representation
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:B.2Intermediate-representation"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
