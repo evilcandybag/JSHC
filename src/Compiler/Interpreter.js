@@ -39,7 +39,7 @@ JSHC.Interpreter = function(modulePrefix){
 ////////////////////////////////////////////////////////////////////////////////
 
 JSHC.Interpreter.commands =
-  [":kind", ":load", ":show", ":type", ":js",
+  [":help", ":kind", ":load", ":show", ":type", ":js",
    ":show path", ":show code", ":show modules"];
 
 JSHC.Interpreter.prototype.execCommand = function(line){
