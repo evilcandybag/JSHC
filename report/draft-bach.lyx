@@ -1969,7 +1969,15 @@ key "haskell-report"
 \end_inset
 
  has been achieved.
- <TODO: redo this completely as this is simply not true>
+ 
+\end_layout
+
+\begin_layout Standard
+<TODO: redo this completely as this is simply not true >
+\end_layout
+
+\begin_layout Standard
+<TODO: read some articles on what to put here> 
 \end_layout
 
 \begin_layout Section
@@ -2308,7 +2316,7 @@ Implementation
 \end_layout
 
 \begin_layout Standard
-<TODO: move certain items from here to Theory chapter>
+<TODO: write an introduction>
 \end_layout
 
 \begin_layout Section
@@ -2748,6 +2756,10 @@ The algorithm computes the ordering lazily, similar to an iterator, but
 
 \begin_layout Section
 Compiler front-end
+\end_layout
+
+\begin_layout Standard
+<TODO: proper introduction here>
 \end_layout
 
 \begin_layout Itemize
@@ -4243,8 +4255,9 @@ Compiler back-end
 \end_layout
 
 \begin_layout Standard
-Takes an AST in the intermediate representation and translates into the
- target language (JavaScript).
+JSHC's back-end takes an intermediate representation in the form of an AST
+ and compiles it to JavaScript code.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -4261,6 +4274,7 @@ Generates javascript code representing the compiled modules.
 Can be compiled so that all exported identifiers would use the same name
  in javascript (under some namespace), which allows easy lookup of identifiers
  by an interpreter, but also debugging of the compiler.
+ <TODO: this is too short>
 \end_layout
 
 \begin_layout Subsection
@@ -4268,7 +4282,7 @@ Internal libraries
 \end_layout
 
 \begin_layout Standard
-To support 
+To support some of the 
 \end_layout
 
 \begin_layout Section
