@@ -1281,7 +1281,7 @@ status collapsed
 \end_layout
 
 \begin_layout Subsection
-Instantiation of types and type inference
+Instantiation of types
 \end_layout
 
 \begin_layout Standard
@@ -1306,7 +1306,7 @@ This is achieved by replacing all bound type variables in the type with
 
 \begin_layout Standard
 These type variables are now free, but will be bound after the type of the
- expression that used the ...and will either be eliminated in the 
+ expression has been inferred unless they are eliminated by the 
 \begin_inset Flex CharStyle:Strong
 status collapsed
 
@@ -1316,7 +1316,11 @@ type inference
 
 \end_inset
 
+.
+\end_layout
 
+\begin_layout Subsection
+Type inference
 \end_layout
 
 \begin_layout Standard
