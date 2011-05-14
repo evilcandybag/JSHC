@@ -182,7 +182,7 @@ JSHC.Compiler.prototype.recompile = function(){
             }
 
             // compute/check top-level namespace and add it to AST body.
-            JSHC.addToplevelNamespace.call(this, mod.ast);
+            JSHC.addToplevelNamespace(compiler, mod.ast);
         }
 
         compiler.onMessage("checking group "+group);
@@ -278,7 +278,7 @@ JSHC.Compiler.prototype.checkExp = function (exp){
 
     res = {name: "module", modid: {name: "modname", id: "interact+"}, body: res};
     
-    JSHC.addToplevelNamespace(res);
+    JSHC.addToplevelNamespace(this,res);
     JSHC.Check.nameCheck(this,res);
     JSHC.Fixity.fixityResolution(res);
     JSHC.Check.typeCheck(this,[res]);

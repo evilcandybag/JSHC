@@ -10,7 +10,7 @@
   adds information to data constructors so that one knows which type
   constructor it belongs to.
 */
-JSHC.addToplevelNamespace = function(module){
+JSHC.addToplevelNamespace = function(comp, module){
     assert.ok(module !== undefined, "addToplevelNamespace: input is not a module")
     var ns,i,j;
     ns = {};
@@ -25,40 +25,68 @@ JSHC.addToplevelNamespace = function(module){
     // must check that for each fixity declaration, the name exists in the
     // tspace in the AST body.
 
+    module.body.spaces = {};
+    var spaces = module.body.spaces;
+    spaces.signature = {};
+    spaces.fixity = {};
+
     var ts = module.body.topdecls;
     for(i=0;i<ts.length;i++){
         if( ts[i].name === "topdecl-decl" ){
-            //ignore fixity declarations
-            if (ts[i].decl.name === "fixity" || ts[i].decl.name === "type-signature")
+            var decl = ts[i].decl;
+            switch( decl.name ){
+            case "fixity":
+            case "type-signature":
                 continue;
-            // qualify name and add to tspace
-            var varname = ts[i].decl.ident;
-            assert.ok( varname.loc === undefined );
-            varname.loc = module.modid.id;
-            ns[varname.toString(false)] = varname;
+
+            case "decl-fun":
+                // qualify name and add to tspace
+                var varname = ts[i].decl.ident;
+                assert.ok( varname.loc === undefined );
+                varname.loc = module.modid.id;
+                // add first occurence
+                if( ns[varname.toString()] === undefined ){
+                    ns[varname.toString()] = varname;
+                }
+            }
         } else if( ts[i].name === "topdecl-data" ){
             // add type constructor
             var tycon = ts[i].typ.tycon;
             assert.ok( tycon.loc === undefined );
             tycon.loc = module.modid.id;
-            ns[tycon.toString(false)] = tycon;
+            ns[tycon.toString()] = tycon;
             // add all data constructors
             for(j=0;j<ts[i].constrs.length;j++){
                 var dacon = ts[i].constrs[j].dacon;
                 assert.ok( dacon.loc === undefined );
                 dacon.loc = module.modid.id;
                 dacon.memberOf = tycon;
-                ns[dacon.toString(false)] = dacon;
+                ns[dacon.toString()] = dacon;
             }
         } else {
             throw new JSHC.CompilerError("unknown top-level declaration");
         }
     }
+/*
+    for(i=0 ; i<ts.length ; i++){
+        if( ts[i].name === "topdecl-decl" ){
+            var decl = ts[i].decl;
+            if( decl.name == "type-signature" ){
+                for (j=0; j<decl.vars.length; j++ ) {
+                    var name = decl.vars[i];
+                    if( ns[name] === undefined ){
+                        onError("signature declaration but no definition of "+name.toStringQ());
+                    } else {
+                        ns[name].sig = decl.sig;
+                    }
+                }
+            }
+        }
+    }
+*/
     module.body.tspace = ns;
-//    JSHC.alert("NS: ", ns)
-    JSHC.addFixitySpace(module, ns);
-//    JSHC.alert("NS2s: ", ns)
-    
+
+    JSHC.addFixity(comp, module, ns);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -67,22 +95,24 @@ JSHC.addToplevelNamespace = function(module){
   produces a map from operator name (both id and symbol possible) to
   {fix,prec} object.
 */
-JSHC.addFixitySpace = function(module_ast,ns) {
-    // TODO: find operator precedences by filtering out all top-level fixity
-    //       declarations and producing a map from operators to fixity.
-    //       Q:is this affected by built-in syntax and if the Prelude was
-    //         imported ?
-    // TODO: fix to work with expressions as well. need fixity info of modules.
+JSHC.addFixity = function(comp,module_ast,ns) {
     assert.ok(module_ast.name === "module", "argument to Fixity.findInfo must be a module AST!");
     var decls = module_ast.body.topdecls;
-    for (var d in decls) {
+    for (var d=0 ; d<decls.length ; d++) {
         if (decls[d].name === "topdecl-decl") {
             if (decls[d].decl.name === "fixity") {
                 var ops = decls[d].decl.ops;
                 for (var i = 0; i < ops.length; i++ ) {
-                    ns[ops[i]].fixity = {fix: decls[d].decl.fix, prec: decls[d].decl.num.value};
+                    var name = ns[ops[i]];
+                    if( name === undefined ){
+                        comp.onError("fixity declaration but no definition of "+ops[i].toStringQ());
+                    } else {
+                        ns[ops[i]].fixity = {fix: decls[d].decl.fix, prec: decls[d].decl.num.value};
+                    }
                 }
             }
         }
     }
 };
+
+////////////////////////////////////////////////////////////////////////////////
