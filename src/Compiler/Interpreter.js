@@ -160,7 +160,7 @@ JSHC.Interpreter.prototype.execCommand = function(line){
 	//                // should have a command to open code in a buffer ?
 
 	if( words.length !== 2 ){
-	    this.onError("invalid number of arguments for :show");
+	    this.onMessage(":show path\n:show code\n:show modules");
 	    break;
 	}
 	switch( words[1] ){
