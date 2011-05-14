@@ -84,12 +84,25 @@ Modern web applications are becoming more and more complex, with users expecting
  in turn means that they are becoming more error prone<TODO: reference?>.
  One large source of errors in web applications is the absence of type safety
  in the form of static type checking in most scripting languages aimed at
- web development, such as JavaScript or PHP <TODO: reference? A Type System
- for Dynamic Web Documents has some stuff, then the Curry stuff can be useful>.
+ web development, such as JavaScript or PHP 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "curry-js,type-system-dyn-web"
+
+\end_inset
+
+.
  One solution to this problem is providing an extra layer of abstraction
  on top of these scripts, that in turn can be subject to static type checking.
  For example another, already existing, programming language that has these
- features can be used.
+ features can be used 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "curry-js,HTML-in-haskell,CGI-haskell"
+
+\end_inset
+
+.
  
 \end_layout
 
@@ -1192,13 +1205,6 @@ kind
 
 \end_inset
 
-
-\begin_inset CommandInset citation
-LatexCommand cite
-key "haskell-report4.1.1"
-
-\end_inset
-
 .
 \end_layout
 
@@ -1772,7 +1778,9 @@ Other operations on the syntax tree, such as reduction of complex constructs
  into simpler, more general constructs can also be done as part of the semantic
  analysis.
  This is done to simplify the code generation process.
- <TODO: not done> 
+ Some code optimizations that are independent of the target language used
+ can also be performed at this stage.
+ 
 \end_layout
 
 \begin_layout Section
@@ -1806,12 +1814,14 @@ key "dragon-book1.2"
 \end_layout
 
 \begin_layout Section
-Code generation
+Back-end
 \end_layout
 
 \begin_layout Standard
-Code generation is the process of taking the intermediate representation
- and producing a semantically equivalent program in the target language
+The back-end is the final part of the compiler.
+ The main function of the back-end is code generation, which is the process
+ of taking the intermediate representation and producing a semantically
+ equivalent program in the target language
 \begin_inset CommandInset citation
 LatexCommand cite
 key "dragon-book8"
@@ -1819,6 +1829,8 @@ key "dragon-book8"
 \end_inset
 
 .
+ The back-end can also fill other functions such as performing code optimization
+s that are specific to the target language.
  
 \end_layout
 
@@ -2266,9 +2278,8 @@ ENTER
 
 \end_inset
 
- key (for evaluation of the interpreter commands) is a Ymacs command that
- will read the last line of the buffer send the command on the line to the
- interpreter.
+ key is a Ymacs command that will read the last line of the buffer send
+ the command on the line to the interpreter.
  The 
 \begin_inset Flex CharStyle:Code
 status collapsed
@@ -2279,9 +2290,9 @@ TAB
 
 \end_inset
 
- key (for auto-completion of interpreter commands) is a Ymacs command that
- sends the command on the last line to the interpreter, and the buffer is
- modified depending on if there is none, one, or many matches.
+ key is a Ymacs command that sends the command on the last line to the interpret
+er, and the buffer is modified depending on if there is none, one, or many
+ matches.
 \end_layout
 
 \begin_layout Standard
@@ -2318,245 +2329,12 @@ Interpreter
 \end_layout
 
 \begin_layout Standard
-The interpreter supports a subset of the GHCi commands together with a command
+The interpreter supports a subset of the GHCi commands, and includes a command
  for evaluation of javascript expressions.
 \end_layout
 
 \begin_layout Standard
-The following commands are available.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float table
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset Tabular
-<lyxtabular version="3" rows="10" columns="2">
-<features>
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-command
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-description
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-:help
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-:kind
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-:load
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-:show
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-:type
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-:js
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-:show path
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-:show code
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-:show modules
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\begin_inset Caption
-
-\begin_layout Plain Layout
-Interpreter commands
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
+<TODO: describe currently supported commands>
 \end_layout
 
 \begin_layout Section
@@ -4116,15 +3894,6 @@ Takes an AST in the intermediate representation and translates into the
 \end_layout
 
 \begin_layout Subsection
-Optimization of AST
-\end_layout
-
-\begin_layout Standard
-Transformations on the AST to optimize the performance in space and time.
- <TODO: strictness analysis, etc..>
-\end_layout
-
-\begin_layout Subsection
 Code generation
 \end_layout
 
@@ -4156,6 +3925,10 @@ Standard libraries
 \begin_layout Standard
 <TODO: describe how the code from the Haskell report was used to construct
  the standard libraries for the compiler>
+\end_layout
+
+\begin_layout Chapter
+Discussion
 \end_layout
 
 \begin_layout Standard
