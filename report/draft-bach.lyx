@@ -2337,7 +2337,7 @@ status open
 <lyxtabular version="3" rows="10" columns="2">
 <features>
 <column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="4.5in">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -2372,7 +2372,7 @@ description
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Prints available commands
 \end_layout
 
 \end_inset
@@ -2392,7 +2392,7 @@ description
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Takes any number of type constructors and prints the kind of each
 \end_layout
 
 \end_inset
@@ -2412,7 +2412,8 @@ description
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Takes a number of module names of modules to load.
+ Will find all dependencies and recompile modules as necessary.
 \end_layout
 
 \end_inset
@@ -2432,7 +2433,7 @@ description
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Prints the possible arguments to :show
 \end_layout
 
 \end_inset
@@ -2452,7 +2453,8 @@ description
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Takes a Haskell expression which will be compiled.
+ If it has no errors, the type of the expression will be printed.
 \end_layout
 
 \end_inset
@@ -2472,7 +2474,8 @@ description
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Takes a Javascript expression and evaluates it.
+ If it has no errors, the result will be printed.
 \end_layout
 
 \end_inset
@@ -2492,7 +2495,7 @@ description
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Prints the URLs which will be used when loading Haskell modules.
 \end_layout
 
 \end_inset
@@ -2512,7 +2515,7 @@ description
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Prints the generated Javascript code of all loaded Haskell modules.
 \end_layout
 
 \end_inset
@@ -2532,7 +2535,7 @@ description
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Prints the names of the currently loaded modules.
 \end_layout
 
 \end_inset
