@@ -5227,8 +5227,8 @@ Standard libraries
 \end_layout
 
 \begin_layout Standard
-The standard libraries used for JSHC are a subset of the libraries described
- in 
+The standard Haskell libraries used for JSHC are a subset of the libraries
+ described in 
 \begin_inset CommandInset citation
 LatexCommand cite
 key "haskell-report"
@@ -5236,6 +5236,10 @@ key "haskell-report"
 \end_inset
 
 .
+ Included in these are basic integer arithmetic functions, arithmetic comparison
+s, the Bool type with operators and functions, operators and functions for
+ function compisition and some basic functions on lists.
+ 
 \end_layout
 
 \begin_layout Chapter
