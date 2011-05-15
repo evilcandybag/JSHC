@@ -3369,6 +3369,10 @@ Fixity resolution: Replace all lists of infix applications with operator
 Type check: Compute types and kinds
 \end_layout
 
+\begin_layout Itemize
+Top level namespace?
+\end_layout
+
 \begin_layout Subsubsection
 Export check
 \end_layout
@@ -3412,12 +3416,88 @@ name "sub:Fixity-Resolution"
 \end_layout
 
 \begin_layout Standard
-Applied separately on each module in a group.
+Fixity resolution is applied separately on each module in a group.
+ It is the procedure which, given information on each operator's fixity
+ and precedence, calculates in which order the operators in an infix expression
+ are to be applied.
+ This information is then used to convert the infix expressions into ordinary
+ prefix function applications.
+ 
 \end_layout
 
 \begin_layout Standard
-Given the available operators and their precedences, adjusts the expressions
- in all functions and operators so that they use the declared precedence.
+For example, the expression 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+2 + 3 * 10
+\end_layout
+
+\end_inset
+
+ could evaluate to 32 or 50, depending on the fixity and precedence of the
+ operators 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
++
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+*
+\end_layout
+
+\end_inset
+
+.
+ The algorithm looks up the fixity information of the operators, and finds
+ out that they are both left fix operators with precedences of 6 and 7 respectiv
+ely.
+ Since 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+*
+\end_layout
+
+\end_inset
+
+ has the higher precedence, it should be applied before 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
++
+\end_layout
+
+\end_inset
+
+, resulting in the application expression 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+(+) 2 ((*) 3 10)
+\end_layout
+
+\end_inset
+
+, which evaluates to 32, as expected by anyone familiar with the operators'
+ precedence in ordinary arithmetics.
+ 
+\end_layout
+
+\begin_layout Standard
+
 \end_layout
 
 \begin_layout Subsubsection
