@@ -2929,16 +2929,40 @@ Dependency order traversal
 \end_layout
 
 \begin_layout Standard
-Traversing the graph of the groups in dependency order.
+To traverse the graph in dependency order, an opposide edge is added for
+ each edge so that each group not only knows what it depends upon, but also
+ which groups depends upon it.
+ Each group keeps track of the number of remaining groups that it depends
+ on, and for each group that is checked, this number is decreased for all
+ groups that depends on it (which are exactly the set of groups accessible
+ via the added edges).
+ The traversal keeps track of a ready set and waiting set of groups.
+ Whenever the number of remaining unchecked dependencies reaches 0, the
+ group is moved to the ready set.
 \end_layout
 
 \begin_layout Standard
-The algorithm computes the ordering lazily, similar to an iterator, but
- allows for concurrency by producing a set of nodes at each step.
+Unless there are missing dependencies (or there are groups which are currently
+ being checked), the ready set will never be empty while the waiting set
+ is not.
 \end_layout
 
 \begin_layout Standard
-<TODO: pseudo code here>
+A group is checked by removing it from the ready set, check it, and then
+ inform the traversal algorithm that the group is checked.
+\end_layout
+
+\begin_layout Standard
+When both sets are empty, the traversal is complete.
+\end_layout
+
+\begin_layout Standard
+Concurrency is possible, since any number of groups could be taken out from
+ the ready set to be checked at the same time.
+\end_layout
+
+\begin_layout Standard
+<TODO: should there be pseudo code ?>
 \end_layout
 
 \begin_layout Section
@@ -5110,8 +5134,8 @@ To implement basic some functionality of the generated code which cannot
 
 \begin_layout Standard
 Since JavaScript does not have integers built in, the arithmetics for the
- Haskell integer types requires internal libraries that manage integer bounds
- etc <TODO: bad formulation IMHO>
+ Haskell integer types requires internal libraries that manage integer behaviour
+, such as overflow.
 \end_layout
 
 \begin_layout Standard
