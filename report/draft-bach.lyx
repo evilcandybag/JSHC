@@ -123,6 +123,10 @@ key "haskell-report"
 
 \end_layout
 
+\begin_layout Standard
+<TODO: a nicer introduction might be in order?>
+\end_layout
+
 \begin_layout Section
 Related work
 \end_layout
@@ -154,24 +158,7 @@ key "curry-js"
 \end_inset
 
 .
- <TODO: stuffe here> there are several projects out there with a similar
- approach to the one presented here.
- Notable ones are Yesod 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "yesod-book"
-
-\end_inset
-
-, which is a full-featured web server framework, and YCR2JS 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "yhc-js"
-
-\end_inset
-
-, a JavaScript back end to the York Haskell Compiler.
- <TODO: elaborate here>
+ 
 \end_layout
 
 \begin_layout Section
@@ -1801,8 +1788,8 @@ target language
  Common examples of compilers' target languages are machine code in the
  case of the GNU C Compiler <TODO: ref>, bytecode to be run in a virtual
  machine in the case of Java <TODO: ref> or another high level programming
- language in the case of the Glasgow Haskell Compiler, which compiles to
- C <TODO: ref>.
+ language in the case of the Glasgow Haskell Compiler, which can compile
+ to C <TODO: ref>.
  
 \end_layout
 
@@ -2040,7 +2027,7 @@ Back-end
 \end_layout
 
 \begin_layout Standard
-The back-end is the final part of the compiler.
+The back-end is the final part of a compiler.
  The main function of the back-end is code generation, which is the process
  of taking the intermediate representation and producing a semantically
  equivalent program in the target language
@@ -2061,51 +2048,34 @@ Method
 \end_layout
 
 \begin_layout Standard
-The main part of this project is the development of the compiler itself.
- This task is performed by first implementing a working compiler for a small
- subset of Haskell.
- This smaller compiler is then tested and expanded iteratively, until full
- support for the Haskell specification 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "haskell-report"
-
-\end_inset
-
- has been achieved.
+The main part of this project was the development of the compiler itself.
+ The first stage of the project was to identify and isolate subgoals and
+ -problems that could be reasoned about on their own.
+ Before proceeding with any actual implementation, we attempted to identify
+ a theoretical solution to each of these subgoals and -problems, to facilitate
+ subsequent implementation.
+ Examples of such subproblems are type inference and dependency resolution.
+ The next stage was to identify larger components of the project that could
+ largely be implemented independently.
+ Five such components were identified; lexical analyser, parser, semantic
+ analyser, code generator and graphical interface.
+ Responsibility for these parts was then split between group members.
 \end_layout
 
 \begin_layout Standard
-<TODO: redo this completely as this is simply not true >
+Implementation work was largely carried out individually, with regular meetings
+ to synchronize efforts and plan ahead.
+ To keep work synchronized between meetings, the git version control system
+ was used.
 \end_layout
 
 \begin_layout Standard
-<TODO: read some articles on what to put here>
-\end_layout
-
-\begin_layout Standard
-<TODO: Something about chosing to implement JSHC without using implementation
- details of existing compilers for Haskell>
-\end_layout
-
-\begin_layout Section
-Coding standard
-\end_layout
-
-\begin_layout Standard
-In 
-\end_layout
-
-\begin_layout Section
-Tools and libraries used
-\end_layout
-
-\begin_layout Standard
-Several external tools were used to facilitate the development of JSHC.
+Early on in the project phase, it was determined that several external tools
+ wold be needed to facilitate the development of JSHC.
  
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 PEG.js
 \end_layout
 
@@ -2316,7 +2286,7 @@ key "parsing-expression-grammars"
  
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Jison
 \end_layout
 
@@ -2353,7 +2323,7 @@ key "haskell-report10.3"
  
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Ymacs
 \end_layout
 
@@ -2440,18 +2410,6 @@ modes
  
 \end_layout
 
-\begin_layout Section
-Testing
-\end_layout
-
-\begin_layout Standard
-Custom built test suite 
-\end_layout
-
-\begin_layout Standard
-<TODO: how and what do we test?>
-\end_layout
-
 \begin_layout Chapter
 Implementation
 \end_layout
@@ -2483,7 +2441,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename D:/My Dropbox/Kandidatarbete/Formalia/poster/JSHCscreen_smaller.png
+	filename JSHCscreen_smaller.png
 
 \end_inset
 
@@ -4940,15 +4898,17 @@ Concurrency
 \end_layout
 
 \begin_layout Standard
-The dependency group traversal could run concurrently, as the implemented
- algorithm allow for taking out many groups which do not depend on each
- other.
+To speed up compilation, the dependency group traversal could be implemented
+ to run concurrently, as the implemented algorithm allows for taking out
+ many groups which do not depend on each other.
  Even though extensions for concurrency exists, speed is not important in
  the compiler in it
 \begin_inset Quotes ers
 \end_inset
 
 s current state.
+ Lexical analysis and parsing of modules could also benefit from added concurren
+cy.
 \end_layout
 
 \begin_layout Subsection
@@ -4965,7 +4925,8 @@ Adding an FFI to JavaScript code would simplify the writing of the prelude,
 
 \begin_layout Standard
 More importantly, it will also allow writing Haskell libraries that wrap
- JavaScript APIs.
+ JavaScript APIs, which would greatly increase the flexibility in the developmen
+t capabilities of JSHC.
 \end_layout
 
 \begin_layout Subsection
@@ -5004,33 +4965,73 @@ Syntax highlighting in the Haskell mode
 Issues
 \end_layout
 
+\begin_layout Standard
+During the course of the project, several issues were 
+\end_layout
+
 \begin_layout Subsection
 The Haskell grammar
 \end_layout
 
 \begin_layout Standard
-The grammar in the Haskell report is at least an LR(2) grammar as it requires
- a lookahead of 2 when reading top declarations, and it has conflicts as
- an LALR grammar.
- This means that it must be rewritten for a LALR(1) parser generator such
- as Jison.
- The grammar is also ambiguous <TODO: for example something related to an
- empty file?>.
- We do not think the grammar should be ambiguous, as it makes it less clear
- and also harder to implement a parser for.
+Certain features of the Haskell grammar occurred to us as peculiar and/or
+ problematic when implementing the language.
 \end_layout
 
 \begin_layout Standard
-Other issues.
- e.g 
-\begin_inset Quotes eld
+The grammar in the Haskell report is at least an LR(2) grammar as it requires
+ a lookahead of 2 when reading top declarations <TODO: we should examplify
+ this>, and it has conflicts as an LALR grammar.
+ This means that it must be rewritten for use in a LALR(1) parser generator
+ such as Jison or Bison.
+ This is problematic, as rewriting the grammar can be a source of errors
+ that can be hard to detect <TODO: ref?>.
+ The grammar also contains at least one ambiguity.
+ Both the 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+impdecl
+\end_layout
+
 \end_inset
 
-2=3
-\begin_inset Quotes erd
+ and the 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+gendecl
+\end_layout
+
 \end_inset
 
- should not be a valid declaration in the grammar.
+ have empty productions, and both can be present at the top level.
+ Although this ambiguity only applies to programs with empty declarations,
+ and should not affect implementations, allowing for ambiguities in the
+ formal specification of a language strikes us as bad practice, as it potentiall
+y makes the grammar less clear and also harder to implement a parser for.
+\end_layout
+
+\begin_layout Standard
+Another issue we had was that the specification defines some declarations
+ as legal where the semantics are unclear or nonsensical <TODO: can we say
+ that in that way?>.
+ For example, 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+2 = 3
+\end_layout
+
+\end_inset
+
+ is a valid top level declaration in Haskell, which, we assume, defines
+ a pattern match which can never succeed as it is never reached to begin
+ with.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -5813,6 +5814,19 @@ topdecls → topdecl
 \end_inset
 
 (n ≥ 0)
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+nopagebreak
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -7027,6 +7041,19 @@ fexp → [fexp] aexp
 \end_inset
 
 (function application)
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+nopagebreak
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
