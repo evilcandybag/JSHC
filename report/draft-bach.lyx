@@ -179,18 +179,19 @@ Purpose
 \end_layout
 
 \begin_layout Standard
-The purpose of this thesis is to present an implementation of a fully JavaScript
- Haskell-compiler (i.e.
- a compiler written entirely in JavaScript, compiling Haskell to JavaScript).
- Coupled with the compiler will be an interface in the form of a JavaScript-base
-d text editor with an interactive code console (in the vein of the Glasgow
- Haskell Compiler's GHCi).
- By writing the compiler entirely in JavaScript, all computations will be
- performed by the client, thus greatly lightening the server load compared
- to having the computations run server-side, while still saving the user
- the work of downloading a compiler to their computer.
- The compiler supports the a subset of Haskell, as described in .
- <TODO; rewrite as much of this is filthy LIES!>
+The purpose of this project is to implement a Haskell compiler that generates
+ JavaScript code.
+ The compiler is to be written entirely in JavaScript, to ensure compatibility
+ with most major modern browsers, and relieve users of the burden of having
+ to download and install a compiler to their system.
+ A JavaScript based graphical user interface with a text-editor and a code
+ interpreter will also be developed.
+ The code interpreter will enable users to run their programs, and execute
+ Haskell expressions directly in the editor, in the vein of the Glasgow
+ Haskell Compiler's GHCi, or the Hugs interpreter.
+ The compiler is to serve as a proof of concept for developing web applications
+ in Haskell in an online environment.
+ <TODO: extend and elaborate!>
 \end_layout
 
 \begin_layout Chapter
@@ -386,12 +387,37 @@ True
 .
 \end_layout
 
+\begin_layout Itemize
+user defined operators
+\end_layout
+
+\begin_layout Itemize
+simple examples of Haskell code?
+\end_layout
+
 \begin_layout Section
 Module system
 \end_layout
 
 \begin_layout Standard
-Haskell’s module system is its main method of encapsulation.
+Haskell’s module system is its main method of encapsulation <TODO: better
+ to use 
+\begin_inset Quotes eld
+\end_inset
+
+information hiding
+\begin_inset Quotes erd
+\end_inset
+
+ instead of 
+\begin_inset Quotes eld
+\end_inset
+
+encapsulation
+\begin_inset Quotes erd
+\end_inset
+
+?>.
  Apart from local variables in a certain function, it is the only way to
  determine whether something is known (i.e.
  in scope) or not.
@@ -458,7 +484,7 @@ C
 \end_inset
 
  to also have imported some defnintions defined in module 
-\begin_inset Flex CharStyle:Emph
+\begin_inset Flex CharStyle:Code
 status collapsed
 
 \begin_layout Plain Layout
@@ -543,9 +569,9 @@ The dependency groups are the strongly connected components in the directed
 \end_layout
 
 \begin_layout Standard
-After they have been computed, the resulting graph is a DAG (directed acyclic
- graph) where nodes are dependency groups, and the edges are the dependencies
- between the groups.
+After they have been computed, the resulting graph is a directed acyclic
+ graph (DAG) where nodes are dependency groups, and the edges are the dependenci
+es between the groups.
 \end_layout
 
 \begin_layout Standard
@@ -566,15 +592,34 @@ key "haskell-report"
 \end_layout
 
 \begin_layout Standard
-This concept is used in two places of the compiler.
+This concept is used in several places of the compiler.
  It is needed to describe sets of modules that depend on each other, sets
  of top-level declarations that depend on each other (even between different
- modules), and declarations in let/where expressions.
+ modules), and declarations in 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+let
+\end_layout
+
+\end_inset
+
+/
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+where
+\end_layout
+
+\end_inset
+
+ expressions.
 \end_layout
 
 \begin_layout Standard
-The concept of dependency groups also applies to local definitions, for
- example, in the function:
+An example of dependencies between local definitions is:
 \begin_inset ERT
 status open
 
@@ -788,6 +833,47 @@ where
 \end_inset
 
  expression.
+ The same example can be applied to top-level declarations, where 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Let
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Where
+\end_layout
+
+\end_inset
+
+ are modules that declare 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+even
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+odd
+\end_layout
+
+\end_inset
+
+, respectively.
 \end_layout
 
 \begin_layout Standard
@@ -820,15 +906,26 @@ status open
 \begin_inset Caption
 
 \begin_layout Plain Layout
-<TODO: smart and super cool text about dependency groups>
+Example module dependency graph.
+ The arrows mean 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+imports from
 \end_layout
 
 \end_inset
 
-
+.
+ In this example, the dependency groups are {A,B}, {C,D,E}, {G} and {F}.
+ On compilation, {A,B} and {G} need to be checked first, then {C,D,E} and
+ {F} last.
+ 
 \end_layout
 
-\begin_layout Plain Layout
+\end_inset
+
 
 \end_layout
 
@@ -843,10 +940,7 @@ Types
 
 \begin_layout Standard
 All values in haskell have a type.
-\end_layout
-
-\begin_layout Standard
-The type 
+ The type 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
@@ -1024,7 +1118,17 @@ Array Int Double
 
 \end_inset
 
- , which is an Array with indices of type 
+ , which is an 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Array
+\end_layout
+
+\end_inset
+
+ with indices of type 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
@@ -2298,9 +2402,42 @@ newline
 \end_layout
 
 \begin_layout Standard
-The Ymacs interface consists of a window with one or more buffers for entering
- text.
- <TODO: structure of Ymacs>
+The Ymacs interface design centers around the two central concepts of 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+buffers
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+modes
+\end_layout
+
+\end_inset
+
+.
+ The word buffer refers to two different entities in the Ymacs program;
+ the data structure which stores entered text coupled with the functions
+ managing its manipulation, and the text field which is presented a user.
+ These two denotations will be used interchangeably, as it should be clear
+ from context which denotation is intended.
+ While the default Ymacs view contains a single buffer, buffers can be split,
+ by creating a new buffer sharing the same screen space.
+ Each buffer has a mode, which determines the behaviour of the buffer.
+ Modes determine what hot key commands are available, how text is displayed
+ etc.
+ Due to the transparent nature of JavaScript programs (i.e.
+ all code inside a JavaScript application shares the same global namespace),
+ modes can be used to completely redefine the behavior of a buffer without
+ changing any of the Ymacs source code.
+ 
 \end_layout
 
 \begin_layout Section
@@ -2333,12 +2470,46 @@ Interface
 
 \begin_layout Standard
 An interface for using the compiler has been created.
- It uses Ymacs to allow a user to create modules and then load them in an
+ It uses Ymacs to allow a user to write modules and then load them in an
  interpreter that uses the compiler.
 \end_layout
 
 \begin_layout Standard
-<TODO: image of the interface with two files and the interpreter open>
+\begin_inset Float figure
+placement h
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename D:/My Dropbox/Kandidatarbete/Formalia/poster/JSHCscreen_smaller.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Screen capture of the Ymacs interface and JSHC interpreter as viewed in
+ a web browser.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
@@ -2346,7 +2517,11 @@ Ymacs
 \end_layout
 
 \begin_layout Standard
-Several modifications has been done to the default Ymacs environment.
+To modify the behaviour of Ymacs to make it suitable as a development environmen
+t for JSHC, several modifications has been done to the default environment.
+ The interpreter functionality was implemented by creating a mode for buffers
+ editing Haskell source files and one for a buffer behaving as an interpreter.
+ 
 \end_layout
 
 \begin_layout Subsubsection
@@ -2367,7 +2542,7 @@ status collapsed
 
 \end_inset
 
- extension, and the haskell mode will be set.
+ extension, and the Haskell mode will be set.
 \end_layout
 
 \begin_layout Subsubsection
@@ -2375,7 +2550,7 @@ Haskell mode
 \end_layout
 
 \begin_layout Standard
-A haskell mode for buffers containing haskell code.
+A Haskell mode for buffers containing Haskell code.
  It currently only contains the command 
 \begin_inset Flex CharStyle:Code
 status collapsed
@@ -2460,7 +2635,7 @@ Interpreter
 
 \begin_layout Standard
 The interpreter supports a subset of the GHCi commands, and includes a command
- for evaluation of javascript expressions.
+ for evaluation of JavaScript expressions.
 \end_layout
 
 \begin_layout Standard
@@ -2615,7 +2790,7 @@ Takes a Haskell expression which will be compiled.
 \begin_inset Text
 
 \begin_layout Plain Layout
-Takes a Javascript expression and evaluates it.
+Takes a JavaScript expression and evaluates it.
  If it has no errors, the result will be printed.
 \end_layout
 
@@ -2680,7 +2855,7 @@ hsusr/
 \begin_inset Text
 
 \begin_layout Plain Layout
-Prints the generated Javascript code of all loaded Haskell modules.
+Prints the generated JavaScript code of all loaded Haskell modules.
 \end_layout
 
 \end_inset
@@ -2838,7 +3013,7 @@ The lexical analysis in JSHC is performed in several steps.
 
 \begin_layout Standard
 While lexical analysis is often done by having the parser request a token
- from the lexical analyser, match that token against a rule, request another
+ from the lexical analyzer, match that token against a rule, request another
  and so on
 \begin_inset CommandInset citation
 LatexCommand cite
@@ -3178,11 +3353,11 @@ key "jison"
 
 .
  The parser and the last step of the lexical analysis work in concert, meaning
- that the lexical analyser does not process and return all tokens in one
+ that the lexical analyzer does not process and return all tokens in one
  go, but only sends the parser tokens when asked to.
  To handle certain features of the layout dependent syntax of Haskell, that
- cannot be handled by the lexical analyser alone, the parser will inform
- the lexical analyser of any such parse errors, so that the lexer can react
+ cannot be handled by the lexical analyzer alone, the parser will inform
+ the lexical analyzer of any such parse errors, so that the lexer can react
  and send new tokens that solve the problem (c.f.
  the description of the 
 \begin_inset Flex CharStyle:Code
@@ -3310,7 +3485,7 @@ Type checking is applied on dependency groups over all declarations from
 \begin_layout Standard
 While type checking, the algorithm keeps track of local names and type variables
 , and also the constraints using a map from the type variables to types
- to which they are contrained.
+ to which they are constrained.
 \end_layout
 
 \begin_layout Standard
@@ -3322,7 +3497,7 @@ The constraint map maps type variables (LHS) to types (RHS).
 \end_layout
 
 \begin_layout Standard
-It simply represents the types that type variables are contrained to.
+It simply represents the types that type variables are constrained to.
 \end_layout
 
 \begin_layout Standard
@@ -3385,7 +3560,7 @@ Each declared name in a group is given a type variable.
  As the declarations are checked, the type variables for the names will
  be constrained depending on what the declaration contains.
  After all declarations in the group have been checked, all free type variables
- occuring in the types bound to the type variables of each declared name
+ occurring in the types bound to the type variables of each declared name
  are quantified since they only occur inside the declarations.
 \end_layout
 
@@ -3405,8 +3580,8 @@ Each declared name in a group is given a type variable.
 It is necessary to use dependency groups and check in dependency group order
  to give the correct type, instead of checking all of the declarations as
  a single group <TODO: example needed.
- check the haskell report.
- related to the monomorhism restriction.>
+ check the Haskell report.
+ related to the monomorphism restriction.>
 \end_layout
 
 \begin_layout Standard
@@ -4405,14 +4580,14 @@ Code generation
 \end_layout
 
 \begin_layout Standard
-Generates javascript code representing the compiled modules.
- Compiles a program in the intermediate language to javascript, which can
- then be executed by any javascript interpreter.
+Generates JavaScript code representing the compiled modules.
+ Compiles a program in the intermediate language to JavaScript, which can
+ then be executed by any JavaScript interpreter.
 \end_layout
 
 \begin_layout Standard
 Can be compiled so that all exported identifiers would use the same name
- in javascript (under some namespace), which allows easy lookup of identifiers
+ in JavaScript (under some namespace), which allows easy lookup of identifiers
  by an interpreter, but also debugging of the compiler.
  <TODO: this is too short, talk about stuff such as matching >
 \end_layout
@@ -4433,7 +4608,7 @@ To implement basic some functionality of the generated code which cannot
 \begin_layout Standard
 Since JavaScript does not have integers built in, the arithmetics for the
  Haskell integer types requires internal libraries that manage integer bounds
- etc <TODO: bad formulation imho>
+ etc <TODO: bad formulation IMHO>
 \end_layout
 
 \begin_layout Standard
@@ -4475,6 +4650,75 @@ Thunk
  <TODO: perhaps more elaboration?>
 \end_layout
 
+\begin_layout Standard
+Pattern matching is handled by an internal function that is sent an expression,
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+e
+\end_layout
+
+\end_inset
+
+, and an array of pairs 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+{pattern,rhs}
+\end_layout
+
+\end_inset
+
+, where 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+pattern
+\end_layout
+
+\end_inset
+
+ is the pattern to match the result of 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+e
+\end_layout
+
+\end_inset
+
+ to, and 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+rhs
+\end_layout
+
+\end_inset
+
+ is a function that takes any bindings made in 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+pattern
+\end_layout
+
+\end_inset
+
+ as arguments, and returns the right hand side expression of that particular
+ pattern match alternative.
+ The pairs are then matched sequentially, one at a time until a match is
+ found or there are no more alternatives to match.
+ 
+\end_layout
+
 \begin_layout Section
 Standard libraries
 \end_layout
@@ -4510,7 +4754,7 @@ It is unclear to us what is the best way of computing the set of exported
 
 \begin_layout Standard
 Resolving exports is complicated.
- The haskell report only explains the syntax and semantics of export lists.
+ The Haskell report only explains the syntax and semantics of export lists.
 \end_layout
 
 \begin_layout Standard
@@ -4608,7 +4852,7 @@ The dependency checking was not expected.
  It is something which one does not see as a Haskell user.
  It is not needed in many other languages as they do not have cyclic dependencie
 s between language constructs together with a lack of specification.
- It is this combination that causes the groups that need to be analysed
+ It is this combination that causes the groups that need to be analyzed
  together instead of simple using an export specification of a module or
  a declared type of a function.
 \end_layout
@@ -4617,8 +4861,20 @@ s between language constructs together with a lack of specification.
 Design choices
 \end_layout
 
+\begin_layout Itemize
+Why write compiler in JavaScript?
+\end_layout
+
+\begin_layout Itemize
+non-JavaScript applications
+\end_layout
+
 \begin_layout Section
-Comparison with other implementations
+Comparison with other implementations 
+\end_layout
+
+\begin_layout Standard
+<TODO: is this something we can do well in a short time frame?>
 \end_layout
 
 \begin_layout Subsection
@@ -4626,15 +4882,15 @@ Other possible solutions to client-side Haskell
 \end_layout
 
 \begin_layout Standard
-If making a plug-in, one still required writing a back-end to javascript
- and implementing an FFI to Javascript code.
+If making a plug-in, one still required writing a back-end to JavaScript
+ and implementing an FFI to JavaScript code.
 \end_layout
 
 \begin_layout Standard
-If compiling an existing compiler like GHC to Javascript, it would require
- an existing Javascript back-end, and the performance of it would be important.
+If compiling an existing compiler like GHC to JavaScript, it would require
+ an existing JavaScript back-end, and the performance of it would be important.
  There seems like there would be issues with how I/O is used within the
- compiler since it is not available in Javascript, which would mean that
+ compiler since it is not available in JavaScript, which would mean that
  the compiler need to be modified and can not just be compiled as is.
 \end_layout
 
@@ -4652,7 +4908,7 @@ HIJi (project from previous year)
 
 \begin_layout Standard
 From the report, it is unclear if one can load more than one module, and
- if cyclies in the dependencies of module and declaration are handled as
+ if cycles in the dependencies of module and declaration are handled as
  it is not mentioned.
 \end_layout
 
@@ -4661,7 +4917,7 @@ Future work on JSHC
 \end_layout
 
 \begin_layout Subsection
-Loading files asyncronuously
+Loading files asynchronously
 \end_layout
 
 \begin_layout Standard
@@ -4700,7 +4956,7 @@ FFI: Foreign Function Interface
 \end_layout
 
 \begin_layout Standard
-Adding an FFI to Javascript code would simplify the writing of thePprelude,
+Adding an FFI to JavaScript code would simplify the writing of the prelude,
  as primitive operations such as addition could be described using foreign
  imports instead of a name with a special prefix for which the type would
  be stored in the type checker when looking up the name instead of the type
@@ -4709,7 +4965,7 @@ Adding an FFI to Javascript code would simplify the writing of thePprelude,
 
 \begin_layout Standard
 More importantly, it will also allow writing Haskell libraries that wrap
- Javascript APIs.
+ JavaScript APIs.
 \end_layout
 
 \begin_layout Subsection
@@ -4728,11 +4984,20 @@ Type classes in Haskell Cordelia Hall, Kevin Hammond, Simon Peyton Jones,
 \begin_inset Quotes erd
 \end_inset
 
- from http://homepages.inf.ed.ac.uk/wadler/topics/type-classes.html
+ from http://homepages.inf.ed.ac.uk/wadler/topics/type-classes.html <TODO: we
+ need some text here too.
+ reference added to .bib : 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "type-classes-in-haskell"
+
+\end_inset
+
+>
 \end_layout
 
 \begin_layout Subsection
-Highlighting in the Haskell mode
+Syntax highlighting in the Haskell mode
 \end_layout
 
 \begin_layout Section
@@ -4745,7 +5010,7 @@ The Haskell grammar
 
 \begin_layout Standard
 The grammar in the Haskell report is at least an LR(2) grammar as it requires
- a lookahead of 2 when reading topdeclarations, and it has conflicts as
+ a lookahead of 2 when reading top declarations, and it has conflicts as
  an LALR grammar.
  This means that it must be rewritten for a LALR(1) parser generator such
  as Jison.
@@ -4787,7 +5052,7 @@ The idea was that the interpreter should support adding paths.
  other than the one that the script is executed on.
  If using chrome/chromium, the security policy even prevents accessing local
  files using the file:// protocol when running scripts from local files,
- so the Ymacs interface must be placed on a webserver to work for browsers
+ so the Ymacs interface must be placed on a web server to work for browsers
  with such a restriction.
 \end_layout
 
