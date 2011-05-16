@@ -3048,32 +3048,185 @@ Implementation
 \end_layout
 
 \begin_layout Standard
-<TODO: proper introduction here>
-\end_layout
+Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:implementation"
 
-\begin_layout Itemize
-Find, read and parse all modules: This part identifies the modules used,
- performs lexical analysis on them and parses them into an abstract representati
-on of the language, the Abstract Syntax Tree (AST).
-\end_layout
+\end_inset
 
-\begin_layout Itemize
-Type checking: This part consists of checking each module for type correctness,
- as well as inferring general types.
- This new inferred type information is added to the AST.
-\end_layout
-
-\begin_layout Itemize
-Simplification: Before compilation, the AST is simplified, reducing the
- number of different constructs used, to make for easier compilation.
+ shows how the interface uses the compiler.
 \end_layout
 
 \begin_layout Standard
-<TODO: describe what the front-end does>
+Given a set of modules to load (the 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+target
+\end_layout
+
+\end_inset
+
+ set), the compiler will load (see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Loading-modules"
+
+\end_inset
+
+) them resulting in the 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+loaded
+\end_layout
+
+\end_inset
+
+ set, which is set of all required modules unless there was an error.
 \end_layout
 
 \begin_layout Standard
-<TODO: describe what th back-end does>
+The compiler will then compute the dependency groups of the loaded set,
+ and traverse the groups in dependency order (see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Checking-module-groups"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+The compiler will then for each module, translate the AST (see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Simplify"
+
+\end_inset
+
+) to the IR, and then generate (see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:back-end"
+
+\end_inset
+
+) javascript code.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename gen-prog-structure.png
+	lyxscale 50
+	width 14.5cm
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:implementation"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+<TODO:
+\end_layout
+
+\begin_layout Plain Layout
+* 
+\begin_inset Quotes eld
+\end_inset
+
+loading modules
+\begin_inset Quotes erd
+\end_inset
+
+ is missing.
+\end_layout
+
+\begin_layout Plain Layout
+* 
+\begin_inset Quotes eld
+\end_inset
+
+Add top-level namespace
+\begin_inset Quotes erd
+\end_inset
+
+ (not a good name? (see description of this figure)) must be within the
+ dependency checking.
+\end_layout
+
+\begin_layout Plain Layout
+* 
+\begin_inset Quotes eld
+\end_inset
+
+computing exports
+\begin_inset Quotes erd
+\end_inset
+
+ is missing.
+\end_layout
+
+\begin_layout Plain Layout
+* reverse order of 
+\begin_inset Quotes eld
+\end_inset
+
+code generation
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+AST simplification
+\begin_inset Quotes erd
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Plain Layout
+>
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Flow of information in the implementation
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
@@ -3199,6 +3352,12 @@ The interpreter contains an instance of the compiler, which it uses to load
 \end_layout
 
 \begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Loading-modules"
+
+\end_inset
+
 Loading modules
 \end_layout
 
@@ -3602,12 +3761,76 @@ key "haskell-report"
 \end_layout
 
 \begin_layout Subsection
-Checking dependency groups of modules
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Checking-module-groups"
+
+\end_inset
+
+Checking module groups
 \end_layout
 
 \begin_layout Standard
 The following steps are taken for each group of modules, which are checked
  in dependency order.
+\end_layout
+
+\begin_layout Standard
+....
+\end_layout
+
+\begin_layout Standard
+For each group of modules, the compiler does the following:
+\end_layout
+
+\begin_layout Standard
+For each module, compute the 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+tspace
+\end_layout
+
+\end_inset
+
+ (the set of declared top-level names in the module), and adding fixity
+ information to this name so that it can easily be found later on.
+\end_layout
+
+\begin_layout Standard
+Resolve the exports, which results in the 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+espace
+\end_layout
+
+\end_inset
+
+ (the set of exported names) being known for each module in the group.
+\end_layout
+
+\begin_layout Standard
+For each module, check usage of names.
+\end_layout
+
+\begin_layout Standard
+For each module, resolve fixity of operators.
+\end_layout
+
+\begin_layout Standard
+...
+\end_layout
+
+\begin_layout Standard
+If some modules are already compiled, they will only be compiled if not
+ all of the modules within the same group have previously been compiled.
+\end_layout
+
+\begin_layout Standard
+....
 \end_layout
 
 \begin_layout Itemize
@@ -3630,6 +3853,21 @@ Type check: Compute types and kinds
 
 \begin_layout Itemize
 Top level namespace?
+\end_layout
+
+\begin_layout Standard
+....
+\end_layout
+
+\begin_layout Itemize
+Type checking: This part consists of checking each module for type correctness,
+ as well as inferring general types.
+ This new inferred type information is added to the AST.
+\end_layout
+
+\begin_layout Itemize
+Simplification: Before compilation, the AST is simplified, reducing the
+ number of different constructs used, to make for easier compilation.
 \end_layout
 
 \begin_layout Subsubsection
@@ -3963,6 +4201,12 @@ Checks for missing identifiers (type variables, types, functions, etc..),
 \end_layout
 
 \begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Simplify"
+
+\end_inset
+
 Translation to the intermediate representation
 \end_layout
 
@@ -4938,6 +5182,12 @@ reference "sub:Fixity-Resolution"
 \end_layout
 
 \begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:back-end"
+
+\end_inset
+
 Compiler back-end
 \end_layout
 
