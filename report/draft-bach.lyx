@@ -182,6 +182,10 @@ The purpose of this project is to implement a Haskell compiler that generates
 \end_layout
 
 \begin_layout Chapter
+Theoretical background
+\end_layout
+
+\begin_layout Section
 Introduction to Haskell
 \end_layout
 
@@ -382,7 +386,7 @@ user defined operators
 simple examples of Haskell code?
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 Module system
 \end_layout
 
@@ -525,7 +529,1141 @@ One important feature of Haskell's module system is that unlike, for example,
  
 \end_layout
 
+\begin_layout Subsection
+Types
+\end_layout
+
+\begin_layout Standard
+All values in haskell have a type.
+ The type 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Int -> Int
+\end_layout
+
+\end_inset
+
+ represents a function which takes a value of type 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Int
+\end_layout
+
+\end_inset
+
+ and produces a result of type 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Int
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+To be able to write a function that takes values that may be of more than
+ one type, one uses 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+type variables
+\end_layout
+
+\end_inset
+
+, which are written with lower-case letters.
+\end_layout
+
+\begin_layout Standard
+A function 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+id :: a -> a
+\end_layout
+
+\end_inset
+
+ (where
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+::
+\end_layout
+
+\end_inset
+
+is read as 
+\begin_inset Quotes eld
+\end_inset
+
+has type
+\begin_inset Quotes erd
+\end_inset
+
+) is therefore a function that takes a value of any type and produces a
+ result of the same type.
+\end_layout
+
+\begin_layout Standard
+This is called a 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+polymorphic type
+\end_layout
+
+\end_inset
+
+, as 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+id
+\end_layout
+
+\end_inset
+
+ can have a different type depending on how it is used, as the type variable
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+a
+\end_layout
+
+\end_inset
+
+ can be replaced with different types.
+\end_layout
+
+\begin_layout Standard
+Types can have 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+type parameters
+\end_layout
+
+\end_inset
+
+, which is necessary for collections if one wants to be able to use them
+ where all values have the same type, but be able to choose that type.
+\end_layout
+
+\begin_layout Standard
+A list of integers is written 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[Int]
+\end_layout
+
+\end_inset
+
+, and a function that computes the length of a list as an 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Int
+\end_layout
+
+\end_inset
+
+ would have type 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[a] -> Int
+\end_layout
+
+\end_inset
+
+ as it would work regardless of the type of the values in the list.
+ Note however that all the values must have the same type.
+\end_layout
+
+\begin_layout Standard
+The list type is built-in.
+ More generally, a type can be applied to any number of types as in 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Array Int Double
+\end_layout
+
+\end_inset
+
+ , which is an 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Array
+\end_layout
+
+\end_inset
+
+ with indices of type 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Int
+\end_layout
+
+\end_inset
+
+ and stores values of type 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Double
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+Type declarations
+\end_layout
+
+\begin_layout Standard
+New types can be created.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+data Tree a = Leaf | Node a (Tree a) (Tree a)
+\end_layout
+
+\end_inset
+
+ declares a 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+type constructor
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Tree
+\end_layout
+
+\end_inset
+
+ which can be applied to any type that one wants the values in the tree
+ to have.
+ It also declares the 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+data constructor
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Leaf
+\end_layout
+
+\end_inset
+
+ which represents an empty tree, and the data constructor 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Node
+\end_layout
+
+\end_inset
+
+ which is used to construct a new tree given a value to store in the root
+ node of the tree, and the left and right sub-tree.
+\end_layout
+
+\begin_layout Standard
+The built-in lists have the special type constructor 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[]
+\end_layout
+
+\end_inset
+
+, and the data constructors 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[] :: ∀a.
+ [a]
+\end_layout
+
+\end_inset
+
+ (the empty list) and 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+(:) :: ∀a.
+ a -> [a] -> [a]
+\end_layout
+
+\end_inset
+
+ (creating a new list given a first element and the rest of the elements).
+\end_layout
+
 \begin_layout Section
+Introduction to Compilation
+\end_layout
+
+\begin_layout Standard
+This chapter is intended as an introduction to the general concepts of compilati
+on for readers who have little or no experience with the inner workings
+ of compilers.
+ The approach to compilation described here is not the only one, and only
+ describes the compilation steps used in JSHC.
+ For a more general and in-depth view of compilers and compilation, 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "dragon-book"
+
+\end_inset
+
+ is recommended.
+ 
+\end_layout
+
+\begin_layout Standard
+A compiler is a program that, given program code, produceTop level namespace?s
+ new code in another language, the 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+target language
+\end_layout
+
+\end_inset
+
+.
+ Common examples of compilers' target languages are machine code in the
+ case of the GNU C Compiler <TODO: ref>, bytecode to be run in a virtual
+ machine in the case of Java <TODO: ref> or another high level programming
+ language in the case of the Glasgow Haskell Compiler, which can compile
+ to C <TODO: ref>.
+ 
+\end_layout
+
+\begin_layout Standard
+A compiler consists of two main parts; the 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+front-end
+\end_layout
+
+\end_inset
+
+ and the 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+back-end
+\end_layout
+
+\end_inset
+
+.
+ The front-end takes the program code and creates an abstract representation
+ of it, and the back-end takes that representation and converts it into
+ the target language.
+\end_layout
+
+\begin_layout Subsection
+Lexical analysis
+\end_layout
+
+\begin_layout Standard
+Lexical analysis is the first part of the front-end, and is the process
+ by which the compiler takes the program code in the form of an input string,
+ and parses it into a list of separate tokens, 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+lexemes
+\end_layout
+
+\end_inset
+
+, which are the smallest significant components in a programming language
+\begin_inset CommandInset citation
+LatexCommand cite
+key "dragon-book"
+
+\end_inset
+
+, chapter 1.2.
+\end_layout
+
+\begin_layout Standard
+For example, given a program in a simple language with Haskell-like syntax
+ with a source code that looks like this:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+fun x y = x + y
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+a lexer could generate a list of tokens in this vein:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[fun,x,y,=,x,+,y]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Parsing
+\end_layout
+
+\begin_layout Standard
+Parsing is the second part of the front-end and takes the list of lexemes
+ and interprets it according to a grammar, creating a data structure containing
+ an abstract representation of the code, called the 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+abstract syntax tree
+\end_layout
+
+\end_inset
+
+.
+ The abstract syntax tree is a tree (or tree-like) graph with nodes representing
+ the application of a certain rule in the grammar.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement h
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Graphics
+	filename adsgadgs.png
+	lyxscale 50
+	width 14cm
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Graphic representation of an AST of a function definition in a simple language
+ with Haskell- like syntax.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Semantic analysis
+\end_layout
+
+\begin_layout Standard
+Semantic analysis gathers various semantic properties of the source program,
+ to check for errors and to use later on in the compilation process.
+ One common part of semantic analysis is 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+type checking
+\end_layout
+
+\end_inset
+
+, where the compiler searches the abstract syntax tree for type inconsistencies.
+ For example, in many languages, adding a boolean to an integer is not a
+ valid expression, an error which would be caught by the type checker.
+ Another common part of the semantic analysis is 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+name checking
+\end_layout
+
+\end_inset
+
+, where the compiler checks whether there are any ambiguities in variable
+ names used, and whether used variables are in scope where they are used.
+\end_layout
+
+\begin_layout Standard
+Other operations on the syntax tree, such as reduction of complex constructs
+ into simpler, more general constructs can also be done as part of the semantic
+ analysis.
+ This is done to simplify the code generation process.
+ Some code optimizations that are independent of the target language used
+ can also be performed at this stage.
+ 
+\end_layout
+
+\begin_layout Subsection
+Intermediate representation
+\end_layout
+
+\begin_layout Standard
+After passing through the compiler front-end, the source program has been
+ converted into an 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+intermediate representation
+\end_layout
+
+\end_inset
+
+, which will later be used as input for the back-end.
+ The intermediate representation can take many forms, for example an abstract
+ syntax tree, code in another high-level programming language, or some low-level
+ code (for example three-address code)
+\begin_inset CommandInset citation
+LatexCommand cite
+key "dragon-book"
+
+\end_inset
+
+, chapter 1.2.
+ 
+\end_layout
+
+\begin_layout Subsection
+Back-end
+\end_layout
+
+\begin_layout Standard
+The back-end is the final part of a compiler.
+ The main function of the back-end is code generation, which is the process
+ of taking the intermediate representation and producing a semantically
+ equivalent program in the target language
+\begin_inset CommandInset citation
+LatexCommand cite
+key "dragon-book"
+
+\end_inset
+
+, chapter 8.
+ The back-end can also fill other functions such as performing code optimization
+s that are specific to the target language.
+ 
+\end_layout
+
+\begin_layout Section
+Compiling Haskell
+\end_layout
+
+\begin_layout Standard
+<TODO: perhaps this title, perhaps another>
+\end_layout
+
+\begin_layout Subsection
+SOmething something type system
+\end_layout
+
+\begin_layout Subsubsection
+Quantification of types
+\end_layout
+
+\begin_layout Standard
+Type variables, just as ordinary variables must be declared and used variables
+ must be in scope of a declaration.
+\end_layout
+
+\begin_layout Standard
+The declaration of variables is called 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+quantification
+\end_layout
+
+\end_inset
+
+.
+ A variable that is not declared is 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+free
+\end_layout
+
+\end_inset
+
+, and a variable that is declared is 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+bound
+\end_layout
+
+\end_inset
+
+ (by the quantification).
+\end_layout
+
+\begin_layout Standard
+When writing a type signature in haskell, the quantification is implicit.
+\end_layout
+
+\begin_layout Standard
+This means that a type signature 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[a] -> [a]
+\end_layout
+
+\end_inset
+
+ is actually 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+∀a.
+ [a] -> [a]
+\end_layout
+
+\end_inset
+
+, where 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+∀
+\end_layout
+
+\end_inset
+
+ binds the type variable 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+a
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The implicit quantification of type signatures binds all type variables
+ in the signature.
+\end_layout
+
+\begin_layout Standard
+All type signatures written in a program and inferred by the compiler are
+ 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+rank-1 polymorphic types
+\end_layout
+
+\end_inset
+
+, which means that the type given to a value begins with a quantification
+ of all the type variables that occur in it, followed by the rest of the
+ type which does not contain any quantifications.
+ This makes the type system simpler.
+\end_layout
+
+\begin_layout Subsubsection
+Kinds
+\end_layout
+
+\begin_layout Standard
+The function type 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Tree -> Tree
+\end_layout
+
+\end_inset
+
+ is invalid as the type 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Tree
+\end_layout
+
+\end_inset
+
+ has a type parameter.
+\end_layout
+
+\begin_layout Standard
+To detect these errors, all types and type constructors have a 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+kind
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The kind of all types is 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+*
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+A function type is valid if both the argument and result type have kind
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+*
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The kind of the type constructors 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Tree
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[]
+\end_layout
+
+\end_inset
+
+ is 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+* -> *
+\end_layout
+
+\end_inset
+
+, which means that they take a type and produce a type.
+ They must therefore be applied to a type which is not missing any arguments
+ (i.e have kind 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+*
+\end_layout
+
+\end_inset
+
+), and will result in a type of kind 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+*
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+Instantiation of types
+\end_layout
+
+\begin_layout Standard
+When using a data constructor such as 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[] :: ∀a.[a]
+\end_layout
+
+\end_inset
+
+, one would want to use it with lists with different element types in different
+ locations.
+\end_layout
+
+\begin_layout Standard
+This is achieved by replacing all bound type variables in the type with
+ new type variables wherever it is used.
+\end_layout
+
+\begin_layout Standard
+These type variables are now free, but will be bound after the type of the
+ expression has been inferred unless they are eliminated by the 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+type inference
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+Type inference
+\end_layout
+
+\begin_layout Standard
+If one makes a declaration 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+y = x : []
+\end_layout
+
+\end_inset
+
+ where 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+x :: Int
+\end_layout
+
+\end_inset
+
+, one will have:
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+(:) :: "a -> [a] -> [a]"
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[] :: [b]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+x :: Int
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+a
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+b
+\end_layout
+
+\end_inset
+
+ are free type variables.
+\end_layout
+
+\begin_layout Standard
+To replace the type variables with types, one uses type inference which
+ creates type constraint based upon how
+\end_layout
+
+\begin_layout Standard
+the types are used.
+\end_layout
+
+\begin_layout Standard
+Since 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+x
+\end_layout
+
+\end_inset
+
+ is the 1st argument to 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+(:)
+\end_layout
+
+\end_inset
+
+, the constraint 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+a = Int
+\end_layout
+
+\end_inset
+
+ is created.
+\end_layout
+
+\begin_layout Standard
+Since 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[]
+\end_layout
+
+\end_inset
+
+ is the 2nd argument to 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+(:)
+\end_layout
+
+\end_inset
+
+, the constraint 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[b] = [a]
+\end_layout
+
+\end_inset
+
+ is created, which gives the constraint 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+a = b
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The type inference algorithm must assign a single type to each of the free
+ type variables such that all the constraints are satisified.
+\end_layout
+
+\begin_layout Standard
+If there is more than one possible assignment, then the type is called ambiguous
+, and is an error, unless a default
+\begin_inset CommandInset citation
+LatexCommand cite
+key "haskell-report"
+
+\end_inset
+
+,chapter 4.3.4, type can be chosen.
+\end_layout
+
+\begin_layout Standard
+If there is no possible assignment, then an error will arise from the constraint
+s.
+\end_layout
+
+\begin_layout Standard
+In this case, there is only a single possible assignment, and the inferred
+ types are:
+\end_layout
+
+\begin_layout Itemize
+(:) :: Int -> [Int] -> [Int]
+\end_layout
+
+\begin_layout Itemize
+[] :: [Int]
+\end_layout
+
+\begin_layout Itemize
+y :: [Int]
+\end_layout
+
+\begin_layout Standard
+<TODO: Example using function application and abstraction ?>
+\end_layout
+
+\begin_layout Subsection
 Dependency groups
 \end_layout
 
@@ -944,1128 +2082,6 @@ imports from
 \end_inset
 
 
-\end_layout
-
-\begin_layout Section
-Types
-\end_layout
-
-\begin_layout Standard
-All values in haskell have a type.
- The type 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-Int -> Int
-\end_layout
-
-\end_inset
-
- represents a function which takes a value of type 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-Int
-\end_layout
-
-\end_inset
-
- and produces a result of type 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-Int
-\end_layout
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-To be able to write a function that takes values that may be of more than
- one type, one uses 
-\begin_inset Flex CharStyle:Strong
-status collapsed
-
-\begin_layout Plain Layout
-type variables
-\end_layout
-
-\end_inset
-
-, which are written with lower-case letters.
-\end_layout
-
-\begin_layout Standard
-A function 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-id :: a -> a
-\end_layout
-
-\end_inset
-
- (where
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-::
-\end_layout
-
-\end_inset
-
-is read as 
-\begin_inset Quotes eld
-\end_inset
-
-has type
-\begin_inset Quotes erd
-\end_inset
-
-) is therefore a function that takes a value of any type and produces a
- result of the same type.
-\end_layout
-
-\begin_layout Standard
-This is called a 
-\begin_inset Flex CharStyle:Strong
-status collapsed
-
-\begin_layout Plain Layout
-polymorphic type
-\end_layout
-
-\end_inset
-
-, as 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-id
-\end_layout
-
-\end_inset
-
- can have a different type depending on how it is used, as the type variable
- 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-a
-\end_layout
-
-\end_inset
-
- can be replaced with different types.
-\end_layout
-
-\begin_layout Standard
-Types can have 
-\begin_inset Flex CharStyle:Strong
-status collapsed
-
-\begin_layout Plain Layout
-type parameters
-\end_layout
-
-\end_inset
-
-, which is necessary for collections if one wants to be able to use them
- where all values have the same type, but be able to choose that type.
-\end_layout
-
-\begin_layout Standard
-A list of integers is written 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-[Int]
-\end_layout
-
-\end_inset
-
-, and a function that computes the length of a list as an 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-Int
-\end_layout
-
-\end_inset
-
- would have type 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-[a] -> Int
-\end_layout
-
-\end_inset
-
- as it would work regardless of the type of the values in the list.
- Note however that all the values must have the same type.
-\end_layout
-
-\begin_layout Standard
-The list type is built-in.
- More generally, a type can be applied to any number of types as in 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-Array Int Double
-\end_layout
-
-\end_inset
-
- , which is an 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-Array
-\end_layout
-
-\end_inset
-
- with indices of type 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-Int
-\end_layout
-
-\end_inset
-
- and stores values of type 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-Double
-\end_layout
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Subsection
-Quantification of types
-\end_layout
-
-\begin_layout Standard
-Type variables, just as ordinary variables must be declared and used variables
- must be in scope of a declaration.
-\end_layout
-
-\begin_layout Standard
-The declaration of variables is called 
-\begin_inset Flex CharStyle:Strong
-status collapsed
-
-\begin_layout Plain Layout
-quantification
-\end_layout
-
-\end_inset
-
-.
- A variable that is not declared is 
-\begin_inset Flex CharStyle:Strong
-status collapsed
-
-\begin_layout Plain Layout
-free
-\end_layout
-
-\end_inset
-
-, and a variable that is declared is 
-\begin_inset Flex CharStyle:Strong
-status collapsed
-
-\begin_layout Plain Layout
-bound
-\end_layout
-
-\end_inset
-
- (by the quantification).
-\end_layout
-
-\begin_layout Standard
-When writing a type signature in haskell, the quantification is implicit.
-\end_layout
-
-\begin_layout Standard
-This means that a type signature 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-[a] -> [a]
-\end_layout
-
-\end_inset
-
- is actually 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-∀a.
- [a] -> [a]
-\end_layout
-
-\end_inset
-
-, where 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-∀
-\end_layout
-
-\end_inset
-
- binds the type variable 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-a
-\end_layout
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-The implicit quantification of type signatures binds all type variables
- in the signature.
-\end_layout
-
-\begin_layout Standard
-All type signatures written in a program and inferred by the compiler are
- 
-\begin_inset Flex CharStyle:Strong
-status collapsed
-
-\begin_layout Plain Layout
-rank-1 polymorphic types
-\end_layout
-
-\end_inset
-
-, which means that the type given to a value begins with a quantification
- of all the type variables that occur in it, followed by the rest of the
- type which does not contain any quantifications.
- This makes the type system simpler.
-\end_layout
-
-\begin_layout Subsection
-Type declarations
-\end_layout
-
-\begin_layout Standard
-New types can be created.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-data Tree a = Leaf | Node a (Tree a) (Tree a)
-\end_layout
-
-\end_inset
-
- declares a 
-\begin_inset Flex CharStyle:Strong
-status collapsed
-
-\begin_layout Plain Layout
-type constructor
-\end_layout
-
-\end_inset
-
- 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-Tree
-\end_layout
-
-\end_inset
-
- which can be applied to any type that one wants the values in the tree
- to have.
- It also declares the 
-\begin_inset Flex CharStyle:Strong
-status collapsed
-
-\begin_layout Plain Layout
-data constructor
-\end_layout
-
-\end_inset
-
- 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-Leaf
-\end_layout
-
-\end_inset
-
- which represents an empty tree, and the data constructor 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-Node
-\end_layout
-
-\end_inset
-
- which is used to construct a new tree given a value to store in the root
- node of the tree, and the left and right sub-tree.
-\end_layout
-
-\begin_layout Standard
-The built-in lists have the special type constructor 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-[]
-\end_layout
-
-\end_inset
-
-, and the data constructors 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-[] :: ∀a.
- [a]
-\end_layout
-
-\end_inset
-
- (the empty list) and 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-(:) :: ∀a.
- a -> [a] -> [a]
-\end_layout
-
-\end_inset
-
- (creating a new list given a first element and the rest of the elements).
-\end_layout
-
-\begin_layout Subsection
-Kinds
-\end_layout
-
-\begin_layout Standard
-The function type 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-Tree -> Tree
-\end_layout
-
-\end_inset
-
- is invalid as the type 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-Tree
-\end_layout
-
-\end_inset
-
- has a type parameter.
-\end_layout
-
-\begin_layout Standard
-To detect these errors, all types and type constructors have a 
-\begin_inset Flex CharStyle:Strong
-status collapsed
-
-\begin_layout Plain Layout
-kind
-\end_layout
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-The kind of all types is 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-*
-\end_layout
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-A function type is valid if both the argument and result type have kind
- 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-*
-\end_layout
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-The kind of the type constructors 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-Tree
-\end_layout
-
-\end_inset
-
- and 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-[]
-\end_layout
-
-\end_inset
-
- is 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-* -> *
-\end_layout
-
-\end_inset
-
-, which means that they take a type and produce a type.
- They must therefore be applied to a type which is not missing any arguments
- (i.e have kind 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-*
-\end_layout
-
-\end_inset
-
-), and will result in a type of kind 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-*
-\end_layout
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Subsection
-Instantiation of types
-\end_layout
-
-\begin_layout Standard
-When using a data constructor such as 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-[] :: ∀a.[a]
-\end_layout
-
-\end_inset
-
-, one would want to use it with lists with different element types in different
- locations.
-\end_layout
-
-\begin_layout Standard
-This is achieved by replacing all bound type variables in the type with
- new type variables wherever it is used.
-\end_layout
-
-\begin_layout Standard
-These type variables are now free, but will be bound after the type of the
- expression has been inferred unless they are eliminated by the 
-\begin_inset Flex CharStyle:Strong
-status collapsed
-
-\begin_layout Plain Layout
-type inference
-\end_layout
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Subsection
-Type inference
-\end_layout
-
-\begin_layout Standard
-If one makes a declaration 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-y = x : []
-\end_layout
-
-\end_inset
-
- where 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-x :: Int
-\end_layout
-
-\end_inset
-
-, one will have:
-\end_layout
-
-\begin_layout Itemize
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-(:) :: "a -> [a] -> [a]"
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Itemize
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-[] :: [b]
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Itemize
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-x :: Int
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-where 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-a
-\end_layout
-
-\end_inset
-
- and 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-b
-\end_layout
-
-\end_inset
-
- are free type variables.
-\end_layout
-
-\begin_layout Standard
-To replace the type variables with types, one uses type inference which
- creates type constraint based upon how
-\end_layout
-
-\begin_layout Standard
-the types are used.
-\end_layout
-
-\begin_layout Standard
-Since 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-x
-\end_layout
-
-\end_inset
-
- is the 1st argument to 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-(:)
-\end_layout
-
-\end_inset
-
-, the constraint 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-a = Int
-\end_layout
-
-\end_inset
-
- is created.
-\end_layout
-
-\begin_layout Standard
-Since 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-[]
-\end_layout
-
-\end_inset
-
- is the 2nd argument to 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-(:)
-\end_layout
-
-\end_inset
-
-, the constraint 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-[b] = [a]
-\end_layout
-
-\end_inset
-
- is created, which gives the constraint 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-a = b
-\end_layout
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-The type inference algorithm must assign a single type to each of the free
- type variables such that all the constraints are satisified.
-\end_layout
-
-\begin_layout Standard
-If there is more than one possible assignment, then the type is called ambiguous
-, and is an error, unless a default
-\begin_inset CommandInset citation
-LatexCommand cite
-key "haskell-report"
-
-\end_inset
-
-,chapter 4.3.4, type can be chosen.
-\end_layout
-
-\begin_layout Standard
-If there is no possible assignment, then an error will arise from the constraint
-s.
-\end_layout
-
-\begin_layout Standard
-In this case, there is only a single possible assignment, and the inferred
- types are:
-\end_layout
-
-\begin_layout Itemize
-(:) :: Int -> [Int] -> [Int]
-\end_layout
-
-\begin_layout Itemize
-[] :: [Int]
-\end_layout
-
-\begin_layout Itemize
-y :: [Int]
-\end_layout
-
-\begin_layout Standard
-<TODO: Example using function application and abstraction ?>
-\end_layout
-
-\begin_layout Chapter
-Introduction to Compilation
-\end_layout
-
-\begin_layout Standard
-This chapter is intended as an introduction to the general concepts of compilati
-on for readers who have little or no experience with the inner workings
- of compilers.
- The approach to compilation described here is not the only one, and only
- describes the compilation steps used in JSHC.
- For a more general and in-depth view of compilers and compilation, 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "dragon-book"
-
-\end_inset
-
- is recommended.
- 
-\end_layout
-
-\begin_layout Standard
-A compiler is a program that, given program code, produces new code in another
- language, the 
-\begin_inset Flex CharStyle:Strong
-status collapsed
-
-\begin_layout Plain Layout
-target language
-\end_layout
-
-\end_inset
-
-.
- Common examples of compilers' target languages are machine code in the
- case of the GNU C Compiler <TODO: ref>, bytecode to be run in a virtual
- machine in the case of Java <TODO: ref> or another high level programming
- language in the case of the Glasgow Haskell Compiler, which can compile
- to C <TODO: ref>.
- 
-\end_layout
-
-\begin_layout Standard
-A compiler consists of two main parts; the 
-\begin_inset Flex CharStyle:Strong
-status collapsed
-
-\begin_layout Plain Layout
-front-end
-\end_layout
-
-\end_inset
-
- and the 
-\begin_inset Flex CharStyle:Strong
-status collapsed
-
-\begin_layout Plain Layout
-back-end
-\end_layout
-
-\end_inset
-
-.
- The front-end takes the program code and creates an abstract representation
- of it, and the back-end takes that representation and converts it into
- the target language.
-\end_layout
-
-\begin_layout Section
-Lexical analysis
-\end_layout
-
-\begin_layout Standard
-Lexical analysis is the first part of the front-end, and is the process
- by which the compiler takes the program code in the form of an input string,
- and parses it into a list of separate tokens, 
-\begin_inset Flex CharStyle:Strong
-status collapsed
-
-\begin_layout Plain Layout
-lexemes
-\end_layout
-
-\end_inset
-
-, which are the smallest significant components in a programming language
-\begin_inset CommandInset citation
-LatexCommand cite
-key "dragon-book"
-
-\end_inset
-
-, chapter 1.2.
-\end_layout
-
-\begin_layout Standard
-For example, given a program in a simple language with Haskell-like syntax
- with a source code that looks like this:
-\end_layout
-
-\begin_layout Standard
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-fun x y = x + y
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-a lexer could generate a list of tokens in this vein:
-\end_layout
-
-\begin_layout Standard
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-[fun,x,y,=,x,+,y]
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Section
-Parsing
-\end_layout
-
-\begin_layout Standard
-Parsing is the second part of the front-end and takes the list of lexemes
- and interprets it according to a grammar, creating a data structure containing
- an abstract representation of the code, called the 
-\begin_inset Flex CharStyle:Strong
-status collapsed
-
-\begin_layout Plain Layout
-abstract syntax tree
-\end_layout
-
-\end_inset
-
-.
- The abstract syntax tree is a tree (or tree-like) graph with nodes representing
- the application of a certain rule in the grammar.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-placement h
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset space \hfill{}
-\end_inset
-
-
-\begin_inset Graphics
-	filename adsgadgs.png
-	lyxscale 50
-	width 14cm
-
-\end_inset
-
-
-\begin_inset space \hfill{}
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-Graphic representation of an AST of a function definition in a simple language
- with Haskell- like syntax.
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Section
-Semantic analysis
-\end_layout
-
-\begin_layout Standard
-Semantic analysis gathers various semantic properties of the source program,
- to check for errors and to use later on in the compilation process.
- One common part of semantic analysis is 
-\begin_inset Flex CharStyle:Strong
-status collapsed
-
-\begin_layout Plain Layout
-type checking
-\end_layout
-
-\end_inset
-
-, where the compiler searches the abstract syntax tree for type inconsistencies.
- For example, in many languages, adding a boolean to an integer is not a
- valid expression, an error which would be caught by the type checker.
- Another common part of the semantic analysis is 
-\begin_inset Flex CharStyle:Strong
-status collapsed
-
-\begin_layout Plain Layout
-name checking
-\end_layout
-
-\end_inset
-
-, where the compiler checks whether there are any ambiguities in variable
- names used, and whether used variables are in scope where they are used.
-\end_layout
-
-\begin_layout Standard
-Other operations on the syntax tree, such as reduction of complex constructs
- into simpler, more general constructs can also be done as part of the semantic
- analysis.
- This is done to simplify the code generation process.
- Some code optimizations that are independent of the target language used
- can also be performed at this stage.
- 
-\end_layout
-
-\begin_layout Section
-Intermediate representation
-\end_layout
-
-\begin_layout Standard
-After passing through the compiler front-end, the source program has been
- converted into an 
-\begin_inset Flex CharStyle:Strong
-status collapsed
-
-\begin_layout Plain Layout
-intermediate representation
-\end_layout
-
-\end_inset
-
-, which will later be used as input for the back-end.
- The intermediate representation can take many forms, for example an abstract
- syntax tree, code in another high-level programming language, or some low-level
- code (for example three-address code)
-\begin_inset CommandInset citation
-LatexCommand cite
-key "dragon-book"
-
-\end_inset
-
-, chapter 1.2.
- 
-\end_layout
-
-\begin_layout Section
-Back-end
-\end_layout
-
-\begin_layout Standard
-The back-end is the final part of a compiler.
- The main function of the back-end is code generation, which is the process
- of taking the intermediate representation and producing a semantically
- equivalent program in the target language
-\begin_inset CommandInset citation
-LatexCommand cite
-key "dragon-book"
-
-\end_inset
-
-, chapter 8.
- The back-end can also fill other functions such as performing code optimization
-s that are specific to the target language.
- 
 \end_layout
 
 \begin_layout Chapter
@@ -5644,7 +5660,7 @@ options "plain"
 
 \begin_layout Chapter
 \start_of_appendix
-Nomenclature
+NomenclatureTop level namespace?
 \end_layout
 
 \begin_layout Chapter
