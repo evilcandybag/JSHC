@@ -2925,7 +2925,7 @@ Simplification: Before compilation, the AST is simplified, reducing the
 \end_layout
 
 \begin_layout Subsection
-Interface
+User Interface
 \end_layout
 
 \begin_layout Subsubsection
