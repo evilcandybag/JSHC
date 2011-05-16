@@ -329,8 +329,21 @@ newline
 
 \end_layout
 
+\begin_layout Itemize
+user defined operators
+\end_layout
+
+\begin_layout Itemize
+simple examples of Haskell code?
+\end_layout
+
+\begin_layout Subsection
+Functions 
+\end_layout
+
 \begin_layout Standard
-Being purely functional, Haskell's functions do not have side effects.
+Being a purely functional language, Haskell's functions do not have side
+ effects.
  <TODO: more on purity>
 \end_layout
 
@@ -375,22 +388,147 @@ True
 \end_inset
 
 .
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
 \end_layout
 
-\begin_layout Itemize
-user defined operators
+\end_inset
+
+
 \end_layout
 
-\begin_layout Itemize
-simple examples of Haskell code?
+\begin_layout Standard
+A Haskell function can either be named, meaning it is declared with a name
+ somewhere in the program, either as a top-level definition or as a local
+ function inside a 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+let
+\end_layout
+
+\end_inset
+
+ or 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+where
+\end_layout
+
+\end_inset
+
+ expression, or anonymous as lambda expressions.
+ Function declarations take the form 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+name
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+arg
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ ...
+ arg
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+=
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+expression
+\end_layout
+
+\end_inset
+
+, where 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+name
+\end_layout
+
+\end_inset
+
+ is any identifier starting with a lower case letter, 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+arg
+\end_layout
+
+\end_inset
+
+ 1 through n is a series of patterns and 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+expression
+\end_layout
+
+\end_inset
+
+ is the expression that denotes the result of the function.
+ 
 \end_layout
 
 \begin_layout Subsection
-Functions 
+Pattern matching 
+\end_layout
+
+\begin_layout Standard
+A pattern is 
+\end_layout
+
+\begin_layout Itemize
+match a pattern <TODO: fill in latyer>
 \end_layout
 
 \begin_layout Subsection
 Expressions
+\end_layout
+
+\begin_layout Standard
+<TODO: fill in later.
+ how much do we need here? there are a lot of expressions>
 \end_layout
 
 \begin_layout Subsection
@@ -739,9 +877,9 @@ Haskell’s module system is its main method of encapsulation.
  in scope) or not.
  Each module has a name, a set of imports, a set of exports and a body containin
 g top-level declatiations.
- The specification of these is optional, with defaults being “Main”, the
- empty import set and the export set containing all top-level declarations,
- respectively.
+ The specification of these is optional, with defaults being the module
+ name “Main”, the empty import set and the export set containing all top-level
+ declarations.
  
 \end_layout
 
@@ -1165,11 +1303,13 @@ Compiling Haskell
 \end_layout
 
 \begin_layout Standard
-<TODO: perhaps this title, perhaps another>
+In this section, we present a more detailed introduction to concepts that
+ are required to understand the various steps in the compilation of Haskell.
+ <TODO: is this really an OK intro to this section?> 
 \end_layout
 
 \begin_layout Subsection
-SOmething something type system
+Advanced features of the type system 
 \end_layout
 
 \begin_layout Subsubsection
@@ -2047,7 +2187,7 @@ are
 
 \begin_layout Standard
 \begin_inset Float figure
-placement h
+placement H
 wide false
 sideways false
 status open
@@ -2100,6 +2240,18 @@ imports from
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Subsection
+Laziness
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Standard
 
 \end_layout
 
