@@ -111,7 +111,7 @@ Haskell is one such language, designed with type-safety as one of the major
  concerns <TODO:ref: ?>.
  By compiling Haskell directly to JavaScript, we use its strong type system
  to guard against some of the errors that are hard to avoid when writing
- large and complex application with a dynamically typed language such as
+ large and complex applications with a dynamically typed language such as
  JavaScript.
  <TODO: better formulation plox> 
 \begin_inset CommandInset citation
@@ -154,6 +154,60 @@ key "CGI-haskell"
 \begin_inset CommandInset citation
 LatexCommand cite
 key "curry-js"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+There are several implementations of compilers from Haskell to JavaScript;
+ although none of them has reached a full release stage as of the time of
+ writing.
+ There are three implementations of JavaScript back-ends for existing Haskell
+ compilers; the Utrecht Haskell Compiler has one under development 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "uhc-javascript"
+
+\end_inset
+
+ which is planned for inclusion in an upcoming release, the now defunct
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "yhc-dead"
+
+\end_inset
+
+ York Haskell Compiler had one, coupled with a toolkit for web content creation
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "yhc-web-toolkit"
+
+\end_inset
+
+, and there is one in development as a back-end for the Glasgow Haskell
+ Compiler which is in its alpha stage at the time of writing 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "ghcjs"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+There are also at least one other attempt to implement Haskell directly
+ in JavaScript, called Haskell in JavaScript, which is an online interpreter
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "hiji"
 
 \end_inset
 
@@ -2248,11 +2302,8 @@ Laziness
 \end_layout
 
 \begin_layout Standard
-
-\end_layout
-
-\begin_layout Standard
-
+<TODO: write something here or leave this out? can't think of anything which
+ is not described somewhere else right now>
 \end_layout
 
 \begin_layout Chapter
@@ -5665,13 +5716,30 @@ Dependency checking
 \end_layout
 
 \begin_layout Standard
+Dependency checking was not expected to be as big a part of the implementation
+ as it turned out to be.
+ It is something which one does not see as a Haskell user, and is not needed
+ in many other languages that we have experience with, such as C or Java,
+ as they do not have cyclic dependencies between language constructs.
+ It is also only scarcely mentioned in the specification (
+\begin_inset CommandInset citation
+LatexCommand cite
+key "haskell-report"
+
+\end_inset
+
+ chapters 4.5 and 4.6), which somewhat hides the fact that it is a central
+ concept in the workings of a Haskell compiler.
+\end_layout
+
+\begin_layout Standard
 The dependency checking was not expected.
- It is something which one does not see as a Haskell user.
  It is not needed in many other languages as they do not have cyclic dependencie
 s between language constructs together with a lack of specification.
  It is this combination that causes the groups that need to be analyzed
- together instead of simple using an export specification of a module or
+ together instead of simply using an export specification of a module or
  a declared type of a function.
+ <TODO: keep or not? if so, rewrite a bit for clarity.>
 \end_layout
 
 \begin_layout Section
