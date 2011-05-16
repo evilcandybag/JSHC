@@ -1743,11 +1743,11 @@ If there is more than one possible assignment, then the type is called ambiguous
 , and is an error, unless a default
 \begin_inset CommandInset citation
 LatexCommand cite
-key "haskell-report4.3.4"
+key "haskell-report"
 
 \end_inset
 
- type can be chosen.
+,chapter 4.3.4, type can be chosen.
 \end_layout
 
 \begin_layout Standard
@@ -1865,11 +1865,11 @@ lexemes
 , which are the smallest significant components in a programming language
 \begin_inset CommandInset citation
 LatexCommand cite
-key "dragon-book1.2"
+key "dragon-book"
 
 \end_inset
 
-.
+, chapter 1.2.
 \end_layout
 
 \begin_layout Standard
@@ -2039,11 +2039,11 @@ intermediate representation
  code (for example three-address code)
 \begin_inset CommandInset citation
 LatexCommand cite
-key "dragon-book1.2"
+key "dragon-book"
 
 \end_inset
 
-.
+, chapter 1.2.
  
 \end_layout
 
@@ -2058,11 +2058,11 @@ The back-end is the final part of a compiler.
  equivalent program in the target language
 \begin_inset CommandInset citation
 LatexCommand cite
-key "dragon-book8"
+key "dragon-book"
 
 \end_inset
 
-.
+, chapter 8.
  The back-end can also fill other functions such as performing code optimization
 s that are specific to the target language.
  
@@ -2338,11 +2338,11 @@ Jison was chosen mainly because of the familiarity and extensive documentation
  to a Haskell parser 
 \begin_inset CommandInset citation
 LatexCommand cite
-key "haskell-report10.3"
+key "haskell-report"
 
 \end_inset
 
-.
+, chapter 10.3.
  The speed and compact size of LALR parsers were also taken into account,
  but not critical for the choice.
  
@@ -3025,11 +3025,12 @@ While lexical analysis is often done by having the parser request a token
  and so on
 \begin_inset CommandInset citation
 LatexCommand cite
-key "dragon-book3.1"
+key "dragon-book"
 
 \end_inset
 
-, the layout-dependent syntax of Haskell requires a different approach.
+, chapter 3.1, the layout-dependent syntax of Haskell requires a different
+ approach.
  First, the input (i.e.
  the Haskell source code, including whitespace and comments) is parsed into
  an array of tokens in one go.
@@ -3038,11 +3039,11 @@ key "dragon-book3.1"
  
 \begin_inset CommandInset citation
 LatexCommand cite
-key "haskell-report2.2"
+key "haskell-report"
 
 \end_inset
 
-.
+, chapter 2.2.
  Second, the generated array of tokens is run through a function that adds
  indentation information to the array in the form of special indentation
  tokens, and annotates tokens with position information.
@@ -3052,12 +3053,12 @@ key "haskell-report2.2"
  according to the Jison/Bison style API
 \begin_inset CommandInset citation
 LatexCommand cite
-key "dragon-book3.1"
+key "dragon-book"
 
 \end_inset
 
-, using the indentation information to generate tokens to convert Haskell's
- layout-dependent syntax into a context-free one.
+, chapter 3.1, using the indentation information to generate tokens to convert
+ Haskell's layout-dependent syntax into a context-free one.
  
 \end_layout
 
@@ -3380,11 +3381,11 @@ parse-error
  function in 
 \begin_inset CommandInset citation
 LatexCommand cite
-key "haskell-report10.3"
+key "haskell-report"
 
 \end_inset
 
-).
+, chapter 10.3).
  
 \end_layout
 
@@ -3693,11 +3694,11 @@ reference "sec:B.2Intermediate-representation"
  The constructs that can be reduced in this way syntactic sugar of the kernel
 \begin_inset CommandInset citation
 LatexCommand cite
-key "haskell-report1.2"
+key "haskell-report"
 
 \end_inset
 
-.
+, chapter 1.2.
  
 \end_layout
 
