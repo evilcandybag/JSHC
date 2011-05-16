@@ -39,6 +39,42 @@ JSHC.int32read = function(s){
   // TOOD: must give some reasonable exception when not a number.
 }
 
+JSHC.int32lt = function (a,b) {
+    return a < b;
+};
+
+JSHC.int32gt = function (a,b) {
+    return a > b;
+};
+
+JSHC.int32le = function (a,b) {
+    return a <= b;
+};
+
+JSHC.int32ge = function (a,b) {
+    return a >= b;
+};
+
+JSHC.int32eq = function (a,b) {
+    return a == b;
+};
+
+JSHC.int32ne = function (a,b) {
+    return a != b;
+};
+
+JSHC.int32comp = function(fun) {
+    return (
+  /*function () {return*/ function(a) {
+    return function (b) {
+        if ( fun( (a instanceof JSHC.Thunk)? a.v : a , (b instanceof JSHC.Thunk)? b.v : b ) ) {
+            return ["True"];
+        } else {
+            return ["False"];
+        }
+    }} );
+},
+
 //match evaluated exp against pat
 //returns: an array with any bound variables if successful, Boolean false if failed
 JSHC.Internal.match = function(exp, alts) {
@@ -102,7 +138,7 @@ JSHC.Internal.match = function(exp, alts) {
         } else        
             binds = [];
     }
-    throw new Error("Unhandled case in pattern match! " + JSHC.showAST((exp instanceof JSHC.Thunk)? exp.v : exp) ); //TODO: proper error reporting would be?
+    throw new Error("Unhandled case in pattern match! " + JSHC.showAST(exp) + " alts:\n\n" + JSHC.showAST(alts)); //TODO: proper error reporting would be?
     
 }
 

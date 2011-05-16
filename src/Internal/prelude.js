@@ -37,30 +37,12 @@ JSHC.Internal.Prelude = {
         return JSHC.int32div((a instanceof JSHC.Thunk)? a.v : a,(b instanceof JSHC.Thunk)? b.v : b)
         }}/*}*/,
 
-  int32lt: /*function () {return*/ function(a) {
-    return function (b) {
-        return ( (a instanceof JSHC.Thunk)? a.v : a ) < ((b instanceof JSHC.Thunk)? b.v : b) 
-    }}/*}*/,
-  int32gt: /*function () {return*/ function(a) {
-    return function (b) {
-        return ( (a instanceof JSHC.Thunk)? a.v : a ) > ((b instanceof JSHC.Thunk)? b.v : b) 
-    }}/*}*/,
-  int32le: /*function () {return*/ function(a) {
-    return function (b) {
-        return ( (a instanceof JSHC.Thunk)? a.v : a ) <= ((b instanceof JSHC.Thunk)? b.v : b) 
-    }}/*}*/,
-  int32ge: /*function () {return*/ function(a) {
-    return function (b) {
-        return ( (a instanceof JSHC.Thunk)? a.v : a ) >= ((b instanceof JSHC.Thunk)? b.v : b) 
-    }}/*}*/,
-  int32eq: /*function () {return*/ function(a) {
-    return function (b) {
-        return ( (a instanceof JSHC.Thunk)? a.v : a ) == ((b instanceof JSHC.Thunk)? b.v : b) 
-    }}/*}*/,
-  int32ne: /*function () {return*/ function(a) {
-    return function (b) {
-        return ( (a instanceof JSHC.Thunk)? a.v : a ) != ((b instanceof JSHC.Thunk)? b.v : b) 
-    }}/*}*/,
+  int32lt: JSHC.int32comp(JSHC.int32lt),
+  int32gt: JSHC.int32comp(JSHC.int32gt),
+  int32le: JSHC.int32comp(JSHC.int32le),
+  int32ge: JSHC.int32comp(JSHC.int32ge),
+  int32eq: JSHC.int32comp(JSHC.int32eq),
+  int32ne: JSHC.int32comp(JSHC.int32ne),
  }
 
 JSHC.Internal.Prelude["undefined"] = JSHC.TC(function() {return undefined});
