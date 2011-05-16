@@ -3106,7 +3106,14 @@ reference "fig:implementation"
 
 \end_inset
 
- shows how the interface uses the compiler.
+ shows how the interface (see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:User-Interface"
+
+\end_inset
+
+) uses the compiler.
 \end_layout
 
 \begin_layout Standard
@@ -3281,6 +3288,12 @@ Flow of information in the implementation
 \end_layout
 
 \begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:User-Interface"
+
+\end_inset
+
 User Interface
 \end_layout
 
@@ -3822,16 +3835,13 @@ Checking module groups
 \end_layout
 
 \begin_layout Standard
-The following steps are taken for each group of modules, which are checked
- in dependency order.
+For each dependency group of modules checked in dependency order, the compiler
+ does the following:
 \end_layout
 
 \begin_layout Standard
-....
-\end_layout
-
-\begin_layout Standard
-For each group of modules, the compiler does the following:
+If some modules are already compiled, they will only be compiled if not
+ all of the modules within the same group have previously been compiled.
 \end_layout
 
 \begin_layout Standard
@@ -3850,7 +3860,14 @@ tspace
 \end_layout
 
 \begin_layout Standard
-Resolve the exports, which results in the 
+Resolve the exports (see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Export-check"
+
+\end_inset
+
+), which results in the 
 \begin_inset Flex CharStyle:Strong
 status collapsed
 
@@ -3864,24 +3881,35 @@ espace
 \end_layout
 
 \begin_layout Standard
-For each module, check usage of names.
+For each module, check usage of names (see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Name-check"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Standard
-For each module, resolve fixity of operators.
+For each module, resolve fixity of operators (see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Fixity-Resolution"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Standard
-...
+Then dependency groups are produced for the top-level declarations of all
+ modules in the group.
+ The groups are then type checked in dependency order.
 \end_layout
 
-\begin_layout Standard
-If some modules are already compiled, they will only be compiled if not
- all of the modules within the same group have previously been compiled.
-\end_layout
-
-\begin_layout Standard
-....
+\begin_layout Itemize
+<TODO: Top level namespace?>
 \end_layout
 
 \begin_layout Itemize
@@ -3899,26 +3927,7 @@ Fixity resolution: Replace all lists of infix applications with operator
 \end_layout
 
 \begin_layout Itemize
-Type check: Compute types and kinds
-\end_layout
-
-\begin_layout Itemize
-Top level namespace?
-\end_layout
-
-\begin_layout Standard
-....
-\end_layout
-
-\begin_layout Itemize
-Type checking: This part consists of checking each module for type correctness,
- as well as inferring general types.
- This new inferred type information is added to the AST.
-\end_layout
-
-\begin_layout Itemize
-Simplification: Before compilation, the AST is simplified, reducing the
- number of different constructs used, to make for easier compilation.
+Type check: Compute types and kinds.
 \end_layout
 
 \begin_layout Subsubsection
@@ -4001,6 +4010,12 @@ Concurrency is possible, since any number of groups could be taken out from
 \end_layout
 
 \begin_layout Subsubsection
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Export-check"
+
+\end_inset
+
 Export check
 \end_layout
 
@@ -4015,6 +4030,12 @@ The implementation gives an error if modules in the same group have a list
 \end_layout
 
 \begin_layout Subsubsection
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Name-check"
+
+\end_inset
+
 Name check
 \end_layout
 
@@ -4032,14 +4053,13 @@ Errors is given for missing and ambiguous names.
 \end_layout
 
 \begin_layout Subsubsection
-Fixity Resolution
 \begin_inset CommandInset label
 LatexCommand label
 name "sub:Fixity-Resolution"
 
 \end_inset
 
-
+Fixity Resolution
 \end_layout
 
 \begin_layout Standard
@@ -4124,6 +4144,12 @@ status collapsed
 \end_layout
 
 \begin_layout Subsubsection
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Type-checking"
+
+\end_inset
+
 Type checking
 \end_layout
 
@@ -5863,6 +5889,11 @@ Implementation details
 
 \begin_layout Subsection
 Export checking
+\end_layout
+
+\begin_layout Standard
+<TODO: not finding any resources on implementing it.
+ usually people write about avoid/resolve cycles by rewriting the modules>
 \end_layout
 
 \begin_layout Standard
