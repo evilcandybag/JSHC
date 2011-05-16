@@ -47,7 +47,7 @@ logicalmkup
 \cite_engine basic
 \use_bibtopic false
 \paperorientation portrait
-\secnumdepth 3
+\secnumdepth 4
 \tocdepth 3
 \paragraph_separation indent
 \defskip medskip
@@ -2452,7 +2452,7 @@ modes
 \end_layout
 
 \begin_layout Chapter
-Implementation
+Result
 \end_layout
 
 \begin_layout Standard
@@ -2460,11 +2460,16 @@ Implementation
 \end_layout
 
 \begin_layout Section
-Introduction
+Syntax
+\end_layout
+
+\begin_layout Standard
+<TODO: simple description of the syntax used by the compiler.
+ reference the appendix.>
 \end_layout
 
 \begin_layout Section
-Interface
+User Interface <TODO: move out some stuff>
 \end_layout
 
 \begin_layout Standard
@@ -2643,7 +2648,7 @@ The following commands are available.
 
 \begin_layout Standard
 \begin_inset Float table
-placement h
+placement H
 wide false
 sideways false
 status open
@@ -2903,86 +2908,7 @@ Interpreter commands
 \end_layout
 
 \begin_layout Section
-Dependency groups
-\end_layout
-
-\begin_layout Standard
-The implementation for handling dependency groups takes a set of entries,
- where each entry provides a set of names, depends on a set of names, and
- contains a set of items, such as modules or declarations.
-\end_layout
-
-\begin_layout Standard
-These entries will have to be created from the declarations or modules that
- one will want to create dependency groups for.
-\end_layout
-
-\begin_layout Standard
-The entries are nodes in a graph where the minimal number of entries are
- merged such that there are no longer any cycles in the graph.
-\end_layout
-
-\begin_layout Subsection
-Condensing the graph
-\end_layout
-
-\begin_layout Standard
-Given a directed graph representing the dependencies, it merges the minimal
- amount of nodes to create a directed acyclic graph.
- This takes O(|E|+|V|) time.
-\end_layout
-
-\begin_layout Standard
-<TODO: pseudo code for condensing the graph>
-\end_layout
-
-\begin_layout Standard
-<TODO: time and space analysis ?>
-\end_layout
-
-\begin_layout Subsection
-Dependency order traversal
-\end_layout
-
-\begin_layout Standard
-To traverse the graph in dependency order, an opposide edge is added for
- each edge so that each group not only knows what it depends upon, but also
- which groups depends upon it.
- Each group keeps track of the number of remaining groups that it depends
- on, and for each group that is checked, this number is decreased for all
- groups that depends on it (which are exactly the set of groups accessible
- via the added edges).
- The traversal keeps track of a ready set and waiting set of groups.
- Whenever the number of remaining unchecked dependencies reaches 0, the
- group is moved to the ready set.
-\end_layout
-
-\begin_layout Standard
-Unless there are missing dependencies (or there are groups which are currently
- being checked), the ready set will never be empty while the waiting set
- is not.
-\end_layout
-
-\begin_layout Standard
-A group is checked by removing it from the ready set, check it, and then
- inform the traversal algorithm that the group is checked.
-\end_layout
-
-\begin_layout Standard
-When both sets are empty, the traversal is complete.
-\end_layout
-
-\begin_layout Standard
-Concurrency is possible, since any number of groups could be taken out from
- the ready set to be checked at the same time.
-\end_layout
-
-\begin_layout Standard
-<TODO: should there be pseudo code ?>
-\end_layout
-
-\begin_layout Section
-Compiler front-end
+Implementation
 \end_layout
 
 \begin_layout Standard
@@ -3004,6 +2930,18 @@ Type checking: This part consists of checking each module for type correctness,
 \begin_layout Itemize
 Simplification: Before compilation, the AST is simplified, reducing the
  number of different constructs used, to make for easier compilation.
+\end_layout
+
+\begin_layout Standard
+<TODO: describe what the front-end does>
+\end_layout
+
+\begin_layout Standard
+<TODO: describe what th back-end does>
+\end_layout
+
+\begin_layout Subsection
+Interface
 \end_layout
 
 \begin_layout Subsection
@@ -3441,6 +3379,85 @@ Top level namespace?
 \end_layout
 
 \begin_layout Subsubsection
+Finding and traversing dependency groups
+\end_layout
+
+\begin_layout Standard
+The implementation for handling dependency groups takes a set of entries,
+ where each entry provides a set of names, depends on a set of names, and
+ contains a set of items, such as modules or declarations.
+\end_layout
+
+\begin_layout Standard
+These entries will have to be created from the declarations or modules that
+ one will want to create dependency groups for.
+\end_layout
+
+\begin_layout Standard
+The entries are nodes in a graph where the minimal number of entries are
+ merged such that there are no longer any cycles in the graph.
+\end_layout
+
+\begin_layout Paragraph
+Condensing the graph
+\end_layout
+
+\begin_layout Standard
+Given a directed graph representing the dependencies, it merges the minimal
+ amount of nodes to create a directed acyclic graph.
+ This takes O(|E|+|V|) time.
+\end_layout
+
+\begin_layout Standard
+<TODO: pseudo code for condensing the graph>
+\end_layout
+
+\begin_layout Standard
+<TODO: time and space analysis ?>
+\end_layout
+
+\begin_layout Paragraph
+Dependency order traversal
+\end_layout
+
+\begin_layout Standard
+To traverse the graph in dependency order, an opposide edge is added for
+ each edge so that each group not only knows what it depends upon, but also
+ which groups depends upon it.
+ Each group keeps track of the number of remaining groups that it depends
+ on, and for each group that is checked, this number is decreased for all
+ groups that depends on it (which are exactly the set of groups accessible
+ via the added edges).
+ The traversal keeps track of a ready set and waiting set of groups.
+ Whenever the number of remaining unchecked dependencies reaches 0, the
+ group is moved to the ready set.
+\end_layout
+
+\begin_layout Standard
+Unless there are missing dependencies (or there are groups which are currently
+ being checked), the ready set will never be empty while the waiting set
+ is not.
+\end_layout
+
+\begin_layout Standard
+A group is checked by removing it from the ready set, check it, and then
+ inform the traversal algorithm that the group is checked.
+\end_layout
+
+\begin_layout Standard
+When both sets are empty, the traversal is complete.
+\end_layout
+
+\begin_layout Standard
+Concurrency is possible, since any number of groups could be taken out from
+ the ready set to be checked at the same time.
+\end_layout
+
+\begin_layout Standard
+<TODO: should there be pseudo code ?>
+\end_layout
+
+\begin_layout Subsubsection
 Export check
 \end_layout
 
@@ -3589,8 +3606,8 @@ While type checking, the algorithm keeps track of local names and type variables
  to which they are constrained.
 \end_layout
 
-\begin_layout Standard
-*** The constrain map
+\begin_layout Paragraph
+The constrain map
 \end_layout
 
 \begin_layout Standard
@@ -3633,8 +3650,8 @@ Pierce, B.
  chapter 22 or so>
 \end_layout
 
-\begin_layout Standard
-*** Adding constraints
+\begin_layout Paragraph
+Adding constraints
 \end_layout
 
 \begin_layout Standard
@@ -3652,8 +3669,8 @@ a -> b = c -> d
  equal.>
 \end_layout
 
-\begin_layout Standard
-*** Checking a group of declared names
+\begin_layout Paragraph
+Checking a group of declared names
 \end_layout
 
 \begin_layout Standard
@@ -3665,8 +3682,8 @@ Each declared name in a group is given a type variable.
  are quantified since they only occur inside the declarations.
 \end_layout
 
-\begin_layout Standard
-*** Checking declarations
+\begin_layout Paragraph
+Checking declarations
 \end_layout
 
 \begin_layout Standard
@@ -3692,7 +3709,7 @@ Checks for missing identifiers (type variables, types, functions, etc..),
 \end_layout
 
 \begin_layout Subsection
-Reduction of syntax tree
+Translation to the intermediate representation
 \end_layout
 
 \begin_layout Standard
@@ -4666,7 +4683,7 @@ reference "sub:Fixity-Resolution"
  
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 Compiler back-end
 \end_layout
 
@@ -4676,7 +4693,7 @@ JSHC's back-end takes an intermediate representation in the form of an AST
  
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Code generation
 \end_layout
 
@@ -5136,7 +5153,7 @@ Thunk
  
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Internal libraries
 \end_layout
 
@@ -5260,10 +5277,9 @@ pattern
  pattern match alternative.
  The pairs are then matched sequentially, one at a time until a match is
  found or there are no more alternatives to match.
- 
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 Standard libraries
 \end_layout
 
@@ -5280,7 +5296,6 @@ key "haskell-report"
  Included in these are basic integer arithmetic functions, arithmetic comparison
 s, the Bool type with operators and functions, operators and functions for
  function compisition and some basic functions on lists.
- 
 \end_layout
 
 \begin_layout Chapter
