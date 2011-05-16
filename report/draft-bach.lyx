@@ -197,7 +197,6 @@ This chapter is intended as a quick but thorough introduction to Haskell
 \end_layout
 
 \begin_layout Standard
-\paragraph_spacing onehalf
 Haskell is a 
 \begin_inset Flex CharStyle:Strong
 status collapsed
@@ -271,9 +270,9 @@ Being lazy means that an expression is only evaluated when its result is
  Any expression whose result is not used is simply ignored.
  This enables lazy languages to feature some things that are otherwise impossibl
 e, such as infinite data structures.
- Since the data structure is lazy, only the part that is needed.
- For example, a list of infinite length can be described in Haskell using
- like so:
+ Since the data structure is lazy, only the part that is needed is calculated.
+ For example, a list of infinite length can be described in Haskell like
+ so:
 \end_layout
 
 \begin_layout Standard
@@ -290,8 +289,8 @@ x = [1..]
 \end_layout
 
 \begin_layout Standard
-This statement assigns to the variable x an expression that calculates an
- infinite list containing all integers > 0 in rising order.
+This declaration assigns to the variable x an expression that calculates
+ an infinite list containing all integers > 0 in rising order.
  While an expression calculating this in a strict language would never terminate
  as the set of integers > 0 is infinite, a lazy language only calculates
  the needed parts, e.g:
@@ -387,146 +386,11 @@ simple examples of Haskell code?
 \end_layout
 
 \begin_layout Subsection
-Module system
+Functions 
 \end_layout
 
-\begin_layout Standard
-Haskell’s module system is its main method of encapsulation <TODO: better
- to use 
-\begin_inset Quotes eld
-\end_inset
-
-information hiding
-\begin_inset Quotes erd
-\end_inset
-
- instead of 
-\begin_inset Quotes eld
-\end_inset
-
-encapsulation
-\begin_inset Quotes erd
-\end_inset
-
-?>.
- Apart from local variables in a certain function, it is the only way to
- determine whether something is known (i.e.
- in scope) or not.
- Each module has a name, a set of imports and a set of exports.
- The specification of these is optional, with defaults being “Main”, the
- empty import set and the export set containing all top-level declarations,
- respectively.
- 
-\end_layout
-
-\begin_layout Standard
-By specifying exports, nothing defined in the module that is not in the
- export space can be accessed by an importing module.
- It is also allowed to specify the export of imported modules or their respectiv
-e exports.
- This way, if module 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-A
-\end_layout
-
-\end_inset
-
- imports module 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-B
-\end_layout
-
-\end_inset
-
- and module 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-C
-\end_layout
-
-\end_inset
-
- imports module 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-A
-\end_layout
-
-\end_inset
-
-, it is possible for module 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-C
-\end_layout
-
-\end_inset
-
- to also have imported some defnintions defined in module 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-B
-\end_layout
-
-\end_inset
-
- (or even module 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-B
-\end_layout
-
-\end_inset
-
-'s entire export set), depending on what module 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-A
-\end_layout
-
-\end_inset
-
-'s export set is.
-\end_layout
-
-\begin_layout Standard
-It is also possible for a module to specify what it will import from another
- module, either as an inclusive specification or as an exclusive specification
- (using the 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-hiding
-\end_layout
-
-\end_inset
-
- keyword).
-\end_layout
-
-\begin_layout Standard
-One important feature of Haskell's module system is that unlike, for example,
- Java, it is permitted for a group of modules to import each other.
- 
+\begin_layout Subsection
+Expressions
 \end_layout
 
 \begin_layout Subsection
@@ -569,8 +433,9 @@ Int
 \end_layout
 
 \begin_layout Standard
-To be able to write a function that takes values that may be of more than
- one type, one uses 
+It is possible to write a function that takes values that may be of more
+ than one type.
+ To acheive that, one uses 
 \begin_inset Flex CharStyle:Strong
 status collapsed
 
@@ -748,6 +613,13 @@ Double
 
 \begin_layout Subsubsection
 Type declarations
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Type-declarations"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -854,6 +726,146 @@ status collapsed
 \end_inset
 
  (creating a new list given a first element and the rest of the elements).
+\end_layout
+
+\begin_layout Subsection
+Module system
+\end_layout
+
+\begin_layout Standard
+Haskell’s module system is its main method of encapsulation.
+ Apart from local variables in a certain function, it is the only way to
+ determine whether something is known (i.e.
+ in scope) or not.
+ Each module has a name, a set of imports, a set of exports and a body containin
+g top-level declatiations.
+ The specification of these is optional, with defaults being “Main”, the
+ empty import set and the export set containing all top-level declarations,
+ respectively.
+ 
+\end_layout
+
+\begin_layout Standard
+By specifying exports, nothing defined in the module that is not in the
+ export space can be accessed by an importing module.
+ It is also allowed to specify the export of imported modules or their respectiv
+e exports.
+ This way, if module 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+A
+\end_layout
+
+\end_inset
+
+ imports module 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+B
+\end_layout
+
+\end_inset
+
+ and module 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+C
+\end_layout
+
+\end_inset
+
+ imports module 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+A
+\end_layout
+
+\end_inset
+
+, it is possible for module 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+C
+\end_layout
+
+\end_inset
+
+ to also have imported some defnintions defined in module 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+B
+\end_layout
+
+\end_inset
+
+ (or even module 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+B
+\end_layout
+
+\end_inset
+
+'s entire export set), depending on what module 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+A
+\end_layout
+
+\end_inset
+
+'s export set is.
+\end_layout
+
+\begin_layout Standard
+It is also possible for a module to specify what it will import from another
+ module, either as an inclusive specification or as an exclusive specification
+ (using the 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+hiding
+\end_layout
+
+\end_inset
+
+ keyword).
+\end_layout
+
+\begin_layout Standard
+One important feature of Haskell's module system is that unlike, for example,
+ Java, it is permitted for a group of modules to import each other.
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -1281,7 +1293,14 @@ Kinds
 \end_layout
 
 \begin_layout Standard
-The function type 
+Given the datatype declared in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Type-declarations"
+
+\end_inset
+
+, the function type 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
@@ -2646,7 +2665,7 @@ The following commands are available.
 placement h
 wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \begin_inset Tabular
