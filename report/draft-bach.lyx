@@ -90,7 +90,16 @@ Development of large web based applications using scripting languages such
 \end_layout
 
 \begin_layout Abstract
-We present a solution 
+We suggest a solution where the statically typed functional language Haskell
+ is compiled to JavaScript code, enabling programmers to create web applications
+ in a type safe environment.
+ 
+\end_layout
+
+\begin_layout Abstract
+An implementation of a subset Haskell to JavaScript compiler written in
+ JavaScript, JSHC, is presented as a proof of concept.
+ 
 \end_layout
 
 \begin_layout Standard
