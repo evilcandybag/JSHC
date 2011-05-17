@@ -2767,12 +2767,136 @@ Result
 \end_layout
 
 \begin_layout Section
-Syntax
+Supported language features
 \end_layout
 
 \begin_layout Standard
-<TODO: simple description of the syntax used by the compiler.
- reference the appendix.>
+This section describes informally the subset of Haskell features implemented
+ in JSHC.
+ For a formal syntax reference, see Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Context-free-syntax"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+Module system:
+\end_layout
+
+\end_inset
+
+ the Haskell module system, apart from hiding, qualifying and renaming imports
+ and some module cycles.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+Type system:
+\end_layout
+
+\end_inset
+
+ Polymorphic type inference, without overloading through interfaces.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+Lazy evaluation:
+\end_layout
+
+\end_inset
+
+ Call by need implemented.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+Top level declarations:
+\end_layout
+
+\end_inset
+
+ Non-strict abstract datatypes, fixity declarations, top-level function
+ declarations and type signatures.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+Local declarations:
+\end_layout
+
+\end_inset
+
+ In the form of let and where expressions.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+Infix operators:
+\end_layout
+
+\end_inset
+
+ User defined infix operators.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+Expressions:
+\end_layout
+
+\end_inset
+
+ Lambda abstractions, conditionals, case expressions, function and datatype
+ applications.
+ Tuples, lists and integer literals.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+Pattern matching:
+\end_layout
+
+\end_inset
+
+ Matching on abstract datatypes, tuples, literals, wildcards.
+ Variable bindings through case.
+\end_layout
+
+\begin_layout Standard
+
 \end_layout
 
 \begin_layout Section
@@ -2916,7 +3040,7 @@ TAB
 placement h
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset Tabular
@@ -4052,14 +4176,44 @@ The algorithm is a depth-first search through the graph which keeps track
  found.
 \end_layout
 
+\begin_layout Standard
+<TODO: time and space analysis>
+\end_layout
+
+\begin_layout Standard
+...
+\end_layout
+
+\begin_layout Standard
+reaches each node once looks up the destination node for each edge
+\end_layout
+
+\begin_layout Standard
+V for values, N for nodes, and E for edges.
+ since cycles are never merged, and the merging copies all the edges and
+ values, the cost of merging is bounded by the number of edges and values
+ in the graph.
+ This makes the cost of the algorithm O(|E| + |N| + |V|).
+\end_layout
+
+\begin_layout Standard
+Since the current implementation only uses a list of the path, the cost
+ of checking for cycles is not O(1), but O(|N|^2 + |V|).
+ 
+\end_layout
+
+\begin_layout Standard
+...
+\end_layout
+
 \begin_layout Paragraph
 Dependency order traversal
 \end_layout
 
 \begin_layout Standard
-To traverse the graph in dependency order, an edge in the opposite direction
- is added for each edge so that each group not only knows what it depends
- upon, but also which groups depends upon it.
+To traverse the graph in dependency order, an opposide edge is added for
+ each edge so that each group not only knows what it depends upon, but also
+ which groups depends upon it.
  Each group keeps track of the number of remaining groups that it depends
  on, and for each group that is checked, this number is decreased for all
  groups that depends on it (which are exactly the set of groups accessible
@@ -4077,7 +4231,7 @@ Unless there are missing dependencies (or there are groups which are currently
 
 \begin_layout Standard
 A group is checked by removing it from the ready set, check it, and then
- inform the traversal data structure that the group is checked.
+ inform the traversal algorithm that the group is checked.
 \end_layout
 
 \begin_layout Standard
@@ -4087,6 +4241,10 @@ When both sets are empty, the traversal is complete.
 \begin_layout Standard
 Concurrency is possible, since any number of groups could be taken out from
  the ready set to be checked at the same time.
+\end_layout
+
+\begin_layout Standard
+<TODO: should there be pseudo code ?>
 \end_layout
 
 \begin_layout Subsubsection
@@ -7805,9 +7963,412 @@ key "haskell-report"
 \end_inset
 
 .
- Included in these are basic integer arithmetic functions, arithmetic comparison
-s, the Bool type with operators and functions, operators and functions for
- function compisition and some basic functions on lists.
+ The contents of the JSHC Prelude are detailed in Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Flo:prelude contains"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="17" columns="2">
+<features>
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+Name
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+Description
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Int32
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+32 bit integer datatype 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Bool
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Boolean datatype
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Maybe a
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Nullary datatype
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Either a b
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+&&, ||, not, otherwise
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Boolean functions
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+undefined
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Undefined function
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
++, -, *, /
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Arithmetic operators
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+<, >, <=, >=, /=, ==
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Arithmetic comparison operators
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+id 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Identity function
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+const
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Constant function
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+.
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Function composition
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+flip
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Argument switch
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+seq
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Strict evaluation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+$, $!
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Function application operators
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+map, ++, filter, concat, concatMap, head, tail
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+List functions
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+foldr
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Right fold
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+ 
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Functions and datatypes included in the JSHC Prelude
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "Flo:prelude contains"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Chapter
@@ -7823,52 +8384,105 @@ Export checking
 \end_layout
 
 \begin_layout Standard
-The only implementation of Haskell that we have found that implements mutually
- recursive modules is Programatica
-\begin_inset CommandInset citation
-LatexCommand cite
-key "the-programatica-project"
-
-\end_inset
-
-.
- Hugs
-\begin_inset CommandInset citation
-LatexCommand cite
-key "hugs-user-guide"
-
-\end_inset
-
- and GHC
-\begin_inset CommandInset citation
-LatexCommand cite
-key "ghc-user-guide"
-
-\end_inset
-
- do not implement mutually recursive modules as specified in the haskell
- report.
+<TODO: not finding any resources on implementing it.
+ usually people write about avoid/resolve cycles by rewriting the modules>
 \end_layout
 
 \begin_layout Standard
-We were unsure of how to implement the computation of the exported names,
- as mutually recursive modules means that to compute the exports of one
- module in the cycle, it appears that one must also compute the exports
- of all the others.
- The only idea we had that seemed to actually work was a fix point iteration
- to find exported names until no more names can be found.
- One concern was efficiency, and hope of finding a simpler and more efficient
- way of computing the exported names.
- It appears to us that most people try to avoid module cycles, so we had
- some trouble finding resources about implementing it, but eventually found
-\begin_inset CommandInset citation
-LatexCommand cite
-key "formal-haskell-module-system"
+It is unclear to us what is the best way of computing the set of exported
+ names within dependency groups of modules.
+\end_layout
+
+\begin_layout Standard
+Resolving exports is complicated.
+ The Haskell report only explains the syntax and semantics of export lists.
+\end_layout
+
+\begin_layout Standard
+Example of a missing name:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+module A ( x ) where
+\end_layout
 
 \end_inset
 
-, which formally describes the haskell module system using a fix point computati
-on, but we have not had enough time to implement something like it.
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+import B
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+module B ( x ) where
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+import C
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+module C ( x ) where
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+import A
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Names could also be ambiguous.
+
 \end_layout
 
 \begin_layout Subsection
@@ -8215,10 +8829,6 @@ options "plain"
 
 \begin_layout Chapter
 \start_of_appendix
-Nomenclature
-\end_layout
-
-\begin_layout Chapter
 Syntax reference
 \end_layout
 
@@ -8231,6 +8841,13 @@ Detailed in this appendix is a reference to the subset of the Haskell syntax
 
 \begin_layout Section
 Context-free syntax
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Context-free-syntax"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -10256,7 +10873,7 @@ status collapsed
 
 \end_inset
 
-(general constructor)
+(generalized constructor)
 \end_layout
 
 \begin_layout Standard
@@ -10851,6 +11468,19 @@ newline
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+gcon → [] | qcon
+\end_layout
+
+\end_inset
+
+ (generalized constructor)
 \end_layout
 
 \begin_layout Standard
