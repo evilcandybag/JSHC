@@ -1431,7 +1431,7 @@ Compiling Haskell
 \begin_layout Standard
 In this section, we present a more detailed introduction to concepts that
  are required to understand the various steps in the compilation of Haskell.
- <TODO: is this really an OK intro to this section?> 
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -2367,15 +2367,6 @@ imports from
 \end_inset
 
 
-\end_layout
-
-\begin_layout Subsection
-Laziness
-\end_layout
-
-\begin_layout Standard
-<TODO: write something here or leave this out? can't think of anything which
- is not described somewhere else right now>
 \end_layout
 
 \begin_layout Chapter
@@ -8486,7 +8477,6 @@ import A
 
 \begin_layout Standard
 Names could also be ambiguous.
-
 \end_layout
 
 \begin_layout Subsection
