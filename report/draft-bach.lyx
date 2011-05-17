@@ -2767,12 +2767,136 @@ Result
 \end_layout
 
 \begin_layout Section
-Syntax
+Supported language features
 \end_layout
 
 \begin_layout Standard
-<TODO: simple description of the syntax used by the compiler.
- reference the appendix.>
+This section describes informally the subset of Haskell features implemented
+ in JSHC.
+ For a formal syntax reference, see Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Context-free-syntax"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+Module system:
+\end_layout
+
+\end_inset
+
+ the Haskell module system, apart from hiding, qualifying and renaming imports
+ and some module cycles.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+Type system:
+\end_layout
+
+\end_inset
+
+ Polymorphic type inference, without overloading through interfaces.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+Lazy evaluation:
+\end_layout
+
+\end_inset
+
+ Call by need implemented.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+Top level declarations:
+\end_layout
+
+\end_inset
+
+ Non-strict abstract datatypes, fixity declarations, top-level function
+ declarations and type signatures.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+Local declarations:
+\end_layout
+
+\end_inset
+
+ In the form of let and where expressions.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+Infix operators:
+\end_layout
+
+\end_inset
+
+ User defined infix operators.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+Expressions:
+\end_layout
+
+\end_inset
+
+ Lambda abstractions, conditionals, case expressions, function and datatype
+ applications.
+ Tuples, lists and integer literals.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+Pattern matching:
+\end_layout
+
+\end_inset
+
+ Matching on abstract datatypes, tuples, literals, wildcards.
+ Variable bindings through case.
+\end_layout
+
+\begin_layout Standard
+
 \end_layout
 
 \begin_layout Section
@@ -4107,7 +4231,7 @@ Unless there are missing dependencies (or there are groups which are currently
 
 \begin_layout Standard
 A group is checked by removing it from the ready set, check it, and then
- inform the traversal data structure that the group is checked.
+ inform the traversal algorithm that the group is checked.
 \end_layout
 
 \begin_layout Standard
@@ -8646,10 +8770,6 @@ options "plain"
 
 \begin_layout Chapter
 \start_of_appendix
-Nomenclature
-\end_layout
-
-\begin_layout Chapter
 Syntax reference
 \end_layout
 
@@ -8662,6 +8782,13 @@ Detailed in this appendix is a reference to the subset of the Haskell syntax
 
 \begin_layout Section
 Context-free syntax
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Context-free-syntax"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -10687,7 +10814,7 @@ status collapsed
 
 \end_inset
 
-(general constructor)
+(generalized constructor)
 \end_layout
 
 \begin_layout Standard
@@ -11282,6 +11409,19 @@ newline
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+gcon → [] | qcon
+\end_layout
+
+\end_inset
+
+ (generalized constructor)
 \end_layout
 
 \begin_layout Standard
