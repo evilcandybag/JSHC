@@ -8512,22 +8512,6 @@ key "haskell-report"
  concept in the workings of a Haskell compiler.
 \end_layout
 
-\begin_layout Standard
-
-\end_layout
-
-\begin_layout Section
-Design choices
-\end_layout
-
-\begin_layout Itemize
-Why write compiler in JavaScript?
-\end_layout
-
-\begin_layout Itemize
-non-JavaScript applications
-\end_layout
-
 \begin_layout Section
 Comparison with other implementations
 \end_layout
@@ -8680,10 +8664,6 @@ Function overloading through type classes is one of the most important features
  Overloading is an important part of Haskell, and is used by many of the
  most common functions in the standard Prelude.
  
-\end_layout
-
-\begin_layout Subsection
-Syntax highlighting in the Haskell mode
 \end_layout
 
 \begin_layout Section
