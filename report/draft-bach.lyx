@@ -8617,6 +8617,11 @@ It is supposed to be possible to load modules by placing them on the same
  unable to load anything.
 \end_layout
 
+\begin_layout Standard
+The interpreter has a history of written expressions, which we have yet
+ to implement.
+\end_layout
+
 \begin_layout Section
 Future work on JSHC
 \end_layout
