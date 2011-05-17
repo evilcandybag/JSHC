@@ -2632,7 +2632,14 @@ Jison
 \end_layout
 
 \begin_layout Standard
-Jison is a parser generator for generating JavaScript parsers.
+Jison
+\begin_inset CommandInset citation
+LatexCommand cite
+key "jison"
+
+\end_inset
+
+ is a parser generator for generating JavaScript parsers.
  It takes a context-free grammar in the same format as the input files to
  Bison, apart for parser actions, which are defined in the implementation
  language, which is JavaScript for Jison and C for Bison.
@@ -4576,6 +4583,19 @@ status collapsed
 \end_inset
 
 .
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -4944,6 +4964,19 @@ status collapsed
 \end_inset
 
  
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -5338,6 +5371,20 @@ a
 \end_inset
 
  are variable pattern matches created to preserve function arity.
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -5345,6 +5392,10 @@ Function declarations with arguments are converted into a binding from the
  function name to a sequence of lambda expressions corresponding to the
  arity of the function.
  Functions of the form: 
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing onehalf
 \begin_inset Flex CharStyle:Emph
 status collapsed
 
@@ -5393,7 +5444,11 @@ rhs
 
 \end_inset
 
-, where 
+
+\end_layout
+
+\begin_layout Standard
+where 
 \begin_inset Flex CharStyle:Emph
 status collapsed
 
@@ -5443,6 +5498,10 @@ rhs
 
  is the right hand side of the function, are converted into functions of
  the form 
+\end_layout
+
+\begin_layout Standard
+\paragraph_spacing onehalf
 \begin_inset Flex CharStyle:Emph
 status collapsed
 
@@ -5546,36 +5605,214 @@ rhs
 \end_inset
 
 .
-\end_layout
-
-\begin_layout Subsubsection
-List expressions
-\end_layout
-
-\begin_layout Standard
-List expressions are converted into applications of the list datatype, so
- that the list 
-\begin_inset Flex CharStyle:Code
-status collapsed
+ 
+\begin_inset ERT
+status open
 
 \begin_layout Plain Layout
-[1,2,3]
+
+
+\backslash
+newline
 \end_layout
 
 \end_inset
 
- is converted into 
+
+\end_layout
+
+\begin_layout Standard
+The syntactic sugar for lists, 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
 \begin_layout Plain Layout
-((:) 1 ((:) 2 ((:) 3 [])))
+[ 
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+,
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+: : :
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+,
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+ ]
+\end_layout
+
+\end_inset
+
+, where 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ through 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ are arbitrary expressions, is converted into applications of the list construct
+or (cons), resulting in expressions of the form 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+((:)
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+( 
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+:::
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+(:)
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[])))
 \end_layout
 
 \end_inset
 
 .
- Note that the cons operator is written in prefix notation, as an ordinary
+ 
+\end_layout
+
+\begin_layout Standard
+Note that the cons operator is written in prefix notation, as an ordinary
  data constructor, instead of as an infix constructor, as is normally done
  when writing source code.
  This is because at this stage operator applications have already been removed
@@ -5618,9 +5855,321 @@ The code generation step generates JavaScript code representing the compiled
  as possible, the code generation preserves the names of as many identifiers
  as possible.
  This also allows for easier debugging of the generated code.
- Function definitions are stored as members of JavaScript objects the same
- name as the Haskell module they are defined in, which are in turn contained
- in another JavaScript object specified by the user called the module prefix.
+ Below follows a walkthrough of how components of the intermediate representatio
+n (Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:B.2Intermediate-representation"
+
+\end_inset
+
+) are translated to JavaScript.
+ If not defined in the text, names in italics refer to the an item name
+ in the description of the corresponding node in the intermediate representation
+ 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "sec:B.2Intermediate-representation"
+
+\end_inset
+
+.
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Modules are represented as JavaScript objects of the form 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+prefix
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+.
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+modid
+\end_layout
+
+\end_inset
+
+, where 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+prefix
+\end_layout
+
+\end_inset
+
+ is a module prefix specified by the user.
+ Both 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+prefix
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+modid
+\end_layout
+
+\end_inset
+
+ can include 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+.
+\end_layout
+
+\end_inset
+
+ , which will create a nested object.
+ E.g.
+ substituting 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+prefix
+\end_layout
+
+\end_inset
+
+ for 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+JSHC.mod
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+modid
+\end_layout
+
+\end_inset
+
+ for 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Data.List
+\end_layout
+
+\end_inset
+
+ will create the JavaScript object 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+JSHC.mod.Data.List
+\end_layout
+
+\end_inset
+
+.
+ Following paragraphs will use 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+modid
+\end_layout
+
+\end_inset
+
+ to refer to the concatenation
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+prefix
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+.
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+modid
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The only top-level declarations that generate any code are function declarations.
+ They are compiled as members of the object representing the module, using
+ JavaScript's associative array notation to enable members with non-alphanumeric
+ characters as identifiers.
+ This creates statements of the form 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+modid
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+[
+\begin_inset Quotes eld
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+ident
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Quotes erd
+\end_inset
+
+] =
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+exp
+\end_layout
+
+\end_inset
+
+, where 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+exp
+\end_layout
+
+\end_inset
+
+ is the code generated by the expression in 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+rhs
+\end_layout
+
+\end_inset
+
+.
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Lambda expressions are compiled 
 \end_layout
 
 \begin_layout Standard
