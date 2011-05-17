@@ -6198,7 +6198,67 @@ newline
 \end_layout
 
 \begin_layout Standard
-Lambda expressions are compiled 
+Lambda expressions are compiled from a form 
+\backslash
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+p
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+...
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+p
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+->
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+exp
+\end_layout
+
+\end_inset
+
+ 
 \end_layout
 
 \begin_layout Standard
