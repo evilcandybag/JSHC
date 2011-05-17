@@ -8379,104 +8379,48 @@ Export checking
 \end_layout
 
 \begin_layout Standard
-<TODO: not finding any resources on implementing it.
- usually people write about avoid/resolve cycles by rewriting the modules>
-\end_layout
-
-\begin_layout Standard
-It is unclear to us what is the best way of computing the set of exported
- names within dependency groups of modules.
-\end_layout
-
-\begin_layout Standard
-Resolving exports is complicated.
- The Haskell report only explains the syntax and semantics of export lists.
-\end_layout
-
-\begin_layout Standard
-Example of a missing name:
-\end_layout
-
-\begin_layout Standard
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-module A ( x ) where
-\end_layout
+The only implementation of Haskell that we have found that implements mutually
+ recursive modules is Programatica 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "the-programatica-project"
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-import B
-\end_layout
+.
+ Hugs
+\begin_inset CommandInset citation
+LatexCommand cite
+key "hugs-user-guide"
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-module B ( x ) where
-\end_layout
+ and GHC
+\begin_inset CommandInset citation
+LatexCommand cite
+key "ghc-user-guide"
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-import C
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-module C ( x ) where
-\end_layout
+ do not implement mutually recursive modules as specified in the haskell
+ report.
+ We were unsure of how to implement the computation of the exported names,
+ as mutually recursive modules means that to compute the exports of one
+ module in the cycle, it appears that one must also compute the exports
+ of all the others.
+ The only idea we had that seemed to actually work was a fix point iteration
+ to find exported names until no more names can be found.
+ One concern was efficiency, and hope of finding a simpler and more efficient
+ way of computing the exported names.
+ It appears to us that most people try to avoid module cycles, so we had
+ some trouble finding resources about implementing it, but eventually found
+\begin_inset CommandInset citation
+LatexCommand cite
+key "formal-haskell-module-system"
 
 \end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-import A
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Names could also be ambiguous.
+, which formally describes the haskell module system using a fix point computati
+ on, but we have not had enough time to implement something like it.
 \end_layout
 
 \begin_layout Subsection
