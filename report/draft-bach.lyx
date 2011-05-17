@@ -12559,9 +12559,9 @@ Both group members have been equally active in the project, from planning,
 Regarding implementation, Peter Holm has had the main responsibility for
  lexical analysis and code generation, while Staffan Björnesjö has had main
  responsibility over large part of the semantic analysis (name check, type
- check), the module system and user interface.
+ check), dependency group analysis, loading of modules, the module system
+ and user interface.
  All other parts have been developed collaboratively.
- 
 \end_layout
 
 \begin_layout Standard
