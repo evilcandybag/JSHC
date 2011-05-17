@@ -12592,9 +12592,29 @@ newline
 
 \end_layout
 
+\begin_layout Chapter
+Declaration of contributions
+\end_layout
+
 \begin_layout Standard
-<TODO: some significant pieces of the source code, test cases, etc..
- probably an example of how the compiler can be used on a web page>
+Both group members have been equally active in the project, from planning,
+ through execution to final stages.
+ 
+\end_layout
+
+\begin_layout Standard
+Regarding implementation, Peter Holm has had the main responsibility for
+ lexical analysis and code generation, while Staffan Björnesjö has had main
+ responsibility over large part of the semantic analysis (name check, type
+ check), the module system and user interface.
+ All other parts have been developed collaboratively.
+ 
+\end_layout
+
+\begin_layout Standard
+Regarding report, participants have been responsible for documenting their
+ areas of responsibility in the implementation.
+ All other parts have been documented collaboratively.
 \end_layout
 
 \end_body
