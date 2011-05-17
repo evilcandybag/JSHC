@@ -3955,17 +3955,24 @@ Condensing the graph
 \end_layout
 
 \begin_layout Standard
-Given a directed graph representing the dependencies, it merges the minimal
- amount of nodes to create a directed acyclic graph.
- This takes O(|E|+|V|) time.
+Given a directed graph where the edges represents dependencies, it merges
+ the minimal amount of nodes to create a directed acyclic graph.
+ This is done by finding the connected components in the graph and merging
+ all the nodes in each connected component into a single node.
 \end_layout
 
 \begin_layout Standard
-<TODO: pseudo code for condensing the graph>
+The algorithm is a depth-first search through the graph which keeps track
+ of the current path and merges all the nodes in a cycle whenever one is
+ found.
 \end_layout
 
 \begin_layout Standard
 <TODO: time and space analysis ?>
+\end_layout
+
+\begin_layout Standard
+This takes O(|E|+|V|) time.
 \end_layout
 
 \begin_layout Paragraph
