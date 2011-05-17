@@ -4489,18 +4489,14 @@ The reason for using a constraint map is that type errors are discovered
  as soon as possible, so a type error in a sub-expression will be given
  for the sub-expression instead of the expression as a whole if the constraints
  were just gathered and then checked after computing all of them, which
- is the usual description of solving the constraints <reference to 
-\begin_inset Quotes eld
+ is the usual description of solving the constraints (see chapter 22 in
+\begin_inset CommandInset citation
+LatexCommand cite
+key "tapl"
+
 \end_inset
 
-Pierce, B.
- C.
- 2002 Types and Programming Languages.
- MIT Press.
-\begin_inset Quotes erd
-\end_inset
-
- chapter 22 or so>
+).
 \end_layout
 
 \begin_layout Paragraph
@@ -4508,18 +4504,38 @@ Adding constraints
 \end_layout
 
 \begin_layout Standard
-<TODO: describe what happens when adding constraints such as 
-\begin_inset Quotes eld
-\end_inset
+Function constraints of the form 
+\begin_inset Flex CharStyle:Code
+status collapsed
 
+\begin_layout Plain Layout
 a -> b = c -> d
-\begin_inset Quotes erd
+\end_layout
+
 \end_inset
 
-.
- Will be split into two separate constraints, which will each cause elimination
- of a type variable as the constraint specifies that two constraints are
- equal.>
+ will be split into two separate constraints 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+a = c
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+b = d
+\end_layout
+
+\end_inset
+
+, which will each cause elimination of a type variable as the constraint
+ specifies that two types variables are equal.
 \end_layout
 
 \begin_layout Paragraph
@@ -4540,25 +4556,36 @@ Checking declarations
 \end_layout
 
 \begin_layout Standard
-<TODO: Probably need a few concrete examples.
- Should be done in a similar way to as it was done in the theory chapter,
- but need to show the constraint map.
- need to give example of nested let-declarations to show the point of it
- all.>
-\end_layout
-
-\begin_layout Standard
 It is necessary to use dependency groups and check in dependency group order
  to give the correct type, instead of checking all of the declarations as
- a single group <TODO: example needed.
- check the Haskell report.
- related to the monomorphism restriction.>
+ a single group, because of the monomorphism restriction.
+ In a declaration such as 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+f = (+)
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+f
+\end_layout
+
+\end_inset
+
+ is supposed to be non-polymorphic, which means that the polymorphic type
+ must be simplified before checking other declarations that depend upon
+ it.
 \end_layout
 
 \begin_layout Standard
-Checks for missing identifiers (type variables, types, functions, etc..),
- instances, and infer type.
- Adds type information to the AST.
+However, the monomorphism restriction is currently not implemented.
 \end_layout
 
 \begin_layout Subsection
