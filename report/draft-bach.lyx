@@ -4107,7 +4107,7 @@ Unless there are missing dependencies (or there are groups which are currently
 
 \begin_layout Standard
 A group is checked by removing it from the ready set, check it, and then
- inform the traversal algorithm that the group is checked.
+ inform the traversal data structure that the group is checked.
 \end_layout
 
 \begin_layout Standard
