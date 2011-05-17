@@ -136,10 +136,6 @@ newline
 
 \end_layout
 
-\begin_layout Standard
-<TODO: vad ville vi göra, vad blev gjort>
-\end_layout
-
 \begin_layout Section
 Related work
 \end_layout
@@ -399,6 +395,13 @@ newline
 
 \begin_layout Subsection
 Functions 
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Functions"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -557,7 +560,7 @@ arg
 
 \end_inset
 
- 1 through n is a series of arguments and 
+ 1 through n is a series of zero or more arguments and 
 \begin_inset Flex CharStyle:Emph
 status collapsed
 
@@ -570,6 +573,94 @@ expression
  is the expression that denotes the result of the function.
  It is possible to define functions as infix operators in the same way as
  ordinary functions, complete with custom precedence levels.
+ 
+\end_layout
+
+\begin_layout Standard
+It is also possible to create anonymous functions, which are not bound to
+ any declarations through 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+lambda expressions
+\end_layout
+
+\end_inset
+
+.
+ Lambda expressions have the form 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+
+\backslash
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+arg
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ ...
+ arg
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+->
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+expression
+\end_layout
+
+\end_inset
+
+ where 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+arg
+\end_layout
+
+\end_inset
+
+ 1 through n is a series of arguments and 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+expression
+\end_layout
+
+\end_inset
+
+ is the expression that denotes the result of the function.
  
 \end_layout
 
@@ -989,8 +1080,18 @@ Expressions
 \end_layout
 
 \begin_layout Standard
-<TODO: fill in later.
- how much do we need here? there are a lot of expressions>
+Expressions in Haskell include let and where expressions which allow for
+ local declarations inside expressions and functions, respectively.
+\end_layout
+
+\begin_layout Standard
+Conditional expressions of the if-then-else form are supported, as well
+ as pattern matching inside expressions using case expressions.
+ 
+\end_layout
+
+\begin_layout Standard
+
 \end_layout
 
 \begin_layout Subsection
@@ -3651,7 +3752,7 @@ Lexical analysis
 
 \begin_layout Standard
 The lexical analysis in JSHC is performed in several steps.
- <TODO: a good way to init this section?>
+ 
 \end_layout
 
 \begin_layout Standard
@@ -4025,7 +4126,7 @@ key "haskell-report"
 \end_layout
 
 \begin_layout Standard
-<TODO: create figure explaining the layout of finding/lexing/parsing>
+
 \end_layout
 
 \begin_layout Subsection
@@ -7873,7 +7974,7 @@ Thunk
 
  object is called, which evaluates the closure and assigns the value to
  a variable.
- <TODO: perhaps more elaboration?>
+ 
 \end_layout
 
 \begin_layout Standard
@@ -8419,6 +8520,7 @@ LatexCommand cite
 key "formal-haskell-module-system"
 
 \end_inset
+
 , which formally describes the haskell module system using a fix point computati
  on, but we have not had enough time to implement something like it.
 \end_layout
