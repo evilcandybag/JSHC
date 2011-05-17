@@ -8486,6 +8486,7 @@ import A
 
 \begin_layout Standard
 Names could also be ambiguous.
+
 \end_layout
 
 \begin_layout Subsection
@@ -8532,11 +8533,12 @@ non-JavaScript applications
 \end_layout
 
 \begin_layout Section
-Comparison with other implementations 
+Comparison with other implementations
 \end_layout
 
 \begin_layout Standard
-<TODO: is this something we can do well in a short time frame?>
+We have chosen to only compare with other Haskell interpreters/compilers
+ written in Javascript, and we only know of one.
 \end_layout
 
 \begin_layout Subsection
@@ -8557,21 +8559,78 @@ If compiling an existing compiler like GHC to JavaScript, it would require
 \end_layout
 
 \begin_layout Subsection
-GHC
+HIJi (Haskell in Javascript)
 \end_layout
 
 \begin_layout Standard
-<TODO: Anything to write here?>
-\end_layout
-
-\begin_layout Subsection
-HIJi (project from previous year)
+This is a Haskell interpreter written in Javascript as part of a bachelor
+ thesis project.
 \end_layout
 
 \begin_layout Standard
-From the report, it is unclear if one can load more than one module, and
- if cycles in the dependencies of module and declaration are handled as
- it is not mentioned.
+From the report
+\begin_inset CommandInset citation
+LatexCommand cite
+key "hiji"
+
+\end_inset
+
+, it is unclear which exact subset of Haskell they have implemented, as
+ there is no mention of mutually recursive modules or dependency groups
+ and traversal.
+\end_layout
+
+\begin_layout Standard
+Their parser is not generated, but written in Javascript using a parser
+ combinator library called JSParse
+\begin_inset CommandInset citation
+LatexCommand cite
+key "jsparse"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+...
+\end_layout
+
+\begin_layout Standard
+missing (since incomplete) type checking.
+\end_layout
+
+\begin_layout Standard
+...
+\end_layout
+
+\begin_layout Standard
+They have an interpreter that loads the Prelude and allows evaluation of
+ expressions, but no type checking is done, as it is not fully integrated
+ with the rest of the code.
+ <<<typechecker capabilities ?>>>
+\end_layout
+
+\begin_layout Standard
+....
+\end_layout
+
+\begin_layout Standard
+their interpreter appears to support expression evaluation, but no type
+ checking is done, and as it is just a prompt, there is no way to load modules
+ ? .
+\end_layout
+
+\begin_layout Standard
+...
+\end_layout
+
+\begin_layout Standard
+guards.
+\end_layout
+
+\begin_layout Standard
+...
 \end_layout
 
 \begin_layout Section
