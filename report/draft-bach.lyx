@@ -3968,11 +3968,33 @@ The algorithm is a depth-first search through the graph which keeps track
 \end_layout
 
 \begin_layout Standard
-<TODO: time and space analysis ?>
+<TODO: time and space analysis>
 \end_layout
 
 \begin_layout Standard
-This takes O(|E|+|V|) time.
+...
+\end_layout
+
+\begin_layout Standard
+reaches each node once looks up the destination node for each edge
+\end_layout
+
+\begin_layout Standard
+V for values, N for nodes, and E for edges.
+ since cycles are never merged, and the merging copies all the edges and
+ values, the cost of merging is bounded by the number of edges and values
+ in the graph.
+ This makes the cost of the algorithm O(|E| + |N| + |V|).
+\end_layout
+
+\begin_layout Standard
+Since the current implementation only uses a list of the path, the cost
+ of checking for cycles is not O(1), but O(|N|^2 + |V|).
+ 
+\end_layout
+
+\begin_layout Standard
+...
 \end_layout
 
 \begin_layout Paragraph
