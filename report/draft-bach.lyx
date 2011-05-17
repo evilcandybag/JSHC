@@ -64,6 +64,35 @@ logicalmkup
 
 \begin_body
 
+\begin_layout Title
+JSHC - a JavaScript Haskell Compiler
+\end_layout
+
+\begin_layout Author
+Peter Holm, Staffan Björnesjö
+\end_layout
+
+\begin_layout Publishers
+May 2011
+\end_layout
+
+\begin_layout Publishers
+Department of Computer Science and Engineering
+\end_layout
+
+\begin_layout Publishers
+UNIVERSITY OF GOTHENBURG
+\end_layout
+
+\begin_layout Abstract
+Development of large web based applications using scripting languages such
+ as PHP or JavaScript, can be difficult given the lack of static type check
+\end_layout
+
+\begin_layout Abstract
+This 
+\end_layout
+
 \begin_layout Standard
 \begin_inset CommandInset toc
 LatexCommand tableofcontents
@@ -2045,10 +2074,6 @@ In this case, there is only a single possible assignment, and the inferred
 y :: [Int]
 \end_layout
 
-\begin_layout Standard
-<TODO: Example using function application and abstraction ?>
-\end_layout
-
 \begin_layout Subsection
 Dependency groups
 \end_layout
@@ -3511,68 +3536,7 @@ name "fig:implementation"
 \end_layout
 
 \begin_layout Plain Layout
-<TODO:
-\end_layout
 
-\begin_layout Plain Layout
-* 
-\begin_inset Quotes eld
-\end_inset
-
-loading modules
-\begin_inset Quotes erd
-\end_inset
-
- is missing.
-\end_layout
-
-\begin_layout Plain Layout
-* 
-\begin_inset Quotes eld
-\end_inset
-
-Add top-level namespace
-\begin_inset Quotes erd
-\end_inset
-
- (not a good name? (see description of this figure)) must be within the
- dependency checking.
-\end_layout
-
-\begin_layout Plain Layout
-* 
-\begin_inset Quotes eld
-\end_inset
-
-computing exports
-\begin_inset Quotes erd
-\end_inset
-
- is missing.
-\end_layout
-
-\begin_layout Plain Layout
-* reverse order of 
-\begin_inset Quotes eld
-\end_inset
-
-code generation
-\begin_inset Quotes erd
-\end_inset
-
- and 
-\begin_inset Quotes eld
-\end_inset
-
-AST simplification
-\begin_inset Quotes erd
-\end_inset
-
-)
-\end_layout
-
-\begin_layout Plain Layout
->
 \end_layout
 
 \begin_layout Plain Layout
@@ -4211,10 +4175,6 @@ reference "sub:Fixity-Resolution"
 Then dependency groups are produced for the top-level declarations of all
  modules in the group.
  The groups are then type checked in dependency order.
-\end_layout
-
-\begin_layout Itemize
-<TODO: Top level namespace?>
 \end_layout
 
 \begin_layout Itemize
