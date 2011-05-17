@@ -8607,13 +8607,14 @@ They have an interpreter that loads the Prelude and allows evaluation of
 \end_layout
 
 \begin_layout Standard
-The interpreter does not handle datatype declarations..
- <<what about loading a file?>>
+Wildcards and prefix operators does not appear to work in the interpreter,
+ but they do support guards and sections, which we do not.
 \end_layout
 
 \begin_layout Standard
-Wildcards and prefix operators does not appear to work in the interpreter,
- but they do support guards and sections, which we do not.
+It is supposed to be possible to load modules by placing them on the same
+ server as the interpreter in the same way as in our compiler, but we were
+ unable to load anything.
 \end_layout
 
 \begin_layout Section
