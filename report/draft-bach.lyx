@@ -90,7 +90,16 @@ Development of large web based applications using scripting languages such
 \end_layout
 
 \begin_layout Abstract
-This 
+We suggest a solution where the statically typed functional language Haskell
+ is compiled to JavaScript code, enabling programmers to create web applications
+ in a type safe environment.
+ 
+\end_layout
+
+\begin_layout Abstract
+An implementation of a subset Haskell to JavaScript compiler written in
+ JavaScript, JSHC, is presented as a proof of concept.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -4243,36 +4252,6 @@ The algorithm is a depth-first search through the graph which keeps track
  found.
 \end_layout
 
-\begin_layout Standard
-<TODO: time and space analysis>
-\end_layout
-
-\begin_layout Standard
-...
-\end_layout
-
-\begin_layout Standard
-reaches each node once looks up the destination node for each edge
-\end_layout
-
-\begin_layout Standard
-V for values, N for nodes, and E for edges.
- since cycles are never merged, and the merging copies all the edges and
- values, the cost of merging is bounded by the number of edges and values
- in the graph.
- This makes the cost of the algorithm O(|E| + |N| + |V|).
-\end_layout
-
-\begin_layout Standard
-Since the current implementation only uses a list of the path, the cost
- of checking for cycles is not O(1), but O(|N|^2 + |V|).
- 
-\end_layout
-
-\begin_layout Standard
-...
-\end_layout
-
 \begin_layout Paragraph
 Dependency order traversal
 \end_layout
@@ -4311,7 +4290,7 @@ Concurrency is possible, since any number of groups could be taken out from
 \end_layout
 
 \begin_layout Standard
-<TODO: should there be pseudo code ?>
+
 \end_layout
 
 \begin_layout Subsubsection
@@ -8518,13 +8497,7 @@ key "haskell-report"
 \end_layout
 
 \begin_layout Standard
-The dependency checking was not expected.
- It is not needed in many other languages as they do not have cyclic dependencie
-s between language constructs together with a lack of specification.
- It is this combination that causes the groups that need to be analyzed
- together instead of simply using an export specification of a module or
- a declared type of a function.
- <TODO: keep or not? if so, rewrite a bit for clarity.>
+
 \end_layout
 
 \begin_layout Section
@@ -8686,27 +8659,11 @@ Type classes
 \end_layout
 
 \begin_layout Standard
-reference to 
-\begin_inset Quotes eld
-\end_inset
-
-Type classes in Haskell Cordelia Hall, Kevin Hammond, Simon Peyton Jones,
- and Philip Wadler.
- European Symposium On Programming, LNCS 788, Springer Verlag, pp.
- 241-256, April 1994.
-\begin_inset Quotes erd
-\end_inset
-
- from http://homepages.inf.ed.ac.uk/wadler/topics/type-classes.html <TODO: we
- need some text here too.
- reference added to .bib : 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "type-classes-in-haskell"
-
-\end_inset
-
->
+Function overloading through type classes is one of the most important features
+ to add.
+ Overloading is an important part of Haskell, and is used by many of the
+ most common functions in the standard Prelude.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -8718,7 +8675,9 @@ Issues
 \end_layout
 
 \begin_layout Standard
-During the course of the project, several issues were 
+During the course of the project, we encountered some issues that significantly
+ affected our workflow and deserve mention.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -8732,12 +8691,12 @@ Certain features of the Haskell grammar occurred to us as peculiar and/or
 
 \begin_layout Standard
 The grammar in the Haskell report is at least an LR(2) grammar as it requires
- a lookahead of 2 when reading top declarations <TODO: we should examplify
- this>, and it has conflicts as an LALR grammar.
+ a lookahead of 2 when reading top declarations, and it has conflicts as
+ an LALR grammar.
  This means that it must be rewritten for use in a LALR(1) parser generator
  such as Jison or Bison.
  This is problematic, as rewriting the grammar can be a source of errors
- that can be hard to detect <TODO: ref?>.
+ that can be hard to detect.
  The grammar also contains at least one ambiguity.
  Both the 
 \begin_inset Flex CharStyle:Code
@@ -8768,8 +8727,7 @@ y makes the grammar less clear and also harder to implement a parser for.
 
 \begin_layout Standard
 Another issue we had was that the specification defines some declarations
- as legal where the semantics are unclear or nonsensical <TODO: can we say
- that in that way?>.
+ as legal where the semantics are unclear or nonsensical.
  For example, 
 \begin_inset Flex CharStyle:Code
 status collapsed
@@ -8786,26 +8744,20 @@ status collapsed
  
 \end_layout
 
-\begin_layout Standard
-The conflict messages in Jison (and also Bison) are not easy to understand.
- Better explanations of conflicts in these tools is certainly possible.
-\end_layout
-
-\begin_layout Subsection
-Bugs
-\end_layout
-
 \begin_layout Subsection
 Interpreter: accessing URLs
 \end_layout
 
 \begin_layout Standard
-The idea was that the interpreter should support adding paths.
- Unfortunately, the most common browsers prevent getting files from domains
- other than the one that the script is executed on.
- If using chrome/chromium, the security policy even prevents accessing local
- files using the file:// protocol when running scripts from local files,
- so the Ymacs interface must be placed on a web server to work for browsers
+The idea was that the interpreter should support adding paths to Haskell
+ files residing on any url or filepath.
+ Unfortunately, for safety reasons, most common browsers prevent getting
+ files from domains other than the one that the script is executed on.
+ If using Google Chrome/Chromium, the security policy even prevents accessing
+ local files using the file:// protocol when running a script from a local
+ directory i.e.
+ not through a web server.
+ The Ymacs interface must be placed on a web server to work for browsers
  with such a restriction.
 \end_layout
 
