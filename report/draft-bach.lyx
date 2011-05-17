@@ -82,7 +82,7 @@ Modern web applications are becoming more and more complex, with users expecting
  more and more automation of menial tasks such as spelling correction and
  autocompletion of text.
  This leads to web applications becoming larger and more complex, which
- in turn means that they are becoming more error prone<TODO: reference?>.
+ in turn means that they are becoming more error prone.
  One large source of errors in web applications is the absence of type safety
  in the form of static type checking in most scripting languages aimed at
  web development, such as JavaScript or PHP 
@@ -108,21 +108,19 @@ key "curry-js,HTML-in-haskell,CGI-haskell"
 \end_layout
 
 \begin_layout Standard
-Haskell is one such language, designed with type-safety as one of the major
- concerns <TODO:ref: ?>.
- By compiling Haskell directly to JavaScript, we use its strong type system
- to guard against some of the errors that are hard to avoid when writing
- large and complex applications with a dynamically typed language such as
- JavaScript, while still leveraging the wide range of compatible runtime
- environments for JavaScript code.
- <TODO: better formulation plox> 
+Haskell
 \begin_inset CommandInset citation
 LatexCommand cite
 key "haskell-report"
 
 \end_inset
 
-
+ is one such language, with a well developed type system.
+ By compiling Haskell directly to JavaScript, we use its powerful type system
+ to guard against some of the errors that are hard to avoid when writing
+ large and complex applications with a dynamically typed language such as
+ JavaScript, while still leveraging the wide range of compatible runtime
+ environments for JavaScript code.
 \begin_inset ERT
 status open
 
@@ -139,7 +137,7 @@ newline
 \end_layout
 
 \begin_layout Standard
-<TODO: a nicer introduction might be in order? >
+<TODO: vad ville vi göra, vad blev gjort>
 \end_layout
 
 \begin_layout Section
@@ -241,13 +239,14 @@ The purpose of this project is to implement a Haskell compiler that generates
  with most major modern browsers, and relieve users of the burden of having
  to download and install a compiler to their system.
  A JavaScript based graphical user interface with a text-editor and a code
- interpreter will also be developed.
+ interpreter will also be implemented by modifying an existing JavaScript
+ based text editor.
  The code interpreter will enable users to run their programs, and execute
  Haskell expressions directly in the editor, in the vein of the Glasgow
  Haskell Compiler's GHCi, or the Hugs interpreter.
  The compiler is to serve as a proof of concept for developing web applications
  in Haskell in an online environment.
- <TODO: extend and elaborate!>
+ 
 \end_layout
 
 \begin_layout Chapter
@@ -396,10 +395,6 @@ newline
 \end_inset
 
 
-\end_layout
-
-\begin_layout Itemize
-simple examples of Haskell code?
 \end_layout
 
 \begin_layout Subsection
@@ -1173,10 +1168,9 @@ target language
 
 .
  Common examples of compilers' target languages are machine code in the
- case of the GNU C Compiler <TODO: ref>, bytecode to be run in a virtual
- machine in the case of Java <TODO: ref> or another high level programming
- language in the case of the Glasgow Haskell Compiler, which can compile
- to C <TODO: ref>.
+ case of the GNU C Compiler, bytecode to be run in a virtual machine in
+ the case of Java or another high level programming language in the case
+ of the Glasgow Haskell Compiler, which can compile to C.
  
 \end_layout
 
@@ -2406,8 +2400,14 @@ The main part of this project was the development of the compiler itself.
 \begin_layout Standard
 Implementation work was largely carried out individually, with regular meetings
  to synchronize efforts and plan ahead.
- To keep work synchronized between meetings, the git version control system
- was used.
+ To keep work synchronized between meetings, the git
+\begin_inset CommandInset citation
+LatexCommand cite
+key "git"
+
+\end_inset
+
+ version control system was used.
 \end_layout
 
 \begin_layout Standard
@@ -2763,7 +2763,11 @@ Result
 \end_layout
 
 \begin_layout Standard
-<TODO: write an introduction>
+The result of this project is a Haskell compiler written in JavaScript,
+ producing code in JavaScript.
+ An interface with a text editor and interpreter terminal has been implemented
+ by integrating an existing editor with the compiler.
+ 
 \end_layout
 
 \begin_layout Section
