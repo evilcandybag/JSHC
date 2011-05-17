@@ -86,7 +86,14 @@ UNIVERSITY OF GOTHENBURG
 
 \begin_layout Abstract
 Development of large web based applications using scripting languages such
- as PHP or JavaScript, can be difficult given the lack of static type check
+ as PHP or JavaScript, can be difficult given the lack of static type checking
+ in such languages.
+ We argue that static type checking can help programmers avoid common errors
+ when developing large web applications.
+ The literature indicates that adding an extra layer of abstraction on top
+ of the scripting languages that can be subject to static type checking
+ can be a solution to this problem.
+ 
 \end_layout
 
 \begin_layout Abstract
@@ -99,6 +106,15 @@ We suggest a solution where the statically typed functional language Haskell
 \begin_layout Abstract
 An implementation of a subset Haskell to JavaScript compiler written in
  JavaScript, JSHC, is presented as a proof of concept.
+ The compiler has a graphical interface in the form of an Emacs-like text
+ editor extended to contain an interpreter terminal, to allow execution
+ of arbitrary expressions.
+ 
+\end_layout
+
+\begin_layout Abstract
+A comparison between JSHC and another JavaScript based Haskell implementation
+ is presented, as well as some unexpected issues with the Haskell specification.
  
 \end_layout
 
