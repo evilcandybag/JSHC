@@ -49,7 +49,40 @@ Rapportens upplägg och struktur
 \end_layout
 
 \begin_layout Standard
+Rapportens disposition är dess största svaghet.
+ 
+\end_layout
 
+\begin_layout Standard
+Kapitel 4, Implementering, innehåller ett antal delar som snarare hör hemma
+ i metodavsnittet.
+ Delarna 4.1-4.4 behandlar till exempel inte koncept som är specifika för
+ implementationen, utan behandlar snarare koncept att använda när man realiserar
+ implementationen, och bör därför ligga i avsnittet för metod.
+ Det är också tveksamt om det är motiverat att kapitel 4 och 5, resultat,
+ ska vara olika kapitel.
+ Implementationen är lika mycket en del av resultatet som resultat från
+ användartester.
+ Det finns också en viss överlappning i innehållet i delarna.
+ Båda delarna 4.9 och 5.1 beskriver samma aspekter av användargränssnittet.
+ 
+\end_layout
+
+\begin_layout Standard
+På flera ställen nämns och används koncept som ännu inte introducerats.
+ Till exempel behandlas användandet av Haar-lika egenskaper i kapitel 2.1
+ innan det definierats (kapitel 2.1.1).
+ Konceptet 
+\begin_inset Quotes eld
+\end_inset
+
+markör
+\begin_inset Quotes erd
+\end_inset
+
+ används på ett flertal ställen, i 4.5 och 4.6 innan det introduceras och
+ motiveras i 4.6.1.
+ 
 \end_layout
 
 \begin_layout Subsection*
