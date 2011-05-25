@@ -4,6 +4,9 @@
 \begin_header
 \textclass article
 \use_default_options true
+\begin_modules
+logicalmkup
+\end_modules
 \language english
 \inputencoding auto
 \font_roman default
@@ -17,6 +20,7 @@
 
 \graphics default
 \paperfontsize default
+\spacing single
 \use_hyperref false
 \papersize default
 \use_geometry false
@@ -36,12 +40,28 @@
 \tracking_changes false
 \output_changes false
 \author "" 
+\author "" 
 \end_header
 
 \begin_body
 
 \begin_layout Section*
 Opponering DATX02-1132 vs 1125
+\end_layout
+
+\begin_layout Standard
+Inledningsvis kan sägas att rapporten i stort är bra och står på en solid
+ teoretisk grund.
+ Innehåll och språk är i stort bra, och beskriver på ett tydligt sätt projektet,
+ dess omfattning, målsättningar och avgränsningar.
+ Vi har valt att fokusera på de punkter där förbättring är möjligt.
+\end_layout
+
+\begin_layout Standard
+Detta dokument är strukturerat så att de viktigaste punkterna kommer i egna
+ sektioner, följt av en sektion med mindre viktiga synpunkter i punktform
+ samt en sektion med sådant vi ansett vara bra, men som eventuellt kan uttryckas
+ annorlunda/bättre.
 \end_layout
 
 \begin_layout Subsection*
@@ -70,8 +90,8 @@ Kapitel 4, Implementering, innehåller ett antal delar som snarare hör hemma
 
 \begin_layout Standard
 På flera ställen nämns och används koncept som ännu inte introducerats.
- Till exempel behandlas användandet av Haar-lika egenskaper i kapitel 2.1
- innan det definierats (kapitel 2.1.1).
+ Användandet av Haar-lika egenskaper behandlas i kapitel 2.1 innan det definierat
+s (kapitel 2.1.1).
  Konceptet 
 \begin_inset Quotes eld
 \end_inset
@@ -82,35 +102,355 @@ markör
 
  används på ett flertal ställen, i 4.5 och 4.6 innan det introduceras och
  motiveras i 4.6.1.
+ Det talas även om simulering av knapptryckningar i kap 4.5.1 (
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Quotes eld
+\end_inset
+
+FACEbot ansvarar för simulering av knapptryckningar
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+), men detta val förklaras och motiveras först senare i 4.8.
  
 \end_layout
 
 \begin_layout Subsection*
-Problemdefinition
+Innehåll
+\end_layout
+
+\begin_layout Standard
+Emedan innehållet, som tidigare nämnts, generellt är bra, så finns en del
+ frågetecken kring ett par punkter.
+\end_layout
+
+\begin_layout Standard
+Det är oklart vem som implementerat den Viola-Jones-detektor som använts.
+ Det framgår inte om det är ni själva som använt OpenCV till detta eller
+ om detektorn är en del av OpenCV.
+ 
+\end_layout
+
+\begin_layout Standard
+Överhuvudtaget är det oklart vilka funktioner OpenCV erbjuder, vilka som
+ används i er implementation och på vilket sätt de används.
+ Det är viktigt att läsaren, utan att behöva kontrollera källorna, får en
+ uppfattning om vad ni gjort själva och vad som är baserat på andras arbete.
+ 
+\end_layout
+
+\begin_layout Standard
+Figur 1 innehåller de 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+Haar-like features
+\end_layout
+
+\end_inset
+
+ som OpenCV använder, men Viola & Jones (2004) beskrivning av de features
+ de använt verkar förutsätta en större mängd 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+features
+\end_layout
+
+\end_inset
+
+ än de som beskrivs (två sådana 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+features
+\end_layout
+
+\end_inset
+
+ visas även i figur 3 i er rapport).
+ 
+\end_layout
+
+\begin_layout Standard
+Vidare beskriver Viola & Jones (2004) en detektor som känner igen hela ansikten,
+ medan ni verkar använda flera olika detektorer (både från OpenCV och egenutveck
+lade) för enskilda delar av ansikten.
+ Detta framgår inte särskilt tydligt i er text.
+ Vilka typer av detektorer ni använt, och hur de kombineras för att ge det
+ resultat ni vill ha, framgår inte helt.
+ 
 \end_layout
 
 \begin_layout Subsection*
-Metod/genomförande
+Övriga kommentarer
+\end_layout
+
+\begin_layout Subsubsection*
+Språk
+\end_layout
+
+\begin_layout Itemize
+Ordet 
+\begin_inset Quotes eld
+\end_inset
+
+knapptryckning
+\begin_inset Quotes erd
+\end_inset
+
+ används för att referera till tangentbordsinmatning.
+ Knapptryckning är väldigt generellt, och innefattar många koncept (knappar
+ på skärmen, knappar på datorchassit etc).
+\end_layout
+
+\begin_layout Itemize
+Övesättningen av 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Quotes eld
+\end_inset
+
+Haar-like features
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ till 
+\begin_inset Quotes eld
+\end_inset
+
+Haar-lika egenskaper
+\begin_inset Quotes erd
+\end_inset
+
+ ger upphov till vissa språkliga problem.
+ En översättning av 
+\begin_inset Quotes eld
+\end_inset
+
+feature
+\begin_inset Quotes erd
+\end_inset
+
+ till 
+\begin_inset Quotes eld
+\end_inset
+
+särdrag
+\begin_inset Quotes erd
+\end_inset
+
+ eller 
+\begin_inset Quotes eld
+\end_inset
+
+kännetecken
+\begin_inset Quotes erd
+\end_inset
+
+ kan vara mer lämplig.
+ Jfr.
+ 
+\begin_inset Quotes eld
+\end_inset
+
+Den översta raden är egenskaper för att hitta kanter
+\begin_inset Quotes erd
+\end_inset
+
+ med 
+\begin_inset Quotes eld
+\end_inset
+
+Den översta raden är särdrag för att identifiera kanter
+\begin_inset Quotes erd
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Subsubsection*
+Figurer
+\end_layout
+
+\begin_layout Itemize
+Figur 5 föreställer IBMs version av RUP, som ni inte använt.
+ En figur som beskriver den variant av RUP som faktiskt använts i projektet
+ vore mer lämplig.
+ 
+\end_layout
+
+\begin_layout Itemize
+Figur 7 avbildar en klasshierarki.
+ Det verkar som om denna genererats av en programvara utifrån er klasshierarki
+ snarare än ritats av er själva.
+ Är detta fallet bör det stå i beskrivningen.
+ 
+\end_layout
+
+\begin_layout Subsubsection*
+Innehåll
+\end_layout
+
+\begin_layout Itemize
+I kapitel 4.3, tredje stycket nämns att: 
+\begin_inset Quotes eld
+\end_inset
+
+Att Java är tillgängligt på flera olika plattformar var också en bidragande
+ faktor till valet.
+\begin_inset Quotes erd
+\end_inset
+
+ när Java jämförs mot C++.
+ Både Java och C++ finns tillgängliga till alla plattformar ni nämner i
+ rapporten.
+ 
+\end_layout
+
+\begin_layout Itemize
+I 3.3, stycke 2 nämns att ni använt 
+\begin_inset Quotes eld
+\end_inset
+
+evolutionära metoder
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Det finns varken förklaring eller referens till vad detta innebär.
+ 
+\end_layout
+
+\begin_layout Itemize
+2.2.3 nämner 
+\begin_inset Quotes eld
+\end_inset
+
+ortogonalprojektion
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Ingen förklaring av vad detta innebär ges.
+ 
+\end_layout
+
+\begin_layout Itemize
+4.6.1 nämner att 
+\begin_inset Quotes eld
+\end_inset
+
+Det finns emellertid en klassifikator för att hitta näsan men denna skulle
+ inte ge samma punkt på näsan från bild till bild
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Varför det blir så nämns inte.
+\end_layout
+
+\begin_layout Subsubsection*
+Referenser
+\end_layout
+
+\begin_layout Itemize
+På flera ställen används referenser till wikisidor.
+ Finns alternativ (till exempel ett projekts officiella hemsida/informationskana
+l) bör dessa användas istället.
+\end_layout
+
+\begin_layout Itemize
+Referensen till 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+Software engineering
+\end_layout
+
+\end_inset
+
+ av Sommerville, I.
+ saknar information om både år och utgåva.
+ Då det finns minst nio utgåvor av denna bok (nionde utgåvan har ISBN-13:
+ 978-0137035151) är det viktigt att veta vilken av dessa som använts.
+ 
+\end_layout
+
+\begin_layout Itemize
+I kapitel 3.5 omnämns verktyget JUnit4, utan någon referens.
+ 
+\end_layout
+
+\begin_layout Itemize
+Dutchguilder (2007) är en länk till en bild hämtad från wikipedia.
+ Det finns inga indikationer någonstans på vad bilden kommer ifrån eller
+ vad den baserats på.
+ I övrigt saknas även referenser till någon officiell källa som förklarar
+ RUP.
+ Exempel på en sådan källa: http://www.ibm.com/software/awdtools/rup/
 \end_layout
 
 \begin_layout Subsection*
-Avgränsningar
+Bra saker som kan förbättras
 \end_layout
 
-\begin_layout Subsection*
-Teori
+\begin_layout Standard
+Beskrivningen av användartestningen är bra och välstrukturerad.
+ Det verkar dock som om den utformats med någon form av teoretisk bakgrund
+ (t.ex.
+ människa-datorinteraktion).
+ Det skulle ge era testmetoder mer tyngd om det redogjordes för någon eventuell
+ sådan bakgrund.
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
 \end_layout
 
-\begin_layout Subsection*
-Analys
+\end_inset
+
+
 \end_layout
 
-\begin_layout Subsection*
-Resultat och resultathantering 
+\begin_layout Standard
+Kravlistan (appendix A) är väl utformad och lättförståelig, och kraven verkar
+ sunda för projektet.
+ Det saknas dock motivering till hur dessa krav och användningspremisser
+ tagits fram.
+ Ytterligare förklaring och motivering (förslagsvis genom att utöka kap
+ 3.1) kan göra argumentationen kring hur dessa krav uppfyllts lättare att
+ följa med i.
+ 
 \end_layout
 
-\begin_layout Subsection*
-Rapportens utformning och formalia
+\begin_layout Standard
+
 \end_layout
 
 \end_body
