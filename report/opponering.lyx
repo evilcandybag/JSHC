@@ -69,23 +69,42 @@ Rapportens upplägg och struktur
 \end_layout
 
 \begin_layout Standard
-Rapportens disposition är dess största svaghet.
- 
-\end_layout
-
-\begin_layout Standard
 Kapitel 4, Implementering, innehåller ett antal delar som snarare hör hemma
  i metodavsnittet.
- Delarna 4.1-4.4 behandlar till exempel inte koncept som är specifika för
+ Delarna 4.1-4.3 behandlar till exempel inte koncept som är specifika för
  implementationen, utan behandlar snarare koncept att använda när man realiserar
  implementationen, och bör därför ligga i avsnittet för metod.
  Det är också tveksamt om det är motiverat att kapitel 4 och 5, resultat,
  ska vara olika kapitel.
- Implementationen är lika mycket en del av resultatet som resultat från
- användartester.
+ 
+\end_layout
+
+\begin_layout Standard
+Delarna 4.4, 3.3, 3.4 behandlar i större utsträckning teorin bakom de koncept
+ ni använt, än hur de använts i ert projekt och hur detta påverkat arbetsmetoden
+/implementeringen.
+ 
+\end_layout
+
+\begin_layout Standard
+Implementationen är lika mycket en del av resultatet som resultat från användart
+ester.
  Det finns också en viss överlappning i innehållet i delarna.
  Båda delarna 4.9 och 5.1 beskriver samma aspekter av användargränssnittet.
  
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -158,7 +177,16 @@ Haar-like features
 
 \end_inset
 
- som OpenCV använder, men Viola & Jones (2004) beskrivning av de features
+ som OpenCV använder, men Viola & Jones (2004) beskrivning av de 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+features
+\end_layout
+
+\end_inset
+
  de använt verkar förutsätta en större mängd 
 \begin_inset Flex CharStyle:Emph
 status collapsed
@@ -187,9 +215,8 @@ features
 Vidare beskriver Viola & Jones (2004) en detektor som känner igen hela ansikten,
  medan ni verkar använda flera olika detektorer (både från OpenCV och egenutveck
 lade) för enskilda delar av ansikten.
- Detta framgår inte särskilt tydligt i er text.
- Vilka typer av detektorer ni använt, och hur de kombineras för att ge det
- resultat ni vill ha, framgår inte helt.
+ Det framgår inte särskilt tydligt i er text vilka typer av detektorer ni
+ använt, och hur de kombineras för att ge det resultat ni vill ha.
  
 \end_layout
 
@@ -216,7 +243,7 @@ knapptryckning
 \end_layout
 
 \begin_layout Itemize
-Övesättningen av 
+Översättningen av 
 \begin_inset Flex CharStyle:Emph
 status collapsed
 
@@ -312,7 +339,7 @@ Innehåll
 \end_layout
 
 \begin_layout Itemize
-I kapitel 4.3, tredje stycket nämns att: 
+I kapitel 4.3, tredje stycket nämns: 
 \begin_inset Quotes eld
 \end_inset
 
@@ -342,7 +369,25 @@ evolutionära metoder
 \end_layout
 
 \begin_layout Itemize
-2.2.3 nämner 
+2.2 behandlar projektion, men det är oklart vilken grund man förutsätter
+ att läsaren behöver.
+ Termerna 
+\begin_inset Quotes eld
+\end_inset
+
+projektion
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+perspektivprojektion
+\begin_inset Quotes erd
+\end_inset
+
+ och 
 \begin_inset Quotes eld
 \end_inset
 
@@ -350,9 +395,7 @@ ortogonalprojektion
 \begin_inset Quotes erd
 \end_inset
 
-.
- Ingen förklaring av vad detta innebär ges.
- 
+ nämns men det är oklart vad skillnaden mellan dessa är.
 \end_layout
 
 \begin_layout Itemize
@@ -369,6 +412,13 @@ Det finns emellertid en klassifikator för att hitta näsan men denna skulle
  Varför det blir så nämns inte.
 \end_layout
 
+\begin_layout Itemize
+3.4 behandlar versionshantering väldigt generellt som koncept och talar väldigt
+ lite om hur verktyget använts i just ert projekt.
+ Om andra verktyg använts tillsammans med Subversion (t.ex.
+ Eclipse) bör detta också nämnas.
+\end_layout
+
 \begin_layout Subsubsection*
 Referenser
 \end_layout
@@ -376,7 +426,7 @@ Referenser
 \begin_layout Itemize
 På flera ställen används referenser till wikisidor.
  Finns alternativ (till exempel ett projekts officiella hemsida/informationskana
-l) bör dessa användas istället.
+l eller en bok om projektet) bör dessa användas istället.
 \end_layout
 
 \begin_layout Itemize
@@ -392,7 +442,7 @@ Software engineering
 
  av Sommerville, I.
  saknar information om både år och utgåva.
- Då det finns minst nio utgåvor av denna bok (nionde utgåvan har ISBN-13:
+ Då det finns minst nio utgåvor av denna bok (nionde utgåvan har ISBN-13
  978-0137035151) är det viktigt att veta vilken av dessa som använts.
  
 \end_layout
@@ -404,11 +454,15 @@ I kapitel 3.5 omnämns verktyget JUnit4, utan någon referens.
 
 \begin_layout Itemize
 Dutchguilder (2007) är en länk till en bild hämtad från wikipedia.
- Det finns inga indikationer någonstans på vad bilden kommer ifrån eller
+ Det finns inga indikationer någonstans på var bilden kommer ifrån eller
  vad den baserats på.
  I övrigt saknas även referenser till någon officiell källa som förklarar
  RUP.
- Exempel på en sådan källa: http://www.ibm.com/software/awdtools/rup/
+ Exempel på en sådan källa:
+\begin_inset Newline newline
+\end_inset
+
+http://www.ibm.com/software/awdtools/rup/
 \end_layout
 
 \begin_layout Subsection*
@@ -420,8 +474,8 @@ Beskrivningen av användartestningen är bra och välstrukturerad.
  Det verkar dock som om den utformats med någon form av teoretisk bakgrund
  (t.ex.
  människa-datorinteraktion).
- Det skulle ge era testmetoder mer tyngd om det redogjordes för någon eventuell
- sådan bakgrund.
+ Det skulle ge era testmetoder mer tyngd om det redogjordes för någon sådan
+ eventuell bakgrund.
  
 \begin_inset ERT
 status open
@@ -447,10 +501,6 @@ Kravlistan (appendix A) är väl utformad och lättförståelig, och kraven verk
  3.1) kan göra argumentationen kring hur dessa krav uppfyllts lättare att
  följa med i.
  
-\end_layout
-
-\begin_layout Standard
-
 \end_layout
 
 \end_body
