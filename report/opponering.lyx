@@ -7,7 +7,7 @@
 \begin_modules
 logicalmkup
 \end_modules
-\language english
+\language swedish
 \inputencoding auto
 \font_roman default
 \font_sans default
@@ -152,9 +152,10 @@ Emedan innehållet, som tidigare nämnts, generellt är bra, så finns en del
 \end_layout
 
 \begin_layout Standard
-Det är oklart vem som implementerat den Viola-Jones-detektor som använts.
+Det är oklart vem som implementerat den eller de Viola-Jones-detektor(-er)
+ som använts.
  Det framgår inte om det är ni själva som använt OpenCV till detta eller
- om detektorn är en del av OpenCV.
+ om detektorn(-erna) är en del av OpenCV.
  
 \end_layout
 
@@ -315,6 +316,29 @@ Den översta raden är särdrag för att identifiera kanter
  
 \end_layout
 
+\begin_layout Itemize
+I 3.4 står att 
+\begin_inset Quotes eld
+\end_inset
+
+Subversion är ett populärt projekt
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Projekt är ett olyckligt val här.
+ Jfr.
+ med 
+\begin_inset Quotes eld
+\end_inset
+
+Subversion är ett populärt (versionshanterings-)program
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Subsubsection*
 Figurer
 \end_layout
@@ -328,44 +352,23 @@ Figur 5 föreställer IBMs version av RUP, som ni inte använt.
 
 \begin_layout Itemize
 Figur 7 avbildar en klasshierarki.
- Det verkar som om denna genererats av en programvara utifrån er klasshierarki
- snarare än ritats av er själva.
- Är detta fallet bör det stå i beskrivningen.
+ Har denna genererats av ett program snarare än ritats av er själva bör
+ detta anges.
+ 
+\end_layout
+
+\begin_layout Itemize
+Figur 8, 10, 11, 12 visar bilder på personer som använder produkten, men
+ utan någon synlig markör för nästippen, trots detta krävs enligt rapporten.
+ Det nämns också i figur 8 att det finns en markör i bilden, men det syns
+ inte i bilden.
+ För att förbättra tydligheten i rapporten bör bilder som tydligt visar
+ att en markör förekommer användas.
  
 \end_layout
 
 \begin_layout Subsubsection*
 Innehåll
-\end_layout
-
-\begin_layout Itemize
-I kapitel 4.3, tredje stycket nämns: 
-\begin_inset Quotes eld
-\end_inset
-
-Att Java är tillgängligt på flera olika plattformar var också en bidragande
- faktor till valet.
-\begin_inset Quotes erd
-\end_inset
-
- när Java jämförs mot C++.
- Både Java och C++ finns tillgängliga till alla plattformar ni nämner i
- rapporten.
- 
-\end_layout
-
-\begin_layout Itemize
-I 3.3, stycke 2 nämns att ni använt 
-\begin_inset Quotes eld
-\end_inset
-
-evolutionära metoder
-\begin_inset Quotes erd
-\end_inset
-
-.
- Det finns varken förklaring eller referens till vad detta innebär.
- 
 \end_layout
 
 \begin_layout Itemize
@@ -399,6 +402,70 @@ ortogonalprojektion
 \end_layout
 
 \begin_layout Itemize
+I 3.3, stycke 2 nämns att ni använt 
+\begin_inset Quotes eld
+\end_inset
+
+evolutionära metoder
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Det finns varken förklaring eller referens till vad detta innebär.
+ 
+\end_layout
+
+\begin_layout Itemize
+3.4 behandlar versionshantering väldigt generellt som koncept och talar väldigt
+ lite om hur verktyget använts i just ert projekt.
+ Om andra verktyg använts tillsammans med Subversion (t.ex.
+ Eclipse) bör detta också nämnas.
+\end_layout
+
+\begin_layout Itemize
+I kapitel 4.3, tredje stycket nämns: 
+\begin_inset Quotes eld
+\end_inset
+
+Att Java är tillgängligt på flera olika plattformar var också en bidragande
+ faktor till valet.
+\begin_inset Quotes erd
+\end_inset
+
+ när Java jämförs mot C++.
+ Både Java och C++ finns tillgängliga till alla plattformar ni nämner i
+ rapporten.
+ 
+\end_layout
+
+\begin_layout Itemize
+4.5.2 Beskriver bland annat den grundläggande strukturen i Javas 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+Swing
+\end_layout
+
+\end_inset
+
+-bibliotek.
+ Detta är överflödigt då javakurser med 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+Swing
+\end_layout
+
+\end_inset
+
+ som inslag förekommer i kurser som ingår i baskraven för samtliga kandidatprogr
+am som går DATX02.
+ 
+\end_layout
+
+\begin_layout Itemize
 4.6.1 nämner att 
 \begin_inset Quotes eld
 \end_inset
@@ -413,10 +480,17 @@ Det finns emellertid en klassifikator för att hitta näsan men denna skulle
 \end_layout
 
 \begin_layout Itemize
-3.4 behandlar versionshantering väldigt generellt som koncept och talar väldigt
- lite om hur verktyget använts i just ert projekt.
- Om andra verktyg använts tillsammans med Subversion (t.ex.
- Eclipse) bör detta också nämnas.
+5.1.1 talar om 
+\begin_inset Quotes eld
+\end_inset
+
+den fjärde ansiktspunkten
+\begin_inset Quotes erd
+\end_inset
+
+, men det nämns aldrig vilka de fyra ansiktspunkterna är, och vilken ordning
+ de har.
+ 
 \end_layout
 
 \begin_layout Subsubsection*
@@ -463,6 +537,30 @@ Dutchguilder (2007) är en länk till en bild hämtad från wikipedia.
 \end_inset
 
 http://www.ibm.com/software/awdtools/rup/
+\end_layout
+
+\begin_layout Itemize
+På sid 13 refereras 
+\begin_inset Quotes eld
+\end_inset
+
+kopiera-ändra-sammanfoga-modellen
+\begin_inset Quotes erd
+\end_inset
+
+ till Pilato et al.
+ (2004).
+ Då källan är en bok på engelska är det mycket svårt för läsaren att hitta
+ var i boken man refererar till.
+ Antingen bör en sid- eller kapitelanvisning finnas, eller så bör termen
+ återges på originalspråket.
+ 
+\end_layout
+
+\begin_layout Itemize
+7.2 talar om framtida forskning med referens till en källa som är gammal
+ (Ballard & Brown 1982).
+ En nyare källa bör användas.
 \end_layout
 
 \begin_layout Subsection*
