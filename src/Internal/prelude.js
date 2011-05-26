@@ -45,7 +45,7 @@ JSHC.Internal.Prelude = {
   int32ne: JSHC.int32comp(JSHC.int32ne),
  }
 
-JSHC.Internal.Prelude["undefined"] = JSHC.TC(function() {return undefined});
+JSHC.Internal.Prelude["undefined"] = JSHC.TC(function() {throw new JSHC.RuntimeError("undefined")});
 
 /*
 various type classes and instances

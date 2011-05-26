@@ -33,6 +33,9 @@ JSHC.Thunk.prototype = {
         this._v = val;
     }
 };
+JSHC.Thunk.prototype.toString = function() {
+    this.v.toString();
+};
 
 
 

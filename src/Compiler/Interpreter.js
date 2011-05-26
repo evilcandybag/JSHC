@@ -230,8 +230,12 @@ JSHC.Interpreter.prototype.execCommand = function(line){
             var expr = JSHC.Codegen.codegen(decl.rhs, this.prefix);
             this.onMessage(eval(expr).toString());
         } catch (err) {
-            alert("expression:\n" + line + "\ngenerated code:\n" + expr + "\nwith error:\n\n" + JSHC.showError(err));
-            this.onError(err);
+            if (err instanceof JSHC.RuntimeError) {
+                this.onError(err.toString());
+            } else {
+                alert("expression:\n" + line + "\ngenerated code:\n" + expr + "\nwith error:\n\n" + JSHC.showError(err));
+                this.onError(err);
+            }
         }
 	break;
 

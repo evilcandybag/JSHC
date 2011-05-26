@@ -45,10 +45,32 @@ JSHC.CompilerError = function(message){
        this[k] = err[k];
     }
 
-    this.name = "SourceError";
+    this.name = "CompilerError";
     this.message = message;
 };
 JSHC.CompilerError.prototype = new Error();
+
+////////////////////////////////////////////////////////////////////////////////
+
+/*
+  describes an error in the runtime.
+*/
+JSHC.RuntimeError = function(message){
+    assert.ok( message !== undefined );
+
+    var err = new Error();  // error object used to initialize some members
+    for(var k in err){
+       this[k] = err[k];
+    }
+
+    this.name = "RuntimeError";
+    this.message = message;
+};
+JSHC.RuntimeError.prototype = new Error();
+
+JSHC.RuntimeError.prototype.toString = function() {
+    return this.name + ": " + this.message;
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
