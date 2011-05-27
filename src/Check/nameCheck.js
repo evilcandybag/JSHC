@@ -634,7 +634,7 @@ JSHC.Check.nameCheckExp = function(comp,module,lspace,ast){
             var alt = ast.alts[i];
             lspace.push();
             JSHC.Check.nameCheckPattern(comp,module,lspace,alt.pat);
-            JSHC.Check.nameCheckExp(comp,module,lspace,ast.exp);
+            JSHC.Check.nameCheckExp(comp,module,lspace,ast.alts[i].exp);
             lspace.pop();
         }
         break;
