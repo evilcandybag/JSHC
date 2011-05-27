@@ -195,6 +195,11 @@ foldr f z ((:) x xs) = f x (foldr f z xs)
 --take n _      | n <= 0 =  []
 --take _ []              =  []
 --take n (x:xs)          =  x : take (n-1) xs
+take n es = if n <= 0
+  then []
+  else case es of
+    [] -> []
+    ((:) x xs) -> x : take (n-1) xs
 
 --drop                   ::  Int -> [a] -> [a]
 --drop n xs     | n <= 0 =   xs
