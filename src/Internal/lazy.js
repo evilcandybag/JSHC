@@ -1,17 +1,8 @@
 // -----------------------------------------------------------------------------
 // lazy evaluation
 
-/*
-each thunk is an object that either contains a member "v" for the value, or
-a "c" (the computation) with members "a1", "a2", etc.. for the arguments.
-could perhaps use an array for the arguments, but would mean that it takes
-more space for few arguments.
-
-can not store the arguments on the function, since the function is a shared
-object between thunks.
-*/
-
 JSHC.Thunk = function (exp) {
+    assert.ok( ! (exp instanceof JSHC.Thunk) );
     this.v = exp
 }
 
@@ -22,10 +13,9 @@ JSHC.Thunk.prototype = {
             this.v = this._v();
         }
         
-        if (this._v instanceof JSHC.Thunk) {
-            this.v = this._v.v;
-            
-        }
+        //if (this._v instanceof JSHC.Thunk) {
+        //    this.v = this._v.v;
+        //}
         
         return this._v;
     },
@@ -34,18 +24,9 @@ JSHC.Thunk.prototype = {
     }
 };
 JSHC.Thunk.prototype.toString = function() {
-    this.v.toString();
+    return this.v.toString();
 };
 
-
-
-
-JSHC.TC = function (t) {
-  if (t instanceof JSHC.Thunk)
-    return t;
-  else 
-    return new JSHC.Thunk(t);
-}
 /*
 // TODO: need to have a way to handle functions of arbitrary arity.
 function thunk_computation_a1(f){

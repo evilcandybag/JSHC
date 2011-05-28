@@ -30,9 +30,17 @@ JSHC.Codegen.codegen = function (input,namespace) {
         res += comBody(module.body);
         return res;
     }
-    
+
+    /*
+        compiles into lazy expression
+    */
     var comSoloExp = function(exp) {
-        return comExp(exp);
+        var code = comExp(exp);
+        if( code[0] ){
+            return "new JSHC.Thunk("+code[1]+")";
+        } else {
+            return code[1];
+        }
     }
 
     var comBody = function(body) {
@@ -45,6 +53,9 @@ JSHC.Codegen.codegen = function (input,namespace) {
                 case "topdecl-decl":
                     res += comDecl(body.topdecls[i].decl);
                     break;
+                case "topdecl-data":
+                    res += comData(body.topdecls[i]);
+                    break;
                 default:
                     throw new Error("comBody not defined for name " + body.topdecls[i].name);
             }
@@ -54,49 +65,64 @@ JSHC.Codegen.codegen = function (input,namespace) {
     }
 
     var comDecl = function(decl) {
-
         var res = ""
         switch (decl.name) {
             case "decl-fun":
-                res = (modid + "[\"" + decl.ident.id + "\"]" + " = "  + comRhs(decl.rhs)) + ";\n";
+                res = (modid + "[\"" + decl.ident.id + "\"]" + " = " + comRhs(decl.rhs)) + ";\n";
                 break;
             default:
                 throw new Error("comDecl not defined for name " + decl.name);
         }
+
+        if( typeof res != "string" ){
+            JSHC.alert("compiling\n",decl);
+            JSHC.alert("to\n",res);
+            throw new Error("stop");
+        }
+
         return res;
-        
     }
 
     var comRhs = function(rhs) {
-
-        return /*"function() {return " +*/ comExp(rhs) /*+ "}"*/;
+       // not necessary for all RHSs to be lazy, but must avoid evaluating
+       // the RHS when using global names that have no yet been defined outside
+       // functions in the RHS.
+       var code = comExp(rhs);
+       if( code[0] ){
+           return "new JSHC.Thunk(function() {return " + code[1] + "})";
+       } else {
+           return code[1];
+       }
     }
 
     var comExp = function(exp) {
-
-        var res = "";
         switch (exp.name) {
-            case "constrained-exp":
-                throw new Error("comExp not defined for name " + exp.name);
-                break;
-            case "infixexp":
-                res += comInfixexp(exp.exps);
-                break;
-            case "application":
-            case "lambda":
-            case "dacon":
-            case "varname":
-            case "integer-lit":
-            case "case":
-//                alert("compiling expression:\n\n " + JSHC.showAST(exp));
-                res += comInfixexp([exp]);
-                break;
-            default: 
+             case "application":
+//                alert("compiling application of:\n " + JSHC.showAST(exp[i].exps));
+                return comExpApp(exp);
+
+             case "integer-lit":
+                return comExpLit(exp);
+
+             case "varname":
+             case "dacon":
+                return comExpName(exp);
+
+             case "tuple":
+                return comExpTuple(exp);
+
+             case "lambda":
+                return comExpLambda(exp);
+
+             case "case":
+//                alert("comCase:\n\n" + JSHC.showAST(exp[i]))
+                return comExpCase(exp);
+             default:
                 throw new Error("comExp not defined for name " + JSHC.showAST(exp));
         }
-        return res;
     }
 
+/*
     var comPat = function(pat) {
 
         var res = "";
@@ -119,6 +145,7 @@ JSHC.Codegen.codegen = function (input,namespace) {
         }
         return res;
     }
+*/
 
     var comApat = function(apat) {
 
@@ -135,36 +162,7 @@ JSHC.Codegen.codegen = function (input,namespace) {
         
     }
 
-    
-    var comInfixexp = function(exp) {
-
-        var res = "";
-        for (var i = 0; i < exp.length; i++) {
-            switch (exp[i].name) {
-             case "application":
-//                alert("compiling application of:\n " + JSHC.showAST(exp[i].exps));
-                res += comFexp(exp[i].exps);
-                break;
-             case "varname":
-             case "integer-lit":
-             case "dacon":
-                res += comFexp([exp[i]]);
-                break;
-             case "lambda":
-                res += comLambda(exp[i]);
-                break;
-             case "case":
-//                alert("comCase:\n\n" + JSHC.showAST(exp[i]))
-                res += comCase(exp[i]);
-                break;
-             default:
-                throw new Error("comInfixexp not defined for name " + exp[i].name); 
-            }
-        }
-        return res;
-        
-    }
-
+/*
     var comFexp = function(exp) {
         
         var res = "";
@@ -186,41 +184,30 @@ JSHC.Codegen.codegen = function (input,namespace) {
         }
         return res;
     }
+*/
 
-    var comLambda = function(lamb){
-        
-        if (lamb.atArg === undefined) {
-            lamb.atArg = 0;
-            lamb.arglen = lamb.args.length
-        }
-        
-        var res = "";
-        if (lamb.atArg < lamb.arglen) {
-            var arg = lamb.args[lamb.atArg];
-            lamb.atArg++;
-            res += "function(" + comApat(arg) + "){ return " + comLambda(lamb) + "}"
-        } else {
-            res +=  comExp(lamb.rhs);
-        }
-        return res;
-    }
+    var comExpCase = function(cas) {
 
-    var comCase = function(cas) {
+        // does not matter if case gets a strict or lazy value
+        var ex_code = comExp(cas.exp)[1];
 
-        var ex = comExp(cas.exp)
 //        alert("COMPILED: \n" + JSHC.showAST(cas.exp) + "to:\n" + JSHC.showAST(ex))
-        var res = "JSHC.Internal.match(" + ex + ", [\n";
+        var res = "JSHC.Internal.match(" + ex_code + ", [\n";
         for (var i = 0; i < cas.alts.length; i++) {
-            var binds = JSHC.comUtils.getBinds(ex, cas.alts[i].pat);
             var bindStrs = JSHC.comUtils.getBindStrs(cas.alts[i].pat);
-            res += "{p: " + comCasePat(cas.alts[i].pat) + ",";//+ "{name: \"" + cas.alts[i].pat.name + "\", "
-//            res +=            "p: " + comPat(cas.alts[i].pat) + "},";
-//            res += "b: [" + binds.join(",") + "],"; 
-            res += "f: function(" + bindStrs.join(","); 
-            res += "){return " + comExp(cas.alts[i].exp) + "}},\n";             
+            res += "{p: " + comCasePat(cas.alts[i].pat) + ",";
+            res += "f: function(" + bindStrs.join(",");
+            var rhs_code = comExp(cas.alts[i].exp);
+            if( ! rhs_code[0] ){
+                rhs_code = rhs_code[1]+".v";
+            } else {
+                rhs_code = rhs_code[1];
+            }
+            res += "){return " + rhs_code + "}},\n";
         }
         res += "])\n"
-        return res;
+        //JSHC.alert("case result\n",cas.exp,"\n\n",ex,"\n\n",res);
+        return [true,res];
     }
 
     var comCasePat = function(pat) {
@@ -228,117 +215,243 @@ JSHC.Codegen.codegen = function (input,namespace) {
         var res = "";
         switch (pat.name) {
             case "dacon":
-                res += "[\"" + pat.id  + "\"]";
+                res += "new JSHC.Internal.ConPat(\""+pat.id+"\",[])";
                 break;
             case "conpat":
-                res += "[\"" + pat.con.id + "\","
+                res += "new JSHC.Internal.ConPat(\""+pat.con.id+"\",[";
                 for (var i = 0; i < pat.pats.length; i++) {
                     res += comCasePat(pat.pats[i]) + ", ";
                 }
-                res += "]"
+                res += "])"
                 break;
             case "tuple_pat":
-                res += "[" 
+                res += "new JSHC.Internal.TuplePat(["
                 for (var i = 0; i < pat.members.length; i++) {
                     res += comCasePat(pat.members[i]) + ", ";
                 }
-                res += "]"
+                res += "])"
                 break;
             case "varname":
-                res += "\"" + pat.id + "\""
+                res += "new JSHC.Internal.NamePat(\"" + pat.id + "\")";
                 break;
             case "integer-lit":
-                res += pat.value;
+                res += "new JSHC.Internal.IntegerPat("+pat.value+")";
                 break;
             case "wildcard":
-                res += "\"_\"";
+                res += "new JSHC.Internal.WildPat()";
                 break;
             default:
                 throw new Error("comCasePat not defined for name " + pat.name);
         }
-        return "{name: \"" + pat.name + "\", p: " + res + "}";
-    }
-    
-    var comFname = function(exp) {
-
-        var res = "";
-        switch (exp.name) {
-            case "varname":
-                if (exp.loc !== undefined) {
-                    var x = JSHC.comUtils.splitQvarid(exp.id);
-                    var r = exp.loc;
-                    r = r.substr(0, r.length-1);
-                    res += namespace + "." + r + "[\"" + x.i + "\"]";
-                    break;
-                } else {
-                    res += exp.id ;
-                    break;
-                }
-            default:
-                throw new Error("comFname not defined for name " + exp.name);
-        }
         return res;
     }
-    
-    var comAexp = function(exp, strict) {
-        
-        var res = "";
-        switch (exp.name) {
-        
-            case "dacon":
-                res += "[\"" + exp.id + "\"]"
-                break; 
-                
-            case "varname":
-                if (exp.loc !== undefined) {
+
+    var comData = function(type){
+        if( type.constrs.length == 0 ){
+            return "";  // empty datatype, so no code needed
+        }
+        var buf = [];
+        buf.push(modid+"[\":"+type.typ.tycon+"\"] = function(dacon,args){\n");
+        buf.push("    assert.ok(typeof dacon == \"string\");\n");
+        buf.push("    assert.ok(args instanceof Array);\n");
+        buf.push("    this.dacon = dacon;\n");
+        buf.push("    this.args = args;\n");
+        buf.push("};\n");
+        buf.push(modid+"[\":"+type.typ.tycon+"\"].prototype = new JSHC.Internal.Datatype();\n");
+
+        for(var ix=0 ; ix<type.constrs.length ; ix++){
+            var dacon = type.constrs[ix].dacon;
+            var N = type.constrs[ix].types.length;
+
+            buf.push(modid+"[\""+dacon+"\"] = ");
+
+            for(var jx=0 ; jx<N ; jx++){
+                buf.push("function(a"+jx+"){return ");
+            }
+
+            buf.push("new "+modid+"[\":"+type.typ.tycon+"\"](\""+dacon+"\",[");
+            if( N > 0 ){
+                for(var jx=0 ; jx<N ; jx++){
+                    buf.push("a"+jx);
+                    buf.push(",");
+                }
+                buf.pop();   // remove last ",".
+            }
+            buf.push("])");
+
+            for(var jx=0 ; jx<N ; jx++){
+                buf.push("}");
+            }
+            buf.push("\n");
+        }
+        //JSHC.alert("datatype code\n",buf.join(""));
+        return buf.join("");
+    };
+
+    var comExpTuple = function(tuple){
+        var buf = [];
+        buf.push("new JSHC.Internal.Types[\"()\"]([");
+        for(var ix=0 ; ix<tuple.members.length ; ix++){
+            var exp_code = comExp(tuple.members[ix]);
+            if( exp_code[0] ){
+                buf.push("new JSHC.Thunk("+exp_code[1]+")");
+            } else {
+                buf.push(exp_code[1]);
+            }
+            buf.push(",");
+        }
+        buf.pop();
+        buf.push("])");
+        return [true,buf.join("")];
+    };
+
+    /*
+       function application expression
+    */
+    var comExpApp = function(app){
+        assert.ok(app.exps.length > 1);
+
+        var buf = [];
+
+        var fun = comExp(app.exps[0]);
+        buf.push(fun[1]);
+
+        // if lazy, then evaluate it.
+        if( !fun[0] ){
+            buf.push(".v");
+        }
+
+        for(var ix=1 ; ix<app.exps.length ; ix++){
+            var arg = comExp(app.exps[ix]);
+            buf.push("(");
+            //JSHC.alert("compiling\n",app.exps[ix],"\n",arg);
+            if( arg[0] ){
+                buf.push("new JSHC.Thunk("+arg[1]+")");
+            } else {
+                buf.push(arg[1]);
+            }
+            buf.push(")");
+        }
+        return [true,buf.join("")];
+    };
+
+    /*
+        wrap internal names with params into a curried (lazy) function and then
+        add a thunk that evaluates all argument thunks and then calls the strict
+        function
+        if no params, then just add a thunk.
+    */
+    var comExpInternal = function(name){
+        if( ! (eval(name) instanceof Function) ){
+            throw new Error("compilation: missing internal name");
+        }
+
+        var N = eval(name+".length");
+        assert.ok(typeof N == "number", typeof N);
+
+        if( N === 0 ){
+            // wrap foreign function (with no params) to be evaluated.
+            return [false,"new JSHC.Thunk("+name+")"];
+        }
+
+        var buf = [];
+        //buf.push("new JSHC.Thunk(");
+        for(var ix=0 ; ix<N ; ix++){
+            buf.push("function(a"+ix+"){return ");
+        }
+
+        buf.push(name+"(");
+        for(var ix=0 ; ix<N ; ix++){
+            buf.push("a"+ix+".v");
+            buf.push(",");
+        }
+        buf.pop();   // remove last ",".
+        buf.push(")");
+
+        // if the result is a boolean, then create a True/False haskell value.
+        switch(name){
+        case "JSHC.Internal.int32eq":
+        case "JSHC.Internal.int32lt":
+        case "JSHC.Internal.int32gt":
+        case "JSHC.Internal.int32le":
+        case "JSHC.Internal.int32ge":
+        case "JSHC.Internal.int32eq":
+        case "JSHC.Internal.int32ne":
+            buf.push(" ? "+namespace+".Prelude.True : "+namespace+".Prelude.False");
+            break;
+        default:
+            break;
+        }
+
+        for(var ix=0 ; ix<N ; ix++){
+            buf.push("}");
+        }
+        //buf.push(")");
+
+        //JSHC.alert("comExpInternal\n",buf.join(""));
+        //throw new Error("comExpInternal");
+        return [true,buf.join("")];
+    };
+
+    /*
+        read qualified names from the namespace.
+        wrap internal names.
+    */
+    var comExpName = function(exp){
+        if( exp.loc === undefined ){
+            if( exp.id == "[]" ){
+                return [true,"new JSHC.Internal.Types[\"[].[]\"]"];
+            } else if( exp.id == ":" ){
+                return [true,"new JSHC.Internal.Types[\"[].:\"]"];
+            } else {
+                return [false,exp.toString()];
+            }
+        } else {
 //                    var x = exp.id.substr(exp.loc.length);
-                    var x = exp.id.substr(exp.id.lastIndexOf(".")+1);
-                    var r = exp.loc
+            var x = exp.id.substr(exp.id.lastIndexOf(".")+1);
 //                    r = r.substr(0, r.length-1);
-                    res += (strict)? "" : "JSHC.TC(function(){return ";
+            //res += "new JSHC.Thunk(function(){return ";
                     //filter out references to our internal libraries
-                    if (r.substr(0,13) === "JSHC.Internal")
-                        res += r + "[\"" + x + "\"]";
-                    else
-                        res += namespace + "." + r + "[\"" + x + "\"]";
-                    res += (strict)? "" : "})"; 
-                } else {
-                    if (strict) 
-                        res += exp.id;
-                    else
-                        res += "JSHC.TC(function() {return " + exp.id + "})";
-                }
-                break;
-                
-            case "integer-lit":
-                res += exp.value;
-                break;
-
-            case "lambda":    
-            case "infixexp":
-            case "application":
-                res += comExp(exp);
-                break;
-            
-            case "tuple":
-                res += "[";
-//                alert("TUPLE MEMBERS: " + JSHC.showAST(exp.members))
-                for (var i = 0; i < exp.members.length; i++) {
-                    res += comExp(exp.members[i])
-                    if (i !== exp.members.length-1)
-                        res += " , "
-                }
-                res += "]"
-                break;
-                
-            default:
-                throw new Error("comAexp not defined for name " + exp.name);
+            if (exp.loc.substr(0,13) === "JSHC.Internal") {
+                return comExpInternal(exp.loc + "." + x);
+            } else if ( exp instanceof JSHC.DaCon ) {
+                // data constructors are never thunks
+                return [true,namespace + "." + exp.loc + "[\"" + x + "\"]"];
+            } else {
+                // variables are currently always thunks
+                return [false,namespace + "." + exp.loc + "[\"" + x + "\"]"];
+            }
         }
-        return res;
-    }
+    };
 
+    var comExpLambda = function(lamb){
+        if (lamb.atArg === undefined) {
+            lamb.atArg = 0;
+            lamb.arglen = lamb.args.length
+        }
+        var res = "";
+        if (lamb.atArg < lamb.arglen) {
+            var arg = lamb.args[lamb.atArg];
+            lamb.atArg++;
+            res += "function(" + comApat(arg) + "){ return " + comExpLambda(lamb)[1] + "}"
+        } else {
+            var rhs_code = comExp(lamb.rhs);
+            if( ! rhs_code[0] ){
+                res += rhs_code[1]+".v";
+            } else {
+                res += rhs_code[1];
+            }
+        }
+        return [true,res];
+    };
 
-    if (input.name === "infixexp" || input.name === "application" ||
+    var comExpLit = function(exp){
+        assert.ok( exp.name == "integer-lit" );
+        //return "new JSHC.Thunk("+exp.value+")";
+        return [true,""+exp.value];
+    };
+
+    if (input.name === "application" ||
         input.name === "varname" || input.name === "dacon" ||
         input.name === "integer-lit" || input.name === "case" ||
         input.name === "lambda")

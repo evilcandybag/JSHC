@@ -228,7 +228,16 @@ JSHC.Interpreter.prototype.execCommand = function(line){
             }
 
             var expr = JSHC.Codegen.codegen(decl.rhs, this.prefix);
-            this.onMessage(eval(expr).toString());
+            var result = eval(expr);
+            if( result === undefined ){
+                throw new JSHC.RuntimeError("bad result: undefined result for: "+expr);
+            }
+            var show_result = result.toString();
+            if( show_result === undefined ){
+                throw new JSHC.RuntimeError("bad result: undefined string for: "+JSHC.showAST(result));
+            }
+            this.onMessage(show_result);
+
         } catch (err) {
             if (err instanceof JSHC.RuntimeError) {
                 this.onError(err.toString());

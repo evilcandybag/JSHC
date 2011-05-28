@@ -37,12 +37,13 @@ JSHC.Simplify.simplify["body"] = function(ast){
     var ts = ast.topdecls;
     for(i=0;i<ts.length;i++){
         if( ts[i].name === "topdecl-data" ){
-            // remove topdecl-data
-            if( i !== ts.length-1 ){
-                ts[i] = ts[ts.length-1];
-                i--;
-            }
-            ts.pop();
+            // no simplification of data types is needed.
+
+            //if( i !== ts.length-1 ){
+            //    ts[i] = ts[ts.length-1];
+            //    i--;
+            //}
+            //ts.pop();
         } else if( ts[i].name === "topdecl-decl" ){
 	    if( ts[i].decl.name == "type-signature" ||
                 // remove type-signature and fixity
@@ -115,7 +116,7 @@ JSHC.Simplify.reduceExp = function (exp) {
                             throw new JSHC.CompilerError("Simplify.reduceExp not defined for " + exp.decls[i].name);
                     }
                 }
-                new_exp = {name:"application", exps: [new_exp], pos: new_exp.pos}
+                //new_exp = {name:"application", exps: [new_exp], pos: new_exp.pos}
                 //new_exp = {name:"infixexp", exps:[new_exp], pos: new_exp.pos};
                 exp = {name:"case", exp: new_exp, 
                              alts: [{name:"alt", pat: new_pat, exp: exp.exp}]};
@@ -200,7 +201,7 @@ JSHC.Simplify.reduceWhere = function (e) {
                 throw new Error("Simplify.reduceExp not defined for " + exp.decls[i].name);
         }
     }
-    new_exp = {name:"application", exps: [new_exp], pos: new_exp.pos};
+    //new_exp = {name:"application", exps: [new_exp], pos: new_exp.pos};
     //new_exp = {name:"infixexp", exps:[new_exp], pos: new_exp.pos};
                 
     var new_case = {name:"case", exp: new_exp, 
@@ -237,10 +238,10 @@ JSHC.Simplify.patSimplify = function (ast) {
           for (var j = 0; j < funs[0].args.length; j++) {
               var vrnm = new JSHC.VarName("a" + j, funs[0].pos, false);
               newArgs.push(vrnm);
-              newArgsT.push({name: "application", exps: [vrnm]});
+              //newArgsT.push(vrnm);
           }
           
-          newArgsT = {name: "application", exps: [{name: "tuple", members: newArgsT}]};
+          newArgsT = {name: "tuple", members: newArgs};
 //          alert("newargst:\n" + JSHC.showAST(newArgsT) + "\nnewargs:\n" + JSHC.showAST(newArgs))
           //calculate the alts for the case-expression
           for (var j = 0; j < funs.length; j++) {

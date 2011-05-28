@@ -26,7 +26,7 @@ otherwise = True
 
 --------------------------------------------------------------------------------
 
-undefined = JSHC.Internal.Prelude.undefined
+undefined = JSHC.Internal.undefined
 
 --------------------------------------------------------------------------------
 
@@ -41,19 +41,19 @@ data Either a b = Left a | Right b
 
 infixl 7 *, /
 infixl 6 +, -
-(+) = JSHC.Internal.Prelude.int32add
-(-) = JSHC.Internal.Prelude.int32sub
-(*) = JSHC.Internal.Prelude.int32mul
-(/) = JSHC.Internal.Prelude.int32div
+(+) = JSHC.Internal.int32add
+(-) = JSHC.Internal.int32sub
+(*) = JSHC.Internal.int32mul
+(/) = JSHC.Internal.int32div
 
 -- arithmetic comparisons
 infix 4 < , > , <= , >= , == , /=
-(<)  = JSHC.Internal.Prelude.int32lt
-(>)  = JSHC.Internal.Prelude.int32gt
-(<=) = JSHC.Internal.Prelude.int32le
-(>=) = JSHC.Internal.Prelude.int32ge
-(==) = JSHC.Internal.Prelude.int32eq
-(/=) = JSHC.Internal.Prelude.int32ne
+(<)  = JSHC.Internal.int32lt
+(>)  = JSHC.Internal.int32gt
+(<=) = JSHC.Internal.int32le
+(>=) = JSHC.Internal.int32ge
+(==) = JSHC.Internal.int32eq
+(/=) = JSHC.Internal.int32ne
 
 --------------------------------------------------------------------------------
 -- functions
