@@ -89,7 +89,7 @@ JSHC.Load.syncLoadName = function(fileSystem, urls, prev){
 	try{
 	    var req = JSHC.Load.syncLoadURL(url, params);
 	} catch( err ){
-	    this.onWarning("Could not initiate request: "+err);
+	    //this.onWarning("Could not initiate request: "+err);
 	    continue; // try next source
 	}
 

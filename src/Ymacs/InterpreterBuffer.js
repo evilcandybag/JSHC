@@ -35,13 +35,6 @@ JSHC.Ymacs.switchToInterpreter = function(cbuf){
 	return;
     }
     
-    //refresh the fileSystem
-    for (i = 0; i < bs.length; i++) {
-        if( bs[i].name.substr(bs[i].name.lastIndexOf(".")) === ".hs" ) {
-            ibuf.interpreter.compiler.fileSystem[bs[i].name.substr(0,bs[i].name.length-3)] = bs[i].getCode();
-        }
-    }
-
     // if shown in a frame, then change focus to that frame
     for(i=0 ; i<ymacs.frames.length ; i++ ){
 	if( ymacs.frames[i].buffer === ibuf ){
@@ -189,7 +182,15 @@ JSHC.Ymacs.outputToBuffer = function(msg){
 JSHC.Ymacs.runInterpreterCommand = function(opt_text){
     // NOTE: currently running commands synchronuously.
     //       should probably be done asynchronuously instead.
-    
+
+    //refresh the fileSystem
+    var bs = ymacs.buffers;
+    for (var ix = 0; ix < bs.length; ix++) {
+        if( bs[ix].name.substr(bs[ix].name.lastIndexOf(".")) === ".hs" ) {
+            this.interpreter.compiler.fileSystem[bs[ix].name.substr(0,bs[ix].name.length-3)] = bs[ix].getCode();
+        }
+    }
+
     var output, line;
 
     if( opt_text !== undefined ){
