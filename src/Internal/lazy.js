@@ -2,7 +2,7 @@
 // lazy evaluation
 
 JSHC.Thunk = function (exp) {
-    assert.ok( ! (exp instanceof JSHC.Thunk) );
+    //assert.ok( ! (exp instanceof JSHC.Thunk) );
     this.v = exp
 }
 
@@ -11,6 +11,8 @@ JSHC.Thunk.prototype = {
             
         if (this._v instanceof Function && this._v.length === 0) {
             this.v = this._v();
+        } else if( this._v instanceof JSHC.Thunk ) {
+            this.v = this._v.v;
         }
         
         //if (this._v instanceof JSHC.Thunk) {

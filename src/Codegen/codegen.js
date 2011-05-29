@@ -88,11 +88,13 @@ JSHC.Codegen.codegen = function (input,namespace) {
        // the RHS when using global names that have no yet been defined outside
        // functions in the RHS.
        var code = comExp(rhs);
-       if( code[0] ){
-           return "new JSHC.Thunk(function() {return " + code[1] + "})";
-       } else {
-           return code[1];
-       }
+       //if( code[0] ){
+       //    code = "new JSHC.Thunk("+code[1]+")";
+       return "new JSHC.Thunk(function() {return " + code[1] + "})";
+       //} else {
+       //    code = code[1];
+       //}
+       //return "function(){" + code + "}"
     }
 
     var comExp = function(exp) {
@@ -198,8 +200,8 @@ JSHC.Codegen.codegen = function (input,namespace) {
             res += "{p: " + comCasePat(cas.alts[i].pat) + ",";
             res += "f: function(" + bindStrs.join(",");
             var rhs_code = comExp(cas.alts[i].exp);
-            if( ! rhs_code[0] ){
-                rhs_code = rhs_code[1]+".v";
+            if( rhs_code[0] ){
+                rhs_code = "new JSHC.Thunk(" + rhs_code[1] + ")";
             } else {
                 rhs_code = rhs_code[1];
             }
@@ -207,7 +209,7 @@ JSHC.Codegen.codegen = function (input,namespace) {
         }
         res += "])\n"
         //JSHC.alert("case result\n",cas.exp,"\n\n",ex,"\n\n",res);
-        return [true,res];
+        return [false,res];
     }
 
     var comCasePat = function(pat) {
@@ -269,7 +271,7 @@ JSHC.Codegen.codegen = function (input,namespace) {
                 buf.push("function(a"+jx+"){return ");
             }
 
-            buf.push("new "+modid+"[\":"+type.typ.tycon+"\"](\""+dacon+"\",[");
+            buf.push("new JSHC.Thunk(new "+modid+"[\":"+type.typ.tycon+"\"](\""+dacon+"\",[");
             if( N > 0 ){
                 for(var jx=0 ; jx<N ; jx++){
                     buf.push("a"+jx);
@@ -277,7 +279,7 @@ JSHC.Codegen.codegen = function (input,namespace) {
                 }
                 buf.pop();   // remove last ",".
             }
-            buf.push("])");
+            buf.push("]))");
 
             for(var jx=0 ; jx<N ; jx++){
                 buf.push("}");
@@ -316,7 +318,7 @@ JSHC.Codegen.codegen = function (input,namespace) {
         var fun = comExp(app.exps[0]);
         buf.push(fun[1]);
 
-        // if lazy, then evaluate it.
+        // if lazy, then evaluate it to get the function to use.
         if( !fun[0] ){
             buf.push(".v");
         }
@@ -332,7 +334,7 @@ JSHC.Codegen.codegen = function (input,namespace) {
             }
             buf.push(")");
         }
-        return [true,buf.join("")];
+        return [false,buf.join("")];
     };
 
     /*
@@ -360,13 +362,13 @@ JSHC.Codegen.codegen = function (input,namespace) {
             buf.push("function(a"+ix+"){return ");
         }
 
-        buf.push(name+"(");
+        buf.push("new JSHC.Thunk("+name+"(");
         for(var ix=0 ; ix<N ; ix++){
             buf.push("a"+ix+".v");
             buf.push(",");
         }
         buf.pop();   // remove last ",".
-        buf.push(")");
+        buf.push("))");
 
         // if the result is a boolean, then create a True/False haskell value.
         switch(name){
@@ -390,7 +392,7 @@ JSHC.Codegen.codegen = function (input,namespace) {
 
         //JSHC.alert("comExpInternal\n",buf.join(""));
         //throw new Error("comExpInternal");
-        return [true,buf.join("")];
+        return [false,buf.join("")];
     };
 
     /*
@@ -415,10 +417,8 @@ JSHC.Codegen.codegen = function (input,namespace) {
             if (exp.loc.substr(0,13) === "JSHC.Internal") {
                 return comExpInternal(exp.loc + "." + x);
             } else if ( exp instanceof JSHC.DaCon ) {
-                // data constructors are never thunks
                 return [true,namespace + "." + exp.loc + "[\"" + x + "\"]"];
             } else {
-                // variables are currently always thunks
                 return [false,namespace + "." + exp.loc + "[\"" + x + "\"]"];
             }
         }
@@ -436,8 +436,8 @@ JSHC.Codegen.codegen = function (input,namespace) {
             res += "function(" + comApat(arg) + "){ return " + comExpLambda(lamb)[1] + "}"
         } else {
             var rhs_code = comExp(lamb.rhs);
-            if( ! rhs_code[0] ){
-                res += rhs_code[1]+".v";
+            if( rhs_code[0] ){
+                res += "new JSHC.Thunk(" + rhs_code[1] + ")";
             } else {
                 res += rhs_code[1];
             }
