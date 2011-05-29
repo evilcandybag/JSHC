@@ -120,7 +120,13 @@ JSHC.Ymacs.makeNewInterpreterBuffer = function(ymacs){
 	if( text.length === 0 )return;
 
 	// move to end of buffer whenever text is inserted
-	this.caretMarker.setPosition(this.getCodeSize());
+	var cm = this.caretMarker.getRowCol();
+	if( cm.row === this.code.length-1 &&
+	    cm.col > buf.PROMPT.length ){
+	    // something in the input on the last line
+	} else {
+	    this.caretMarker.setPosition(this.getCodeSize());
+	}
 	//this.cmd("end_of_buffer");
 
 	// insert user text
@@ -160,10 +166,10 @@ JSHC.Ymacs.outputToBuffer = function(msg){
 	var pos = this.getCodeSize() - this.caretMarker.getRowCol().col;
 	this.caretMarker.setPosition(pos);
     } else if( line.length !== 0 ) {
-        // if not at the beginning of a line, make a new line.
+        // if not at the beginning of a line, make a new line
 	this.__insertText("\n");
     }
-    
+
     // make sure output ends with a newline
     if( msg[msg.length-1] !== "\n" ){
         msg += "\n";
@@ -214,6 +220,7 @@ JSHC.Ymacs.runInterpreterCommand = function(opt_text){
 	// store buffer text in history
 	this.interpreter.history.push(line);
 
+        this.caretMarker.setPosition(this.getCodeSize());
 	this.__insertText("\n");
 
 	this.interpreter.execCommand(line);
