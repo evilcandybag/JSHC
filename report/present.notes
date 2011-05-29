@@ -1,0 +1,126 @@
+Titel:
+  - Upplägg för presentationen. 
+  	% börjar med att presentera projektet, vad vi gjort
+    % mitten en kort genomgång över programstruktur
+    % slutar med en diskussion om projektet och dess framtid
+
+Vad är det?:
+  - Säg vad som står i sliden.
+  	% just do it
+  	
+Varför JavaScript?:
+  - Fråga vad folk har för koll på skriptning på klientsidan
+  		IF bra THEN skippa grafen ELSE visa den
+  	% skriptning på klientsidan gör det billigare och lättare att sätta upp en server med
+  	  komplicerad applikation på
+  	% alternativ: insticksmoduler till webläsaren; kräver mer av användaren är JS
+  
+Vad är JavaScript?:
+  - Snabb genomgång av vad JS är för språk
+  	% imperativt: liknar Java syntaxmässgit
+  	% objektorienterat: använder sig av prototyper ist för klasser
+  	% dynamiskt typat: 
+  	% första klassens funktioner: innebär att funktioner kan skapas och skickas runt som 
+  	  vilka andra värden som helst
+  	
+Varför är det vettigt att översätta JS?:
+
+Exempel på JavaScript:
+  - Presentera exemplet, det finns två stora problem här.
+  
+  - Vi har hämtat någon annans kod; hur vet vi att den gör det den ska?
+  		% Utan typkontroll måste kod som ska garantera ngt komma med en testsvit så
+  		  användaren kan testa. men är testsviten bra?
+  		
+  - Klipp och klistra är ett dåligt sätt att flytta kod. många felkällor. 
+  	% alla vet ju att copy-paste-programmering är dåligt  
+
+En lösning: Bibliotek:
+  - abstraktion genom funktioner
+  	% slår in koden i en funktion, som returnerar referenser till de funktioner man vill
+  	  ska synas
+  	  
+  - ad-hoc-lösning
+  
+  - osäkert gränssnitt
+  	% det finns ingenting som säkrar att biblioteken anropas korrekt. felaktiga anrop kan
+  	  vara svåra att hitta.
+
+Möjligheter att använda Haskell för webbprogrammering finns redan:
+  - Happstack och Yesod 
+  	% kör en hel webbserver
+  
+  - GHCjs och UHCjs 
+  	% är backends till kompilatorer som måste köras server-side.
+  	% finns även ett par projekt som nu är döda, YHC var stort
+   
+Varför just Haskell?:
+  - Vi är Haskell..
+  	% i en idealisk värd ska man inte begränsas av måldomän när man väljer språk, 
+  	  man ska kunna använda de bibliotek man är van vid och bekväm med. 
+  	  
+  - Typsystem 
+  	% som vi tidigare argumenterat är ett typsystem med statisk typkontroll ett effektivt
+  	  sätt att undvika vissa typer av fel, särskilt när man skriver större applikationer
+  	  
+  - Modulsystem
+  	% samma som ovan 
+  	
+  - Lat evaluering  ¿ska vi ha detta eller hoppa över?
+	% <TODO>
+
+DEMO:
+
+PRODUKTEN:
+Kompilering: en översikt:
+
+  - Abstrakt representation
+    % skapa en abstrakt representation av koden. datastruktur som kompilatorn kan använda 
+      sig av. Ofta ett träd. 
+  
+  - Kontroll av representation
+    % Gå igenom representationen. Kolla efter fel, vanliga exempel; namnkontroll och typkontroll
+    
+  - Generering av målrepresentation
+	% Översätta representationen till någon konkret representation, t.ex. maskinkod eller bytekod 
+
+Hur fungerar JSHC?:
+  - Gå igenom kompileringen av ett program till JavaScript
+  	% Kommando skickas från användargränssnittet att kompilera en modul
+  	% Kommandot tolkas av interpretatorn, som anropar kompilatorgränssnittet
+  	% Vi läser in modulen och hämtar alla moduler den beror på. detta görs iterativt,
+  	  då vi behöver läsa en modul för att veta om vi behöver ladda in mer.
+  	% dependenskontroll
+  	% kontrollera exporter, att de finns deklarerade ngnstans
+  	% Kontrollera namn, att alla namn som refereras till finns, och är kända där de anropas
+  	% Haskell tillåter användardefinierade operatorer, så operatorprecedens kan inte hanteras
+  	  direkt i parsern. vi måste alltså läsa en fil två ggr för att hantera detta. 
+  	% Typkontroll, polymorfisk typinferens etc
+  	% Förenkla AST för att göra kodgenereringen enklare.
+  	% generera JS-kod som en sträng
+  	% exekvera JS-koden i JS-motorn
+
+
+DISKUSSION:
+Problem vi stött på under arbetet:
+  -projektets storlek
+  		% vi underskattade haskells omfattning, och vilken svår uppgift det skulle vara 
+  		  att implementera
+  		% Dynamisk typning i JS gjorde att debugging tog mycket lång tid när projektet 
+  		  växte. en stor del av felen vi hade uppfattades som sådant som kunnat undvikas
+  		  med statisk typkontroll. 
+
+I framtiden: 
+  - Vår kompilator stöder ännu bara en liten del av haskellsyntaxen.
+  		% detta ska åtgärdas
+
+  - Typklasser
+  		% Detta är hur överlagring fungerar i Haskell, för att kunna skriva vettiga program
+  		  är typklasser nödvändiga
+  		  
+  - FFI
+  		% För att kunna skapa program som är meningsfulla i en webkontext behövs FFI mot 
+  		  JS. 
+  		  
+  - Rekursiva moduler
+  		% Haskellspecifikationen kräver rekursiva moduler, detta fungerar inte ännu.
