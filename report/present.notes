@@ -6,7 +6,8 @@ Titel:	P
 
 Vad är det?: P 
   - Säg vad som står i sliden.
-  	% just do it
+  	% vårt projekt har gått ut på att skriva en kompilator som kompilerar Haskell till JS.
+  	  Skriven i JS.
   	
 Varför JavaScript?: P 
   - Fråga vad folk har för koll på skriptning på klientsidan
@@ -19,7 +20,7 @@ Vad är JavaScript?: P
   - Snabb genomgång av vad JS är för språk
   	% imperativt: liknar Java syntaxmässgit
   	% objektorienterat: använder sig av prototyper ist för klasser
-  	% dynamiskt typat: 
+  	% dynamiskt typat: variabler har ingen speciell typ, typer kontrolleras runtime
   	% första klassens funktioner: innebär att funktioner kan skapas och skickas runt som 
   	  vilka andra värden som helst
   	
@@ -33,41 +34,16 @@ Exempel på JavaScript: P
   		  användaren kan testa. men är testsviten bra?
   		
   - Klipp och klistra är ett dåligt sätt att flytta kod. många felkällor. 
-  	% alla vet ju att copy-paste-programmering är dåligt  
+  	% alla vet ju att copy-paste-programmering är dåligt. avsaknaden av modulsystem 
+  	  leder till skapande av icke-modulär kod  
 
 En lösning: Bibliotek: S
-  - abstraktion genom funktioner
-  	% slår in koden i en funktion, som returnerar referenser till de funktioner man vill
-  	  ska synas
-  	  
-  - ad-hoc-lösning
-  
-  - osäkert gränssnitt
-  	% det finns ingenting som säkrar att biblioteken anropas korrekt. felaktiga anrop kan
-  	  vara svåra att hitta.
+ 
+En lösning: översätt! S
+
+Varför just Haskell?: S
 
 Möjligheter att använda Haskell för webbprogrammering finns redan: S
-  - Happstack och Yesod 
-  	% kör en hel webbserver
-  
-  - GHCjs och UHCjs 
-  	% är backends till kompilatorer som måste köras server-side.
-  	% finns även ett par projekt som nu är döda, YHC var stort
-   
-Varför just Haskell?: S
-  - Vi är Haskell..
-  	% i en idealisk värd ska man inte begränsas av måldomän när man väljer språk, 
-  	  man ska kunna använda de bibliotek man är van vid och bekväm med. 
-  	  
-  - Typsystem 
-  	% som vi tidigare argumenterat är ett typsystem med statisk typkontroll ett effektivt
-  	  sätt att undvika vissa typer av fel, särskilt när man skriver större applikationer
-  	  
-  - Modulsystem
-  	% samma som ovan 
-  	
-  - Lat evaluering
-	% förklara snabbt utifrån ones-exempel
 
 DEMO:
 
@@ -87,45 +63,23 @@ Kompilering: en översikt: P
       sig av. Ofta ett träd. 
   
   - Kontroll av representation
-    % Gå igenom representationen. Kolla efter fel, vanliga exempel; namnkontroll och typkontroll
+    % Gå igenom representationen. Kolla efter fel, vanliga exempel; 
+      namnkontroll: kolla att alla namn som används finns, och att det inte finns namnkonflikter
+      typkontroll: kolla att värden av rätt typ används på rätt ställe
     
   - Generering av målrepresentation
-	% Översätta representationen till någon konkret representation, t.ex. maskinkod eller bytekod 
+	% Översätta representationen till någon konkret representation, t.ex. maskinkod, bytekod
+	  någon assembly eller ett annat högnivåspråk 
 
 Hur fungerar JSHC?: S
-  - Gå igenom kompileringen av ett program till JavaScript
-  	% Kommando skickas från användargränssnittet att kompilera en modul 
-  	% Kommandot tolkas av interpretatorn, som anropar kompilatorgränssnittet
-  	% Vi läser in modulen och hämtar alla moduler den beror på. detta görs iterativt,
-  	  då vi behöver läsa en modul för att veta om vi behöver ladda in mer.  
-  	 
-    - dependency checking
-  	  % använd exemplet för att förklara vad och varför
-  	 
-  	% kontrollera exporter, att de finns deklarerade ngnstans. svårt då importer kan
-  	  exporteras, och specifikationen inte behöver vara exakt
-  	% Kontrollera namn, att alla namn som refereras till finns, och är kända där de anropas
-  	
-  	- Haskell tillåter användardefinierade operatorer, så operatorprecedens kan inte hanteras
-  	  direkt i parsern. vi måste alltså läsa en fil två ggr för att hantera detta. 
-  	  % använd exemplet för att visa.
-  	  
-  	- Typkontroll, polymorfisk typinferens etc
-  		% förklara utifrån exemplen
-  		
-  	- Förenkla AST för att göra kodgenereringen enklare.
-  		% förklara utifrån exempel, ite blir case och operatorapplikation blir 
-  		  funktionsapplikation
-  		  
-  	% generera JS-kod som en sträng
-  	% exekvera JS-koden i JS-motorn
 
 
 DISKUSSION:
 Problem vi stött på under arbetet: P
   -projektets storlek
   		% vi underskattade haskells omfattning, och vilken svår uppgift det skulle vara 
-  		  att implementera
+  		  att implementera. Ursprungsplanen var att implementera stöd för hela språket,
+  		  vi har endast lyckats få med en delmängd
   		% Dynamisk typning i JS gjorde att debugging tog mycket lång tid när projektet 
   		  växte. en stor del av felen vi hade uppfattades som sådant som kunnat undvikas
   		  med statisk typkontroll. 
@@ -136,17 +90,22 @@ Problem vi stött på under arbetet: P
   	  problemet själva. Först mot slutet av arbetet stötte vi på litteratur som beskriver
   	  en lösning på problemet. 
 
-I framtiden: 
-  - Vår kompilator stöder ännu bara en liten del av haskellsyntaxen. P 
-  		% detta ska åtgärdas
+I framtiden: P
 
   - Typklasser P 
   		% Detta är hur överlagring fungerar i Haskell, för att kunna skriva vettiga program
   		  är typklasser nödvändiga
   		  
-  - FFI S 
+  - FFI
   		% För att kunna skapa program som är meningsfulla i en webkontext behövs FFI mot 
   		  JS. 
   		  
-  - Rekursiva moduler S
+  - Rekursiva moduler 
   		% Haskellspecifikationen kräver rekursiva moduler, detta fungerar inte ännu.
+  
+  - Vår kompilator stöder ännu bara en liten del av haskellsyntaxen. 
+  		% Det finns ett antal luckor i syntaxen som kräver ganska lite arbete för att lägga till
+  				
+  - Standardbibliotek
+  		% De standardbibliotek vi implementerat är bara en bråkdel av alla som finns
+  		  i specifikationen. 
