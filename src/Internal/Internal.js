@@ -242,7 +242,9 @@ JSHC.Internal.Datatype.prototype.toString = function(){
     buf.push(this.dacon.toString());
     buf.push(" ");
     for(var i=0 ; i<this.args.length ; i++){
+        buf.push("(");
         buf.push(this.args[i].toString());
+        buf.push(")");
         buf.push(" ");
     }
     buf.pop();   // remove last space
