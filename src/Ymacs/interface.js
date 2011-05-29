@@ -226,7 +226,7 @@ try {
     dlg.maximize(true);
 
 } catch(ex) {
-    console.log(ex);
+    JSHC.alert(ex);
 }
 
 DynarchDomUtils.trash($("x-loading"));

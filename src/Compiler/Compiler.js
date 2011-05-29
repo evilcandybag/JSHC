@@ -6,11 +6,7 @@ if( ! JSHC.Compiler )JSHC.Compiler = {};
 JSHC.Compiler = function(modulePrefix){
     this.flags = {};
     this.fileSystem = {};
-    this.path = [];
-    if( location !== undefined && location.href !== undefined ){
-	this.path.push(location.href.substr(0, location.href.lastIndexOf("/") + 1) + "hslib/");
-	this.path.push(location.href.substr(0, location.href.lastIndexOf("/") + 1) + "hsusr/");
-    }
+    this.path = JSHC.Compiler.getDefaultPath();
     this.modulePrefix = modulePrefix;
     this.modules = {};   // mapping from module names to modules
 
@@ -34,6 +30,15 @@ JSHC.Compiler = function(modulePrefix){
 };
 
 ////////////////////////////////////////////////////////////////////////////////
+
+JSHC.Compiler.getDefaultPath = function(){
+    var path = [];
+    if( location !== undefined && location.href !== undefined ){
+        path.push(location.href.substr(0, location.href.lastIndexOf("/") + 1) + "hslib/");
+        path.push(location.href.substr(0, location.href.lastIndexOf("/") + 1) + "hsusr/");
+    }
+    return path;
+};
 
 JSHC.Compiler.prototype.setTargets = function(targets){
     assert.ok( targets instanceof Array );
