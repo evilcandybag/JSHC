@@ -365,9 +365,11 @@ JSHC.Interpreter.prototype.lookupName = function(qname){
     if( dotix === -1 ){
        name = qname;  // not qualified
        var asts = [];
-       var roots = this.compiler.getTargets();
-       for(var ix=0 ; ix<roots.length ; ix++){
-           var ast = this.compiler.modules[roots[ix]].ast.espace[name];
+       //var roots = this.compiler.getTargets();
+       for(var mod in this.compiler.modules){
+       //for(var ix=0 ; ix<roots.length ; ix++){
+           var ast = this.compiler.modules[mod].ast.espace[name];
+           //var ast = this.compiler.modules[roots[ix]].ast.espace[name];
            if( ast === undefined )continue;
            asts.push(ast);
        }
