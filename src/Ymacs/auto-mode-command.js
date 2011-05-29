@@ -55,8 +55,9 @@ Ymacs_Buffer.newCommands({
 	               new JSHC.Load.Module.unread(buf.name.substr(0,buf.name.length-3)));
 
 	    if( mod.status === "success" && typeof mod.contents == "string" ){
-                JSHC.alert(mod.status,mod.contents);
-	        buf._insertText(mod.contents);
+                if( buf.code === undefined || buf.code == "" ){
+	            buf._insertText(mod.contents);
+	        }
 	    }
 	}
 
