@@ -72,7 +72,7 @@ flip :: (a -> b -> c) -> b -> a -> c
 flip f x y = f y x
 
 seq :: a -> b -> b
-seq a b = JSHC.Internal.seq a b
+seq = JSHC.Internal.seq
 
 infixr 0 $, $!, `seq`
 ($), ($!) :: (a -> b) -> a -> b
@@ -83,7 +83,7 @@ f $! x    = x `seq` f x
 -- list functions
 
 --map :: (a -> b) -> [a] -> [b]
-map f []     = []
+map f []         = []
 map f ((:) x xs) = f x : map f xs
 
 infixr 5 ++
@@ -128,8 +128,8 @@ tail []         = undefined -- error "Prelude.tail: empty list"
 
 -- length returns the length of a finite list as an Int.
 --length           :: [a] -> Int
---length []        = 0
---length (_:l)     = 1 + length l
+length []        = 0
+length ((:) _ l) = 1 + length l
 
 -- List index (subscript) operator, 0-origin
 --(!!)                :: [a] -> Int -> a

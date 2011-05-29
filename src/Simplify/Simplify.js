@@ -135,7 +135,7 @@ JSHC.Simplify.reduceExp = function (exp) {
             case "tuple_pat":
             case "tuple":
                 var new_members = [];
-                for(var ix=exp.members.length-1 ; ix>=0 ; ix-- ){
+                for(var ix=0 ; ix<exp.members.length ; ix++ ){
                     new_members.push(JSHC.Simplify.reduceExp(exp.members[ix]));
                 }
                 exp = {name:exp.name,members:new_members};

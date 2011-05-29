@@ -189,7 +189,6 @@ JSHC.Codegen.codegen = function (input,namespace) {
 */
 
     var comExpCase = function(cas) {
-
         // does not matter if case gets a strict or lazy value
         var ex_code = comExp(cas.exp)[1];
 
@@ -201,14 +200,14 @@ JSHC.Codegen.codegen = function (input,namespace) {
             res += "f: function(" + bindStrs.join(",");
             var rhs_code = comExp(cas.alts[i].exp);
             if( rhs_code[0] ){
-                rhs_code = "new JSHC.Thunk(" + rhs_code[1] + ")";
+                rhs_code = "new JSHC.Thunk(function(){return " + rhs_code[1] + "})";
             } else {
                 rhs_code = rhs_code[1];
             }
             res += "){return " + rhs_code + "}},\n";
         }
         res += "])\n"
-        //JSHC.alert("case result\n",cas.exp,"\n\n",ex,"\n\n",res);
+        //JSHC.alert("case result\n",cas.exp,"\n\n",ex_code,"\n\n",res);
         return [false,res];
     }
 
@@ -314,6 +313,7 @@ JSHC.Codegen.codegen = function (input,namespace) {
         assert.ok(app.exps.length > 1);
 
         var buf = [];
+        buf.push("new JSHC.Thunk(function(){return ");
 
         var fun = comExp(app.exps[0]);
         buf.push(fun[1]);
@@ -334,6 +334,7 @@ JSHC.Codegen.codegen = function (input,namespace) {
             }
             buf.push(")");
         }
+        buf.push("})");
         return [false,buf.join("")];
     };
 
@@ -357,18 +358,17 @@ JSHC.Codegen.codegen = function (input,namespace) {
         }
 
         var buf = [];
-        //buf.push("new JSHC.Thunk(");
         for(var ix=0 ; ix<N ; ix++){
             buf.push("function(a"+ix+"){return ");
         }
 
-        buf.push("new JSHC.Thunk("+name+"(");
+        buf.push("new JSHC.Thunk(function(){return "+name+"(");
         for(var ix=0 ; ix<N ; ix++){
             buf.push("a"+ix+".v");
             buf.push(",");
         }
         buf.pop();   // remove last ",".
-        buf.push("))");
+        buf.push(")");
 
         // if the result is a boolean, then create a True/False haskell value.
         switch(name){
@@ -379,20 +379,20 @@ JSHC.Codegen.codegen = function (input,namespace) {
         case "JSHC.Internal.int32ge":
         case "JSHC.Internal.int32eq":
         case "JSHC.Internal.int32ne":
-            buf.push(" ? "+namespace+".Prelude.True : "+namespace+".Prelude.False");
+            buf.push(" ? "+namespace+".Prelude.True.v : "+namespace+".Prelude.False.v");
             break;
         default:
             break;
         }
+        buf.push("})");  // end argument to JSHC.Thunk
 
         for(var ix=0 ; ix<N ; ix++){
             buf.push("}");
         }
-        //buf.push(")");
 
         //JSHC.alert("comExpInternal\n",buf.join(""));
         //throw new Error("comExpInternal");
-        return [false,buf.join("")];
+        return [true,buf.join("")];
     };
 
     /*
@@ -402,9 +402,9 @@ JSHC.Codegen.codegen = function (input,namespace) {
     var comExpName = function(exp){
         if( exp.loc === undefined ){
             if( exp.id == "[]" ){
-                return [true,"new JSHC.Internal.Types[\"[].[]\"]"];
+                return [true,"JSHC.Internal.Types[\"[].[]\"]"];
             } else if( exp.id == ":" ){
-                return [true,"new JSHC.Internal.Types[\"[].:\"]"];
+                return [true,"JSHC.Internal.Types[\"[].:\"]"];
             } else {
                 return [false,exp.toString()];
             }

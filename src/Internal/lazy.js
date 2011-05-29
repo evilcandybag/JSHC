@@ -11,7 +11,8 @@ JSHC.Thunk.prototype = {
             
         if (this._v instanceof Function && this._v.length === 0) {
             this.v = this._v();
-        } else if( this._v instanceof JSHC.Thunk ) {
+        }
+        if( this._v instanceof JSHC.Thunk ) {
             this.v = this._v.v;
         }
         
@@ -19,6 +20,7 @@ JSHC.Thunk.prototype = {
         //    this.v = this._v.v;
         //}
         
+        assert.ok( !(this._v instanceof JSHC.Thunk) );
         return this._v;
     },
     set v(val){
