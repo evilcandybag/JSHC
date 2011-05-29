@@ -1,21 +1,21 @@
-Titel:
+Titel:	P
   - Upplägg för presentationen. 
   	% börjar med att presentera projektet, vad vi gjort
     % mitten en kort genomgång över programstruktur
     % slutar med en diskussion om projektet och dess framtid
 
-Vad är det?:
+Vad är det?: P 
   - Säg vad som står i sliden.
   	% just do it
   	
-Varför JavaScript?:
+Varför JavaScript?: P 
   - Fråga vad folk har för koll på skriptning på klientsidan
   		IF bra THEN skippa grafen ELSE visa den
   	% skriptning på klientsidan gör det billigare och lättare att sätta upp en server med
   	  komplicerad applikation på
   	% alternativ: insticksmoduler till webläsaren; kräver mer av användaren är JS
   
-Vad är JavaScript?:
+Vad är JavaScript?: P 
   - Snabb genomgång av vad JS är för språk
   	% imperativt: liknar Java syntaxmässgit
   	% objektorienterat: använder sig av prototyper ist för klasser
@@ -25,7 +25,7 @@ Vad är JavaScript?:
   	
 Varför är det vettigt att översätta JS?:
 
-Exempel på JavaScript:
+Exempel på JavaScript: P 
   - Presentera exemplet, det finns två stora problem här.
   
   - Vi har hämtat någon annans kod; hur vet vi att den gör det den ska?
@@ -35,7 +35,7 @@ Exempel på JavaScript:
   - Klipp och klistra är ett dåligt sätt att flytta kod. många felkällor. 
   	% alla vet ju att copy-paste-programmering är dåligt  
 
-En lösning: Bibliotek:
+En lösning: Bibliotek: S
   - abstraktion genom funktioner
   	% slår in koden i en funktion, som returnerar referenser till de funktioner man vill
   	  ska synas
@@ -46,7 +46,7 @@ En lösning: Bibliotek:
   	% det finns ingenting som säkrar att biblioteken anropas korrekt. felaktiga anrop kan
   	  vara svåra att hitta.
 
-Möjligheter att använda Haskell för webbprogrammering finns redan:
+Möjligheter att använda Haskell för webbprogrammering finns redan: S
   - Happstack och Yesod 
   	% kör en hel webbserver
   
@@ -54,7 +54,7 @@ Möjligheter att använda Haskell för webbprogrammering finns redan:
   	% är backends till kompilatorer som måste köras server-side.
   	% finns även ett par projekt som nu är döda, YHC var stort
    
-Varför just Haskell?:
+Varför just Haskell?: S
   - Vi är Haskell..
   	% i en idealisk värd ska man inte begränsas av måldomän när man väljer språk, 
   	  man ska kunna använda de bibliotek man är van vid och bekväm med. 
@@ -66,13 +66,21 @@ Varför just Haskell?:
   - Modulsystem
   	% samma som ovan 
   	
-  - Lat evaluering  ¿ska vi ha detta eller hoppa över?
-	% <TODO>
+  - Lat evaluering
+	% förklara snabbt utifrån ones-exempel
 
 DEMO:
 
+ones = 1 : ones
+
+fac 0 = 1
+fac n = n * fac (n-1)
+
+threeSixes = map (\ x -> 5 + x) $ take 3 ones 
+
+
 PRODUKTEN:
-Kompilering: en översikt:
+Kompilering: en översikt: P
 
   - Abstrakt representation
     % skapa en abstrakt representation av koden. datastruktur som kompilatorn kan använda 
@@ -84,43 +92,61 @@ Kompilering: en översikt:
   - Generering av målrepresentation
 	% Översätta representationen till någon konkret representation, t.ex. maskinkod eller bytekod 
 
-Hur fungerar JSHC?:
+Hur fungerar JSHC?: S
   - Gå igenom kompileringen av ett program till JavaScript
-  	% Kommando skickas från användargränssnittet att kompilera en modul
+  	% Kommando skickas från användargränssnittet att kompilera en modul 
   	% Kommandot tolkas av interpretatorn, som anropar kompilatorgränssnittet
   	% Vi läser in modulen och hämtar alla moduler den beror på. detta görs iterativt,
-  	  då vi behöver läsa en modul för att veta om vi behöver ladda in mer.
-  	% dependenskontroll
-  	% kontrollera exporter, att de finns deklarerade ngnstans
+  	  då vi behöver läsa en modul för att veta om vi behöver ladda in mer.  
+  	 
+    - dependency checking
+  	  % använd exemplet för att förklara vad och varför
+  	 
+  	% kontrollera exporter, att de finns deklarerade ngnstans. svårt då importer kan
+  	  exporteras, och specifikationen inte behöver vara exakt
   	% Kontrollera namn, att alla namn som refereras till finns, och är kända där de anropas
-  	% Haskell tillåter användardefinierade operatorer, så operatorprecedens kan inte hanteras
+  	
+  	- Haskell tillåter användardefinierade operatorer, så operatorprecedens kan inte hanteras
   	  direkt i parsern. vi måste alltså läsa en fil två ggr för att hantera detta. 
-  	% Typkontroll, polymorfisk typinferens etc
-  	% Förenkla AST för att göra kodgenereringen enklare.
+  	  % använd exemplet för att visa.
+  	  
+  	- Typkontroll, polymorfisk typinferens etc
+  		% förklara utifrån exemplen
+  		
+  	- Förenkla AST för att göra kodgenereringen enklare.
+  		% förklara utifrån exempel, ite blir case och operatorapplikation blir 
+  		  funktionsapplikation
+  		  
   	% generera JS-kod som en sträng
   	% exekvera JS-koden i JS-motorn
 
 
 DISKUSSION:
-Problem vi stött på under arbetet:
+Problem vi stött på under arbetet: P
   -projektets storlek
   		% vi underskattade haskells omfattning, och vilken svår uppgift det skulle vara 
   		  att implementera
   		% Dynamisk typning i JS gjorde att debugging tog mycket lång tid när projektet 
   		  växte. en stor del av felen vi hade uppfattades som sådant som kunnat undvikas
   		  med statisk typkontroll. 
+  		  
+  - Rekursiva moduler
+  	% Avsaknaden av literatur i ämnet (många haskellimplementationer undviker problemet
+  	  istället för att lösa det, GHC t.ex. klarar inte det) gjorde att vi försökte lösa 
+  	  problemet själva. Först mot slutet av arbetet stötte vi på litteratur som beskriver
+  	  en lösning på problemet. 
 
 I framtiden: 
-  - Vår kompilator stöder ännu bara en liten del av haskellsyntaxen.
+  - Vår kompilator stöder ännu bara en liten del av haskellsyntaxen. P 
   		% detta ska åtgärdas
 
-  - Typklasser
+  - Typklasser P 
   		% Detta är hur överlagring fungerar i Haskell, för att kunna skriva vettiga program
   		  är typklasser nödvändiga
   		  
-  - FFI
+  - FFI S 
   		% För att kunna skapa program som är meningsfulla i en webkontext behövs FFI mot 
   		  JS. 
   		  
-  - Rekursiva moduler
+  - Rekursiva moduler S
   		% Haskellspecifikationen kräver rekursiva moduler, detta fungerar inte ännu.
