@@ -39,4 +39,29 @@ Ymacs_Buffer.newCommands({
     };
 })();
 
+
+(function(){
+    var _switchToBuffer = Ymacs.prototype.switchToBuffer;
+    Ymacs.prototype.switchToBuffer = function(){
+	var buf = _switchToBuffer.apply(this,arguments);
+
+        var ext = buf.name.substr(buf.name.lastIndexOf("."));
+	if( ext == ".hs" ){
+	    var ef = function(){};
+	    var dummystate = {onWarning:ef,onMessage:ef,onError:ef};
+	    var mod = JSHC.Load.syncLoadName.call(dummystate,
+	               {},
+	               JSHC.Compiler.getDefaultPath(),
+	               new JSHC.Load.Module.unread(buf.name.substr(0,buf.name.length-3)));
+
+	    if( mod.status === "success" && typeof mod.contents == "string" ){
+                JSHC.alert(mod.status,mod.contents);
+	        buf._insertText(mod.contents);
+	    }
+	}
+
+	return buf;
+    };
+})();
+
 ////////////////////////////////////////////////////////////////////////////////
