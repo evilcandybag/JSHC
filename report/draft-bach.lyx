@@ -2930,7 +2930,7 @@ Supported language features
 \begin_layout Standard
 This section describes informally the subset of Haskell features implemented
  in JSHC.
- For a formal syntax reference, see Appendix 
+ For a full formal syntax reference, see Appendix 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Context-free-syntax"
@@ -3052,8 +3052,419 @@ Pattern matching:
  Variable bindings through case.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Subsection
+Module system
+\end_layout
 
+\begin_layout Standard
+JSHC supports the creation of modules by using the 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+module
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+M
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+where
+\end_layout
+
+\end_inset
+
+ syntax, where 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+M
+\end_layout
+
+\end_inset
+
+ is an arbitrary module identifier.
+ It is possible to specify what a module exports by using the syntax 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+module
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+M
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+(
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+,
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+...
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+,
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+) where
+\end_layout
+
+\end_inset
+
+, where 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\end_layout
+
+\end_inset
+
+ 1 through n represents arbitrary export declarations.
+ If export specification is omitted, all top level identifiers declared
+ in the module are exported.
+ 
+\end_layout
+
+\begin_layout Standard
+Export declarations are either identifiers in scope at the module's top
+ level (including imported names) or module identifiers of the form 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+module 
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+M
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Import declarations are top-level declarations of the form 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+import 
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+M spec
+\end_layout
+
+\end_inset
+
+ where 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+M
+\end_layout
+
+\end_inset
+
+ is an arbitrary module identifier and 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+spec
+\end_layout
+
+\end_inset
+
+ is an optional specification of the import.
+ Import specifications are either inclusive, of the form 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+(
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+,
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+...
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+,
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+)
+\end_layout
+
+\end_inset
+
+ specifying exactly the set imported, or exclusive, of the form 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+hiding
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+(
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+,
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+...
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+,
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+)
+\end_layout
+
+\end_inset
+
+ specifying what parts of the export specification not to import, where
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\end_layout
+
+\end_inset
+
+ 1 through n are arbitrary members of the imported module's export specification.
+\end_layout
+
+\begin_layout Subsection
+Type system
+\end_layout
+
+\begin_layout Standard
+JSHC supports polymorphic type inference and type checking 
 \end_layout
 
 \begin_layout Section
@@ -4476,7 +4887,7 @@ While type checking, the algorithm keeps track of local names and type variables
 \end_layout
 
 \begin_layout Paragraph
-The constrain map
+The constraint map
 \end_layout
 
 \begin_layout Standard
@@ -6820,7 +7231,7 @@ newline
 \end_layout
 
 \begin_layout Standard
-Applications can be compiled in two different ways.
+<TODO>Applications can be compiled in two different ways.
  If the application is a data constructor application, the application 
 \begin_inset Flex CharStyle:Emph
 status collapsed
@@ -7533,7 +7944,7 @@ newline
 \end_layout
 
 \begin_layout Paragraph
-Patterns
+Patterns and pattern matching
 \end_layout
 
 \begin_layout Standard
@@ -7806,6 +8217,41 @@ Wildcard
 \end_inset
 
 .
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Pattern matching is compiled into calls to an internal function 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+match
+\end_layout
+
+\end_inset
+
+, described in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Internal-libraries"
+
+\end_inset
+
+, that emulates the behaviour of Haskell's pattern matching in JavaScript.
+ 
 \end_layout
 
 \begin_layout Paragraph
@@ -7971,8 +8417,17 @@ Thunk
 \end_layout
 
 \begin_layout Standard
-Pattern matching is handled by an internal function that is sent an expression,
- 
+Pattern matching is handled by an internal function, 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+match
+\end_layout
+
+\end_inset
+
+, that is sent an expression, 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
@@ -8036,6 +8491,27 @@ pattern
  pattern match alternative.
  The pairs are then matched sequentially, one at a time until a match is
  found or there are no more alternatives to match.
+ When a match is found, 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+match
+\end_layout
+
+\end_inset
+
+ evaluates 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+rhs
+\end_layout
+
+\end_inset
+
+ with its bindings as arguments.
 \end_layout
 
 \begin_layout Subsection
