@@ -6647,6 +6647,12 @@ reference "sec:B.2Intermediate-representation"
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Standard
+In this description of the generated code, our methods of handling Lazy
+ evaluation are omitted to improve readability.
+ These methods are instead described in <TODO: cross-reference>.
 \begin_inset ERT
 status open
 
@@ -7351,7 +7357,7 @@ newline
 \end_layout
 
 \begin_layout Standard
-<TODO>Applications can be compiled in two different ways.
+Applications can be compiled in two different ways.
  If the application is a data constructor application, the application 
 \begin_inset Flex CharStyle:Emph
 status collapsed
@@ -7763,10 +7769,7 @@ status collapsed
 
 \end_inset
 
-
  will return a JavaScript expression of the form 
-\lang english
-
 \begin_inset Flex CharStyle:Code
 status collapsed
 
@@ -8255,7 +8258,8 @@ Patterns and pattern matching
 
 \begin_layout Standard
 Constructor patterns, like constructor applications, are compiled into JavaScrip
-t arrays where the first element is the constructor identifier.
+t objects whith one member containing the constructor identifier as a string,
+ and one member containing an array with the constructor's arguments.
  Patterns of the form 
 \begin_inset Flex CharStyle:Emph
 status collapsed
@@ -8304,18 +8308,7 @@ p
 
 \end_inset
 
-, where D is an arbitrary data constructor and p represents arbitrary patterns,
- compile into 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-[
-\end_layout
-
-\end_inset
-
- 
+, where 
 \begin_inset Flex CharStyle:Emph
 status collapsed
 
@@ -8325,17 +8318,28 @@ D
 
 \end_inset
 
- 
-\begin_inset Flex CharStyle:Code
+ is an arbitrary data constructor and 
+\begin_inset Flex CharStyle:Emph
 status collapsed
 
 \begin_layout Plain Layout
-,
+p
 \end_layout
 
 \end_inset
 
+ represents arbitrary patterns, compile into a call to a JavaScript constructor
+ with the string representing 
+\begin_inset Flex CharStyle:Emph
+status collapsed
 
+\begin_layout Plain Layout
+D
+\end_layout
+
+\end_inset
+
+ and the array containing 
 \begin_inset Flex CharStyle:Emph
 status collapsed
 
@@ -8350,12 +8354,11 @@ p
 \end_inset
 
  
-\begin_inset Flex CharStyle:Code
+\begin_inset Flex CharStyle:Emph
 status collapsed
 
 \begin_layout Plain Layout
-, ...
- ,
+...
 \end_layout
 
 \end_inset
@@ -8374,22 +8377,13 @@ p
 
 \end_inset
 
-
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-]
-\end_layout
-
-\end_inset
-
 .
  
 \end_layout
 
 \begin_layout Standard
-Tuple patterns are compiled into JavaScript arrays containing all members.
+Tuple patterns are compiled into JavaScript objects containing an array
+ with all members.
  Patterns of the form 
 \begin_inset Flex CharStyle:Code
 status collapsed
@@ -8449,7 +8443,7 @@ status collapsed
 
 \end_inset
 
- are compiled into 
+ are compiled into JavaScript constructor calls with the argument 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
@@ -8512,17 +8506,18 @@ status collapsed
 \end_layout
 
 \begin_layout Standard
-Wildcard patterns are compiled into a JavaScript object 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-Wildcard
+Wildcard patterns are compiled into a JavaScript object representing wildcard
+ patterns.
 \end_layout
 
-\end_inset
+\begin_layout Standard
+Integer patterns are compiled into JavaScript objects containing an integer
+ literal.
+\end_layout
 
-.
+\begin_layout Standard
+Variable patterns are compiled into an object containing the variable identifier
+ as a string.
 \begin_inset ERT
 status open
 
@@ -9961,59 +9956,6 @@ status collapsed
 \end_inset
 
  , … , cname
-\begin_inset Formula $_{\text{n}}$
-\end_inset
-
- )] 
-\end_layout
-
-\end_inset
-
-(n ≥ 0)
-\end_layout
-
-\begin_layout Standard
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-| qtycls [(..) | ( qvar
-\begin_inset Formula $_{\text{1}}$
-\end_inset
-
-, … , qvar
 \begin_inset Formula $_{\text{n}}$
 \end_inset
 
