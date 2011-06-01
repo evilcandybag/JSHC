@@ -192,8 +192,11 @@ JSHC.Codegen.codegen = function (input,namespace) {
         // does not matter if case gets a strict or lazy value
         var ex_code = comExp(cas.exp)[1];
 
+        var res = "";
+        res += "new JSHC.Thunk(function(){return ";
+
 //        alert("COMPILED: \n" + JSHC.showAST(cas.exp) + "to:\n" + JSHC.showAST(ex))
-        var res = "JSHC.Internal.match(" + ex_code + ", [\n";
+        res += "JSHC.Internal.match(" + ex_code + ", [\n";
         for (var i = 0; i < cas.alts.length; i++) {
             var bindStrs = JSHC.comUtils.getBindStrs(cas.alts[i].pat);
             res += "{p: " + comCasePat(cas.alts[i].pat) + ",";
@@ -206,7 +209,8 @@ JSHC.Codegen.codegen = function (input,namespace) {
             }
             res += "){return " + rhs_code + "}},\n";
         }
-        res += "])\n"
+        res += "])";
+        res += "})\n";  // end of creation of thunk
         //JSHC.alert("case result\n",cas.exp,"\n\n",ex_code,"\n\n",res);
         return [false,res];
     }
@@ -295,6 +299,7 @@ JSHC.Codegen.codegen = function (input,namespace) {
         for(var ix=0 ; ix<tuple.members.length ; ix++){
             var exp_code = comExp(tuple.members[ix]);
             if( exp_code[0] ){
+                // all params of the tuple constructor need to be thunks.
                 buf.push("new JSHC.Thunk("+exp_code[1]+")");
             } else {
                 buf.push(exp_code[1]);
