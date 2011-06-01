@@ -299,6 +299,31 @@ The purpose of this project is to implement a Haskell compiler that generates
  
 \end_layout
 
+\begin_layout Section
+Delimitations
+\end_layout
+
+\begin_layout Standard
+Due to the size and complexity of the Haskell programming language, the
+ JSHC implementation is limited to a small subset of Haskell containing
+ the features described as beneficial to web programming above, i.e.
+ static type checking, module system and lazy evaluation.
+ 
+\end_layout
+
+\begin_layout Standard
+This differs from the initial intention with the project, which was to implement
+ the full Haskell 2010 specification
+\begin_inset CommandInset citation
+LatexCommand cite
+key "haskell-report"
+
+\end_inset
+
+.
+ The reasons for this delimitation is discussed more in <TODO; cross-reference>
+\end_layout
+
 \begin_layout Chapter
 Theoretical background
 \end_layout
@@ -6621,8 +6646,8 @@ Code generation
 \end_layout
 
 \begin_layout Standard
-The code generation step generates JavaScript code representing the compiled
- modules.
+The code generation step generates JavaScript code as a JavaScript string
+ representing the compiled modules.
  This code can then be accessed and executed by any JavaScript interpreter.
  For the generated code to be as easy to use in an external application
  as possible, the code generation preserves the names of as many identifiers
@@ -6650,7 +6675,7 @@ reference "sec:B.2Intermediate-representation"
 \end_layout
 
 \begin_layout Standard
-In this description of the generated code, our methods of handling Lazy
+In this description of the generated code, our methods of handling lazy
  evaluation are omitted to improve readability.
  These methods are instead described in <TODO: cross-reference>.
 \begin_inset ERT
