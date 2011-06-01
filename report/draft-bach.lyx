@@ -7357,7 +7357,7 @@ newline
 \end_layout
 
 \begin_layout Standard
-Applications can be compiled in two different ways.
+<TODO>Applications can be compiled in two different ways.
  If the application is a data constructor application, the application 
 \begin_inset Flex CharStyle:Emph
 status collapsed
@@ -8715,10 +8715,23 @@ Thunk
  object is called, which evaluates the closure and assigns the value to
  a variable.
  
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-Pattern matching is handled by an internal function, 
+<TODO: proofread> Pattern matching is handled by an internal function, 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
@@ -8729,7 +8742,7 @@ match
 \end_inset
 
 , that is sent an expression, 
-\begin_inset Flex CharStyle:Code
+\begin_inset Flex CharStyle:Emph
 status collapsed
 
 \begin_layout Plain Layout
@@ -8743,7 +8756,47 @@ e
 status collapsed
 
 \begin_layout Plain Layout
-{pattern,rhs}
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+pattern
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+,
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+rhs
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+}
 \end_layout
 
 \end_inset
@@ -8759,7 +8812,7 @@ pattern
 \end_inset
 
  is the pattern to match the result of 
-\begin_inset Flex CharStyle:Code
+\begin_inset Flex CharStyle:Emph
 status collapsed
 
 \begin_layout Plain Layout
@@ -8769,7 +8822,7 @@ e
 \end_inset
 
  to, and 
-\begin_inset Flex CharStyle:Code
+\begin_inset Flex CharStyle:Emph
 status collapsed
 
 \begin_layout Plain Layout
@@ -8779,7 +8832,7 @@ rhs
 \end_inset
 
  is a function that takes any bindings made in 
-\begin_inset Flex CharStyle:Code
+\begin_inset Flex CharStyle:Emph
 status collapsed
 
 \begin_layout Plain Layout
@@ -8803,7 +8856,7 @@ match
 \end_inset
 
  evaluates 
-\begin_inset Flex CharStyle:Code
+\begin_inset Flex CharStyle:Emph
 status collapsed
 
 \begin_layout Plain Layout
@@ -8813,6 +8866,81 @@ rhs
 \end_inset
 
  with its bindings as arguments.
+\end_layout
+
+\begin_layout Standard
+Matching of a pattern against an expression is done lazily and recursively.
+ 
+\end_layout
+
+\begin_layout Standard
+Constructor patterns first evaluate 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\end_layout
+
+\end_inset
+
+, then match the name and arity of the constructor in 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\end_layout
+
+\end_inset
+
+, then recursively match all the constructor's arguments from left to right.
+ Tuple patterns work in the same way as constructor patterns, but without
+ the comparison of constructor names, as there are none.
+\end_layout
+
+\begin_layout Standard
+Integer patterns first evaluate 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\end_layout
+
+\end_inset
+
+ and then return a positive match if the value of 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\end_layout
+
+\end_inset
+
+ is equal to the pattern.
+\end_layout
+
+\begin_layout Standard
+Wildcard and variable patterns both match 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\end_layout
+
+\end_inset
+
+ without evaluating it, with the difference that variable patterns also
+ add it to the set of bindings.
+ 
+\end_layout
+
+\begin_layout Standard
+When there are no patterns left to match 
 \end_layout
 
 \begin_layout Subsection
