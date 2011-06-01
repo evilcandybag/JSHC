@@ -1029,27 +1029,15 @@ status collapsed
 \end_inset
 
 , and the data constructors 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
+\family typewriter
 [] :: ∀a.
  [a]
-\end_layout
-
-\end_inset
-
+\family default
  (the empty list) and 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
+\family typewriter
 (:) :: ∀a.
  a -> [a] -> [a]
-\end_layout
-
-\end_inset
-
+\family default
  (creating a new list given a first element and the rest of the elements).
 \end_layout
 
@@ -1653,27 +1641,11 @@ status collapsed
 \end_inset
 
  is actually 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
+\family typewriter
 ∀a.
  [a] -> [a]
-\end_layout
-
-\end_inset
-
-, where 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-∀
-\end_layout
-
-\end_inset
-
- binds the type variable 
+\family default
+, where ∀ binds the type variable 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
@@ -1849,15 +1821,9 @@ Instantiation of types
 
 \begin_layout Standard
 When using a data constructor such as 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
+\family typewriter
 [] :: ∀a.[a]
-\end_layout
-
-\end_inset
-
+\family default
 , one would want to use it with lists with different element types in different
  locations.
 \end_layout
