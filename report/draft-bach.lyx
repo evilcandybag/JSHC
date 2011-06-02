@@ -1,4 +1,4 @@
-#LyX 1.6.9 created this file. For more info see http://www.lyx.org/
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
@@ -163,7 +163,7 @@ Vi föreslår en lösning där det statiskt typade funktionella språket Haskell
 
 \begin_layout Abstract
 En implementation av en kompilator med stöd för kompilering av en delmängd
- av Haskell till Javaskript, 
+ av Haskell till JavaScript, 
 \begin_inset Flex CharStyle:Emph
 status collapsed
 
@@ -228,7 +228,7 @@ Introduction
 \begin_layout Standard
 Modern web applications are becoming more and more complex, with users expecting
  more and more automation of menial tasks such as spelling correction and
- autocompletion of text.
+ auto completion of text.
  This leads to web applications becoming larger and more complex, which
  in turn means that they are becoming more error prone.
  One large source of errors in web applications is the absence of type safety
@@ -866,7 +866,7 @@ Types
 \end_layout
 
 \begin_layout Standard
-All values in haskell have a type.
+All values in Haskell have a type.
  The type 
 \begin_inset Flex CharStyle:Code
 status collapsed
@@ -903,7 +903,7 @@ Int
 \begin_layout Standard
 It is possible to write a function that takes values that may be of more
  than one type.
- To acheive that, one uses 
+ To achieve that, one uses 
 \begin_inset Flex CharStyle:Strong
 status collapsed
 
@@ -1289,7 +1289,7 @@ Haskell’s module system is its main method of encapsulation.
  determine whether something is known (i.e.
  in scope) or not.
  Each module has a name, a set of imports, a set of exports and a body containin
-g top-level declatiations.
+g top-level declarations.
  The specification of these is optional, with defaults being the module
  name “Main”, the empty import set and the export set containing all top-level
  declarations.
@@ -1351,7 +1351,7 @@ C
 
 \end_inset
 
- to also have imported some defnintions defined in module 
+ to also have imported some definitions defined in module 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
@@ -1769,7 +1769,7 @@ bound
 \end_layout
 
 \begin_layout Standard
-When writing a type signature in haskell, the quantification is implicit.
+When writing a type signature in Haskell, the quantification is implicit.
 \end_layout
 
 \begin_layout Standard
@@ -2171,7 +2171,7 @@ a = b
 
 \begin_layout Standard
 The type inference algorithm must assign a single type to each of the free
- type variables such that all the constraints are satisified.
+ type variables such that all the constraints are satisfied.
 \end_layout
 
 \begin_layout Standard
@@ -2230,12 +2230,12 @@ Since modules can mutually depend on each other, there can be a cycle in
 
 \begin_layout Standard
 If a module A and a module B depends on each other by importing functions
- from the other module, one can not analyse one before the other, as the
+ from the other module, one can not analyze one before the other, as the
  imported functions will be missing.
 \end_layout
 
 \begin_layout Standard
-To solve this, one must analyse A and B together.
+To solve this, one must analyze A and B together.
 \end_layout
 
 \begin_layout Standard
@@ -2801,8 +2801,8 @@ status collapsed
 
 \end_inset
 
- operator which eiter matches a rule and returns it, or does not match it
- and returns an empty match.
+ operator which either matches a rule and returns it, or does not match
+ it and returns an empty match.
  Just as with the ordered choice, these operators take a greedy approach,
  i.e.
  they always consume the maximum amount of input possible.
@@ -2881,7 +2881,7 @@ key "ford-packrat"
 
  parser, i.e.
  a top-down recursive descent parser with backtracking.
- To avoid a worst-case scenario of exponential runtime, packrat parsers
+ To avoid a worst-case scenario of exponential runtime, Packrat parsers
  store intermediate results in a table, sacrificing storage space for guaranteed
  linear-time complexity.
  
@@ -2896,7 +2896,7 @@ key "parsing-expression-grammars"
 
 \end_inset
 
- in a concise and intuitive way, as well as for the efficiency of packrat
+ in a concise and intuitive way, as well as for the efficiency of Packrat
  parsers.
  
 \end_layout
@@ -4179,7 +4179,7 @@ C-x i
 \end_layout
 
 \begin_layout Standard
-There will also be an attempt to load the haskell file, and if found, the
+There will also be an attempt to load the Haskell file, and if found, the
  file contents will be written into the buffer.
 \end_layout
 
@@ -4562,7 +4562,7 @@ reference "sub:back-end"
 
 \end_inset
 
-) javascript code.
+) JavaScript code.
 \end_layout
 
 \begin_layout Standard
@@ -4626,8 +4626,8 @@ User Interface
 
 \begin_layout Standard
 Commands in Ymacs are added using modes.
- A mode contains a keymap to be checked before the default keymap, and a
- Ymacs tokenizer that handles coloring.
+ A mode contains a key map to be checked before the default key map, and
+ a Ymacs tokenizer that handles coloring.
 \end_layout
 
 \begin_layout Subsubsection
@@ -5277,7 +5277,7 @@ Dependency order traversal
 \end_layout
 
 \begin_layout Standard
-To traverse the graph in dependency order, an opposide edge is added for
+To traverse the graph in dependency order, an opposite edge is added for
  each edge so that each group not only knows what it depends upon, but also
  which groups depends upon it.
  Each group keeps track of the number of remaining groups that it depends
@@ -9103,7 +9103,7 @@ Patterns and pattern matching
 
 \begin_layout Standard
 Constructor patterns, like constructor applications, are compiled into JavaScrip
-t objects whith one member containing the constructor identifier as a string,
+t objects with one member containing the constructor identifier as a string,
  and one member containing an array with the constructor's arguments.
  Patterns of the form 
 \begin_inset Flex CharStyle:Emph
@@ -9514,7 +9514,7 @@ JSHC.Internal
 
 \end_inset
 
- is a reference to a javascript function.
+ is a reference to a JavaScript function.
  These internal functions will be compiled into a curried function just
  as for lambda expressions
 \begin_inset CommandInset ref
@@ -9524,8 +9524,8 @@ reference "par:code-gen-Expressions"
 \end_inset
 
 , but both parameters types and the return type will also be converted between
- the javascript type and the corresponding haskell type as needed.
- e.g The javascript implementation of the 
+ the JavaScript type and the corresponding Haskell type as needed.
+ e.g The JavaScript implementation of the 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
@@ -9545,8 +9545,8 @@ JSHC.Internal.int32ge
 
 \end_inset
 
-, where no parameter is converted as the representation is the same in javascrip
-t, but the result will be converted from a javascript boolean value to the
+, where no parameter is converted as the representation is the same in JavaScrip
+t, but the result will be converted from a JavaScript boolean value to the
  
 \begin_inset Flex CharStyle:Code
 status collapsed
@@ -9579,7 +9579,7 @@ Prelude.Bool
 
 .
  If the internal function takes no parameters (such as the implementation
- of undefined, which just throws a javascript exception) it is just an expressio
+ of undefined, which just throws a JavaScript exception) it is just an expressio
 n to be evaluated.
 \end_layout
 
@@ -9650,7 +9650,7 @@ To prevent evaluation of function arguments, all function arguments are
 
 \begin_layout Standard
 Whenever an expression is compiled, the result is a pair containing the
- string of the compiled haskell expression and a boolean with the strictness
+ string of the compiled Haskell expression and a boolean with the strictness
  of the expression.
 \end_layout
 
@@ -10133,7 +10133,7 @@ key "ghc-user-guide"
 
 \end_inset
 
- do not implement mutually recursive modules as specified in the haskell
+ do not implement mutually recursive modules as specified in the Haskell
  report.
  We were unsure of how to implement the computation of the exported names,
  as mutually recursive modules means that to compute the exports of one
@@ -10151,8 +10151,8 @@ key "formal-haskell-module-system"
 
 \end_inset
 
-, which formally describes the haskell module system using a fix point computati
- on, but we have not had enough time to implement something like it.
+, which formally describes the Haskell module system using a fix point computati
+on on, but we have not had enough time to implement something like it.
 \end_layout
 
 \begin_layout Subsection
@@ -10203,17 +10203,17 @@ If compiling an existing compiler like GHC to JavaScript, it would require
 \end_layout
 
 \begin_layout Subsection
-HIJi (Haskell in Javascript)
+HIJi (Haskell in JavaScript)
 \end_layout
 
 \begin_layout Standard
-This is a Haskell interpreter written in Javascript as part of a bachelor
+This is a Haskell interpreter written in JavaScript as part of a bachelor
  thesis project.
 \end_layout
 
 \begin_layout Standard
 Their parser is not generated from a grammar description, but instead written
- in Javascript using a parser combinator library called JSParse
+ in JavaScript using a parser combinator library called JSParse
 \begin_inset CommandInset citation
 LatexCommand cite
 key "jsparse"
@@ -10582,7 +10582,7 @@ Interpreter: accessing URLs
 
 \begin_layout Standard
 The idea was that the interpreter should support adding paths to Haskell
- files residing on any url or filepath.
+ files residing on any url or file path.
  Unfortunately, for safety reasons, most common browsers prevent getting
  files from domains other than the one that the script is executed on.
  If using Google Chrome/Chromium, the security policy even prevents accessing
@@ -14305,7 +14305,7 @@ newline
 status collapsed
 
 \begin_layout Plain Layout
-STRING -> a javascript String
+STRING -> a JavaScript String
 \end_layout
 
 \end_inset
@@ -14318,7 +14318,7 @@ STRING -> a javascript String
 status collapsed
 
 \begin_layout Plain Layout
-NUMBER -> a javascript Number
+NUMBER -> a JavaScript Number
 \end_layout
 
 \end_inset
