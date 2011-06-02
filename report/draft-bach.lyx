@@ -299,6 +299,31 @@ The purpose of this project is to implement a Haskell compiler that generates
  
 \end_layout
 
+\begin_layout Section
+Delimitations
+\end_layout
+
+\begin_layout Standard
+Due to the size and complexity of the Haskell programming language, the
+ JSHC implementation is limited to a small subset of Haskell containing
+ the features described as beneficial to web programming above, i.e.
+ static type checking, module system and lazy evaluation.
+ 
+\end_layout
+
+\begin_layout Standard
+This differs from the initial intention with the project, which was to implement
+ the full Haskell 2010 specification
+\begin_inset CommandInset citation
+LatexCommand cite
+key "haskell-report"
+
+\end_inset
+
+.
+ The reasons for this delimitation is discussed more in <TODO; cross-reference>
+\end_layout
+
 \begin_layout Chapter
 Theoretical background
 \end_layout
@@ -2930,7 +2955,7 @@ Supported language features
 \begin_layout Standard
 This section describes informally the subset of Haskell features implemented
  in JSHC.
- For a formal syntax reference, see Appendix 
+ For a full formal syntax reference, see Appendix 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Context-free-syntax"
@@ -3052,8 +3077,539 @@ Pattern matching:
  Variable bindings through case.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Subsection
+Module system
+\end_layout
 
+\begin_layout Standard
+JSHC supports the creation of modules by using the 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+module
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+M
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+where
+\end_layout
+
+\end_inset
+
+ syntax, where 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+M
+\end_layout
+
+\end_inset
+
+ is an arbitrary module identifier.
+ It is possible to specify what a module exports by using the syntax 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+module
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+M
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+(
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+,
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+...
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+,
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+) where
+\end_layout
+
+\end_inset
+
+, where 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\end_layout
+
+\end_inset
+
+ 1 through n represents arbitrary export declarations.
+ If export specification is omitted, all top level identifiers declared
+ in the module are exported.
+ 
+\end_layout
+
+\begin_layout Standard
+Export declarations are either identifiers in scope at the module's top
+ level (including imported names) or module identifiers of the form 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+module 
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+M
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Import declarations are top-level declarations of the form 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+import 
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+M spec
+\end_layout
+
+\end_inset
+
+ where 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+M
+\end_layout
+
+\end_inset
+
+ is an arbitrary module identifier and 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+spec
+\end_layout
+
+\end_inset
+
+ is an optional specification of the import.
+ Import specifications are either inclusive, of the form 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+(
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+,
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+...
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+,
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+)
+\end_layout
+
+\end_inset
+
+ specifying exactly the set imported, or exclusive, of the form 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+hiding
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+(
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+,
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+...
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+,
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+)
+\end_layout
+
+\end_inset
+
+ specifying what parts of the export specification not to import, where
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\end_layout
+
+\end_inset
+
+ 1 through n are arbitrary members of the imported module's export specification.
+\end_layout
+
+\begin_layout Subsection
+Top level declarations
+\end_layout
+
+\begin_layout Standard
+The following top level declarations are supported by JSHC:
+\end_layout
+
+\begin_layout Standard
+Non-strict abstract datatypes, declared by the syntax: 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+data
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+ D a
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+ ...
+ a
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+=
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+C
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+|
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+...
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+|
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+C
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ where 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+D 
+\end_layout
+
+\end_inset
+
+is an arbitrary type identifier and C 1 through n represent arbitrary data
+ constructors.
+\end_layout
+
+\begin_layout Subsection
+Type system
+\end_layout
+
+\begin_layout Standard
+JSHC supports polymorphic type inference and type checking 
 \end_layout
 
 \begin_layout Section
@@ -4476,7 +5032,7 @@ While type checking, the algorithm keeps track of local names and type variables
 \end_layout
 
 \begin_layout Paragraph
-The constrain map
+The constraint map
 \end_layout
 
 \begin_layout Standard
@@ -6090,8 +6646,8 @@ Code generation
 \end_layout
 
 \begin_layout Standard
-The code generation step generates JavaScript code representing the compiled
- modules.
+The code generation step generates JavaScript code as a JavaScript string
+ representing the compiled modules.
  This code can then be accessed and executed by any JavaScript interpreter.
  For the generated code to be as easy to use in an external application
  as possible, the code generation preserves the names of as many identifiers
@@ -6116,6 +6672,12 @@ reference "sec:B.2Intermediate-representation"
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Standard
+In this description of the generated code, our methods of handling lazy
+ evaluation are omitted to improve readability.
+ These methods are instead described in <TODO: cross-reference>.
 \begin_inset ERT
 status open
 
@@ -6820,7 +7382,7 @@ newline
 \end_layout
 
 \begin_layout Standard
-Applications can be compiled in two different ways.
+<TODO>Applications can be compiled in two different ways.
  If the application is a data constructor application, the application 
 \begin_inset Flex CharStyle:Emph
 status collapsed
@@ -7133,6 +7695,189 @@ status collapsed
 
 \begin_layout Plain Layout
 )
+\end_layout
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+This approach, coupled with how compilation of lambda expressions is handled,
+ allows for partial application of functions.
+ An application of the form 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+f
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+(
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+a
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+)
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+...
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+(
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+a
+\begin_inset Formula $_{\text{n-2}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+)
+\end_layout
+
+\end_inset
+
+ will return a JavaScript expression of the form 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+function (
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+p
+\begin_inset Formula $_{\text{n-1}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+) {return 
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+function (
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+p
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+) { return
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+rhs
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+}}
 \end_layout
 
 \end_inset
@@ -7533,12 +8278,13 @@ newline
 \end_layout
 
 \begin_layout Paragraph
-Patterns
+Patterns and pattern matching
 \end_layout
 
 \begin_layout Standard
 Constructor patterns, like constructor applications, are compiled into JavaScrip
-t arrays where the first element is the constructor identifier.
+t objects whith one member containing the constructor identifier as a string,
+ and one member containing an array with the constructor's arguments.
  Patterns of the form 
 \begin_inset Flex CharStyle:Emph
 status collapsed
@@ -7587,18 +8333,7 @@ p
 
 \end_inset
 
-, where D is an arbitrary data constructor and p represents arbitrary patterns,
- compile into 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-[
-\end_layout
-
-\end_inset
-
- 
+, where 
 \begin_inset Flex CharStyle:Emph
 status collapsed
 
@@ -7608,17 +8343,28 @@ D
 
 \end_inset
 
- 
-\begin_inset Flex CharStyle:Code
+ is an arbitrary data constructor and 
+\begin_inset Flex CharStyle:Emph
 status collapsed
 
 \begin_layout Plain Layout
-,
+p
 \end_layout
 
 \end_inset
 
+ represents arbitrary patterns, compile into a call to a JavaScript constructor
+ with the string representing 
+\begin_inset Flex CharStyle:Emph
+status collapsed
 
+\begin_layout Plain Layout
+D
+\end_layout
+
+\end_inset
+
+ and the array containing 
 \begin_inset Flex CharStyle:Emph
 status collapsed
 
@@ -7633,12 +8379,11 @@ p
 \end_inset
 
  
-\begin_inset Flex CharStyle:Code
+\begin_inset Flex CharStyle:Emph
 status collapsed
 
 \begin_layout Plain Layout
-, ...
- ,
+...
 \end_layout
 
 \end_inset
@@ -7657,22 +8402,13 @@ p
 
 \end_inset
 
-
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-]
-\end_layout
-
-\end_inset
-
 .
  
 \end_layout
 
 \begin_layout Standard
-Tuple patterns are compiled into JavaScript arrays containing all members.
+Tuple patterns are compiled into JavaScript objects containing an array
+ with all members.
  Patterns of the form 
 \begin_inset Flex CharStyle:Code
 status collapsed
@@ -7732,7 +8468,7 @@ status collapsed
 
 \end_inset
 
- are compiled into 
+ are compiled into JavaScript constructor calls with the argument 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
@@ -7795,17 +8531,53 @@ status collapsed
 \end_layout
 
 \begin_layout Standard
-Wildcard patterns are compiled into a JavaScript object 
-\begin_inset Flex CharStyle:Code
-status collapsed
+Wildcard patterns are compiled into a JavaScript object representing wildcard
+ patterns.
+\end_layout
+
+\begin_layout Standard
+Integer patterns are compiled into JavaScript objects containing an integer
+ literal.
+\end_layout
+
+\begin_layout Standard
+Variable patterns are compiled into an object containing the variable identifier
+ as a string.
+\begin_inset ERT
+status open
 
 \begin_layout Plain Layout
-Wildcard
+
+
+\backslash
+newline
 \end_layout
 
 \end_inset
 
-.
+
+\end_layout
+
+\begin_layout Standard
+Pattern matching is compiled into calls to an internal function 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+match
+\end_layout
+
+\end_inset
+
+, described in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Internal-libraries"
+
+\end_inset
+
+, that emulates the behaviour of Haskell's pattern matching in JavaScript.
+ 
 \end_layout
 
 \begin_layout Paragraph
@@ -7968,12 +8740,34 @@ Thunk
  object is called, which evaluates the closure and assigns the value to
  a variable.
  
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-Pattern matching is handled by an internal function that is sent an expression,
- 
+<TODO: proofread> Pattern matching is handled by an internal function, 
 \begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+match
+\end_layout
+
+\end_inset
+
+, that is sent an expression, 
+\begin_inset Flex CharStyle:Emph
 status collapsed
 
 \begin_layout Plain Layout
@@ -7987,7 +8781,47 @@ e
 status collapsed
 
 \begin_layout Plain Layout
-{pattern,rhs}
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+pattern
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+,
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+rhs
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+}
 \end_layout
 
 \end_inset
@@ -8003,7 +8837,7 @@ pattern
 \end_inset
 
  is the pattern to match the result of 
-\begin_inset Flex CharStyle:Code
+\begin_inset Flex CharStyle:Emph
 status collapsed
 
 \begin_layout Plain Layout
@@ -8013,7 +8847,7 @@ e
 \end_inset
 
  to, and 
-\begin_inset Flex CharStyle:Code
+\begin_inset Flex CharStyle:Emph
 status collapsed
 
 \begin_layout Plain Layout
@@ -8023,7 +8857,7 @@ rhs
 \end_inset
 
  is a function that takes any bindings made in 
-\begin_inset Flex CharStyle:Code
+\begin_inset Flex CharStyle:Emph
 status collapsed
 
 \begin_layout Plain Layout
@@ -8036,6 +8870,102 @@ pattern
  pattern match alternative.
  The pairs are then matched sequentially, one at a time until a match is
  found or there are no more alternatives to match.
+ When a match is found, 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+match
+\end_layout
+
+\end_inset
+
+ evaluates 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+rhs
+\end_layout
+
+\end_inset
+
+ with its bindings as arguments.
+\end_layout
+
+\begin_layout Standard
+Matching of a pattern against an expression is done lazily and recursively.
+ 
+\end_layout
+
+\begin_layout Standard
+Constructor patterns first evaluate 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\end_layout
+
+\end_inset
+
+, then match the name and arity of the constructor in 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\end_layout
+
+\end_inset
+
+, then recursively match all the constructor's arguments from left to right.
+ Tuple patterns work in the same way as constructor patterns, but without
+ the comparison of constructor names, as there are none.
+\end_layout
+
+\begin_layout Standard
+Integer patterns first evaluate 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\end_layout
+
+\end_inset
+
+ and then return a positive match if the value of 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\end_layout
+
+\end_inset
+
+ is equal to the pattern.
+\end_layout
+
+\begin_layout Standard
+Wildcard and variable patterns both match 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\end_layout
+
+\end_inset
+
+ without evaluating it, with the difference that variable patterns also
+ add it to the set of bindings.
+ 
+\end_layout
+
+\begin_layout Standard
+When there are no patterns left to match 
 \end_layout
 
 \begin_layout Subsection
@@ -9179,59 +10109,6 @@ status collapsed
 \end_inset
 
  , … , cname
-\begin_inset Formula $_{\text{n}}$
-\end_inset
-
- )] 
-\end_layout
-
-\end_inset
-
-(n ≥ 0)
-\end_layout
-
-\begin_layout Standard
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-| qtycls [(..) | ( qvar
-\begin_inset Formula $_{\text{1}}$
-\end_inset
-
-, … , qvar
 \begin_inset Formula $_{\text{n}}$
 \end_inset
 
