@@ -291,6 +291,13 @@ The purpose of this project is to implement a Haskell compiler that generates
 
 \begin_layout Section
 Delimitations
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Delimitations"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -311,7 +318,14 @@ key "haskell-report"
 \end_inset
 
 .
- The reasons for this delimitation is discussed more in <TODO; cross-reference>
+ The reasons for this delimitation is discussed more in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Project-size"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Chapter
@@ -2940,6 +2954,13 @@ The result of this project is a Haskell compiler written in JavaScript,
 
 \begin_layout Section
 Supported language features
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Supported-language-features"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -9731,6 +9752,13 @@ Discussion
 
 \begin_layout Section
 Implementation details
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Implementation-details"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
@@ -9892,43 +9920,30 @@ Future work on JSHC
 \end_layout
 
 \begin_layout Subsection
-Loading files asynchronously
+Additional support of the Haskell specification
 \end_layout
 
 \begin_layout Standard
-This is not difficult, but since only local files or files on the same domain
- may be accessed, there does not appear to be a reason to implement this.
-\end_layout
-
-\begin_layout Subsection
-Pretty printer
+As only a small subset of Haskell is supported in JSHC, the most important
+ future work is to extend its support to larger parts of the Haskell specificati
+on (and eventually to supporting it in full).
 \end_layout
 
 \begin_layout Standard
-To give good error messages related to expressions within functions, a pretty
- printer is required.
- Currently, only the abstract syntax tree is available.
-\end_layout
-
-\begin_layout Subsection
-Concurrency
+There are several minor syntactic features missing, such as sections (syntactic
+ sugar for partial application of binary operators), list comprehensions
+ and guards.
 \end_layout
 
 \begin_layout Standard
-To speed up compilation, the dependency group traversal could be implemented
- to run concurrently, as the implemented algorithm allows for taking out
- many groups which do not depend on each other.
- Even though extensions for concurrency exists, speed is not important in
- the compiler in it
-\begin_inset Quotes ers
-\end_inset
-
-s current state.
- Lexical analysis and parsing of modules could also benefit from added concurren
-cy.
+Some major missing features are described below.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Standard
+<TODO: write something about IO as well?>
+\end_layout
+
+\begin_layout Subsubsection
 FFI: Foreign Function Interface
 \end_layout
 
@@ -9946,7 +9961,7 @@ More importantly, it will also allow writing Haskell libraries that wrap
 t capabilities of JSHC.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Type classes
 \end_layout
 
@@ -9958,6 +9973,47 @@ Function overloading through type classes is one of the most important features
  
 \end_layout
 
+\begin_layout Subsection
+Possible additions to the compiler
+\end_layout
+
+\begin_layout Subsubsection
+Loading files asynchronously
+\end_layout
+
+\begin_layout Standard
+This is not difficult, but since only local files or files on the same domain
+ may be accessed, there does not appear to be a reason to implement this.
+\end_layout
+
+\begin_layout Subsubsection
+Pretty printer
+\end_layout
+
+\begin_layout Standard
+To give good error messages related to expressions within functions, a pretty
+ printer is required.
+ Currently, only the abstract syntax tree is available.
+\end_layout
+
+\begin_layout Subsubsection
+Concurrency
+\end_layout
+
+\begin_layout Standard
+To speed up compilation, the dependency group traversal could be implemented
+ to run concurrently, as the implemented algorithm allows for taking out
+ many groups which do not depend on each other.
+ Even though extensions for concurrency exists, speed is not important in
+ the compiler in it
+\begin_inset Quotes ers
+\end_inset
+
+s current state.
+ Lexical analysis and parsing of modules could also benefit from added concurren
+cy.
+\end_layout
+
 \begin_layout Section
 Issues
 \end_layout
@@ -9965,6 +10021,96 @@ Issues
 \begin_layout Standard
 During the course of the project, we encountered some issues that significantly
  affected our workflow and deserve mention.
+ 
+\end_layout
+
+\begin_layout Subsection
+Project size
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Project-size"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+As mentioned in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Delimitations"
+
+\end_inset
+
+, the intention of this project was initially to implement the full Haskell
+ 2010 specification.
+ This was, however, not possible within the scope of a bachelor's thesis.
+ Instead, a small subset of Haskell was implemented (described in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Supported-language-features"
+
+\end_inset
+
+).
+ 
+\end_layout
+
+\begin_layout Standard
+There are several reasons for this underestimation of project size.
+ 
+\end_layout
+
+\begin_layout Standard
+Our experience in writing compilers comes mainly from courses we have attended,
+ where we have implemented compilers for simple imperative and functional
+ languages.
+ As we managed these courses with relative ease, implementing a full scale
+ programming language like Haskell seemed feasible.
+ 
+\end_layout
+
+\begin_layout Standard
+As the Haskell specification is often brief in its description of complex
+ language features and implementation details, such as polymorphic type
+ checking or overloading through type classes, as well as the features discussed
+ in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Implementation-details"
+
+\end_inset
+
+, the challenge of implementing seemed lesser than it actually was.
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In addition, none of the group members had used JavaScript before the start
+ of this project.
+ The problems caused by JavaScript's weak dynamic typing and lack of module
+ system
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Mikkonen07usingjavascript"
+
+\end_inset
+
+ were surprisingly difficult to overcome as the project grew.
  
 \end_layout
 
