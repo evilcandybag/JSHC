@@ -203,7 +203,7 @@ JSHC.Codegen.codegen = function (input,namespace) {
             res += "f: function(" + bindStrs.join(",");
             var rhs_code = comExp(cas.alts[i].exp);
             if( rhs_code[0] ){
-                rhs_code = "new JSHC.Thunk(function(){return " + rhs_code[1] + "})";
+                rhs_code = "new JSHC.Thunk(" + rhs_code[1] + ")";
             } else {
                 rhs_code = rhs_code[1];
             }
