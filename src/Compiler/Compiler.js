@@ -182,11 +182,13 @@ JSHC.Compiler.prototype.recompile = function(){
             var mod = group.values[ix];
             if( prev_modules[mod.ast.modid.id] === mod ){
                 // re-parse to get new AST
-                group.values[k] = JSHC.Load.Module.done(
+                group.values[ix] = JSHC.Load.Module.done(
                     mod.name, mod.contents, mod.source, mod.date);
+                mod = group.values[ix];
             }
 
             // compute/check top-level namespace and add it to AST body.
+            assert.ok( mod.checked !== true );
             JSHC.addToplevelNamespace(compiler, mod.ast);
         }
 
@@ -238,6 +240,7 @@ JSHC.Compiler.prototype.recompile = function(){
         for (var i = 0; i < group.values.length; i++) {
             var m = group.values[i];
             compiler.modules[m.name] = m;
+            m.checked = true;
         }
     };
 

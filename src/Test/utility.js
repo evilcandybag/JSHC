@@ -3,6 +3,7 @@
 
 if( JSHC.Test === undefined ) JSHC.Test = {};
 if( JSHC.Test.Cases === undefined) JSHC.Test.Cases = {};
+
 ////////////////////////////////////////////////////////////////////////////////
 
 /*
@@ -66,6 +67,8 @@ JSHC.Test.Tester = function(){
     this.passed = 0;
     this.failed = 0;
     this.interpreter = new JSHC.Interpreter("JSHC.Test.modules");
+    this.commandsExecuted = 0;
+    this.cmdgroupsExecuted = 0;
 };
 
 /*
@@ -129,6 +132,8 @@ JSHC.Test.Tester.prototype.runTC = function(tc){
 JSHC.Test.Tester.prototype.toString = function(tc){
     var rn,msg = [];
     msg.push("tests passed:" + this.passed + "\n");
+    msg.push("executed " + this.commandsExecuted + " commands in " +
+             this.cmdgroupsExecuted + " tests\n");
     msg.push("tests failed:" + this.failed + "\n");
     msg.push("\n");
     for(rn in this.results){
@@ -156,6 +161,8 @@ JSHC.Test.Tester.prototype.toString = function(tc){
 JSHC.Test.Tester.prototype.toHTML = function(tc){
     var rn,msg = [];
     msg.push("<p>tests passed:" + this.passed + "<br>");
+    msg.push("executed " + this.commandsExecuted + " commands in " +
+             this.cmdgroupsExecuted + " tests<br>");
     msg.push("tests failed:" + this.failed + "<br>");
     msg.push("</p><hr>");
     for(rn in this.results){
@@ -197,6 +204,8 @@ JSHC.Test.runtests = function(tests, showHTML){
 JSHC.Test.runData = function(tester,td){
     assert.ok( td.fileSystem !== undefined );
 
+    tester.interpreter.resetStatus();
+
     // set file system
     tester.interpreter.compiler.setFileSystem(td.fileSystem);
 
@@ -235,34 +244,53 @@ JSHC.Test.runData = function(tester,td){
     var success = tester.interpreter.errors === errorAmount;
 
     var commands = td.commands;
+    var has_commands = false;
     for(var command in commands){
+        tester.commandsExecuted++;
+        has_commands = true;
         tester.interpreter.execCommand(command);
 
-        if( tester.interpreter.errors > 0 ){
-            success = false;
-            info.push(tester.interpreter.errorList.join("\n"));
-            info.push(tester.interpreter.warningList.join("\n"));
-            continue;
+        if( commands[command] === null ){
+            // supposed to result in an error
+            if( tester.interpreter.errors === 0 ){
+                success = false;
+                info.push(tester.interpreter.errorList.join("\n"));
+                info.push(tester.interpreter.warningList.join("\n"));
+                continue;
+            } else {
+                // success: got an error
+                continue;
+            }
+        } else {
+            if( tester.interpreter.errors > 0 ){
+                success = false;
+                info.push(tester.interpreter.errorList.join("\n"));
+                info.push(tester.interpreter.warningList.join("\n"));
+                continue;
+            }
+            if ( tester.interpreter.messageList.length === 0 ) {
+                success = false;
+                info.push("got no result when executing\""+command+"\"");
+                info.push(tester.interpreter.messageList.join("\n"));
+                continue;
+            }
+            if( tester.interpreter.messageList.length !== 1 ){
+                success = false;
+                info.push("got more than one result when executing \""+command+"\":");
+                info.push(tester.interpreter.messageList.join("\n"));
+                continue;
+            }
+            if( tester.interpreter.messageList[0] !== commands[command] ){
+                success = false;
+                info.push("got result \""+tester.interpreter.messageList[0]+"\""+
+                          " instead of \""+commands[command]+"\" when executing "+
+                          "\""+command+"\"");
+                continue;
+            }
         }
-        if ( tester.interpreter.messageList.length === 0 ) {
-            success = false;
-            info.push("got no result when executing\""+command+"\"");
-            info.push(tester.interpreter.messageList.join("\n"));
-            continue;
-        }
-        if( tester.interpreter.messageList.length !== 1 ){
-            success = false;
-            info.push("got more than one result when executing \""+command+"\":");
-            info.push(tester.interpreter.messageList.join("\n"));
-            continue;
-        }
-        if( tester.interpreter.messageList[0] !== commands[command] ){
-            success = false;
-            info.push("got result \""+tester.interpreter.messageList[0]+"\""+
-                      " instead of \""+commands[command]+"\" when executing "+
-                      "\""+command+"\"");
-            continue;
-        }
+    }
+    if( has_commands ){
+        tester.cmdgroupsExecuted++;
     }
 
     tester.addResult(new JSHC.Test.TestResult(

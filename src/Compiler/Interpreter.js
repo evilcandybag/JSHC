@@ -24,23 +24,27 @@ JSHC.Interpreter = function(modulePrefix){
 
     this.prefix = modulePrefix;
 
-    this.errors = 0;
-    this.warnings = 0;
-    this.messages = 0;
-    this.errorList = [];
-    this.warningList = [];
-    this.messageList = [];
+    this.resetStatus();
 
     this.errorHandlers = [];
     this.warningHandlers = [];
     this.messageHandlers = [];
 };
 
-////////////////////////////////////////////////////////////////////////////////
-
 JSHC.Interpreter.commands =
   [":help", ":kind", ":load", ":show", ":type", ":js",
    ":show path", ":show code", ":show modules"];
+
+////////////////////////////////////////////////////////////////////////////////
+
+JSHC.Interpreter.prototype.resetStatus = function(){
+    this.errors = 0;
+    this.warnings = 0;
+    this.messages = 0;
+    this.errorList = [];
+    this.warningList = [];
+    this.messageList = [];
+};
 
 JSHC.Interpreter.prototype.execCommand = function(line){
     var command;
@@ -54,12 +58,7 @@ JSHC.Interpreter.prototype.execCommand = function(line){
     }
 
     // clear old messages
-    this.errors = 0;
-    this.warnings = 0;
-    this.messages = 0;
-    this.errorList = [];
-    this.warningList = [];
-    this.messageList = [];
+    this.resetStatus();
 
     switch( command ){
     case ":":

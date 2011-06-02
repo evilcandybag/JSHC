@@ -292,10 +292,10 @@ take n es = if n <= 0
 -- tuples
 
 --fst :: (a,b) -> a
---fst (x,y) = x
+fst (x,y) = x
 
 --snd :: (a,b) -> b
---snd (x,y) = y
+snd (x,y) = y
 
 --curry :: ((a, b) -> c) -> a -> b -> c
 --curry f x y = f (x, y)
