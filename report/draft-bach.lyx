@@ -1,9 +1,14 @@
-#LyX 1.6.9 created this file. For more info see http://www.lyx.org/
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
 \textclass extreport
 \begin_preamble
+\usepackage{fontspec}
+\usepackage{xunicode}
+\usepackage{xltxtra}
+\setmainfont{DejaVu Serif}
+
 \pagenumbering{roman}
 \let\myTOC\tableofcontents
 \renewcommand\tableofcontents{%
@@ -1173,12 +1178,20 @@ status collapsed
 
 , and the data constructors 
 \family typewriter
-[] :: ∀a.
+[] :: 
+\family default
+∀
+\family typewriter
+a.
  [a]
 \family default
  (the empty list) and 
 \family typewriter
-(:) :: ∀a.
+(:) :: 
+\family default
+∀
+\family typewriter
+a.
  a -> [a] -> [a]
 \family default
  (creating a new list given a first element and the rest of the elements).
@@ -1783,9 +1796,9 @@ status collapsed
 
 \end_inset
 
- is actually 
+ is actually ∀
 \family typewriter
-∀a.
+a.
  [a] -> [a]
 \family default
 , where ∀ binds the type variable 
@@ -1965,7 +1978,11 @@ Instantiation of types
 \begin_layout Standard
 When using a data constructor such as 
 \family typewriter
-[] :: ∀a.[a]
+[] :: 
+\family default
+∀
+\family typewriter
+a.[a]
 \family default
 , one would want to use it with lists with different element types in different
  locations.
