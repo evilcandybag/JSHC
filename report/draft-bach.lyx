@@ -10162,10 +10162,11 @@ key "hiji"
 \end_layout
 
 \begin_layout Standard
-They have an interpreter that loads the Prelude and allows evaluation of
- expressions.
- No checking is done as the type checker is not fully integrated with the
- rest of the code, but they have an implementation of type classes.
+They have an interpreter that loads an unknown subset of the Prelude and
+ allows evaluation of expressions.
+ There are no error messages and no type checking is done as the type checker
+ is not fully integrated with the rest of the code, but they have an implementat
+ion of type classes according to their report.
 \end_layout
 
 \begin_layout Standard
