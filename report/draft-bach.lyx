@@ -1441,8 +1441,8 @@ key "dragon-book"
 \end_layout
 
 \begin_layout Standard
-A compiler is a program that, given program code, produceTop level namespace?s
- new code in another language, the 
+A compiler is a program that, given program code, produces new code in another
+ language, the 
 \begin_inset Flex CharStyle:Strong
 status collapsed
 
@@ -2670,6 +2670,18 @@ key "git"
 \end_inset
 
  version control system was used.
+\end_layout
+
+\begin_layout Standard
+To allow for compatibility with as many web browsers and JavaScript engines
+ as possible, all code in JSHC is compliant with the ECMAScript standard
+\begin_inset CommandInset citation
+LatexCommand cite
+key "ecma-262"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -10365,7 +10377,7 @@ The idea was that the interpreter should support adding paths to Haskell
 \begin_inset CommandInset bibtex
 LatexCommand bibtex
 bibfiles "jshc"
-options "plain"
+options "bibtotoc,plain"
 
 \end_inset
 
