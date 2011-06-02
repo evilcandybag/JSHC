@@ -64,26 +64,6 @@ logicalmkup
 
 \begin_body
 
-\begin_layout Title
-JSHC - a JavaScript Haskell Compiler
-\end_layout
-
-\begin_layout Author
-Peter Holm, Staffan Björnesjö
-\end_layout
-
-\begin_layout Publishers
-May 2011
-\end_layout
-
-\begin_layout Publishers
-Department of Computer Science and Engineering
-\end_layout
-
-\begin_layout Publishers
-UNIVERSITY OF GOTHENBURG
-\end_layout
-
 \begin_layout Abstract
 Development of large web based applications using scripting languages such
  as PHP or JavaScript, can be difficult given the lack of static type checking
@@ -142,13 +122,23 @@ Modern web applications are becoming more and more complex, with users expecting
  web development, such as JavaScript or PHP 
 \begin_inset CommandInset citation
 LatexCommand cite
-key "curry-js,type-system-dyn-web"
+key "curry-js,type-system-dyn-web,Mikkonen07usingjavascript"
+
+\end_inset
+
+.
+ Another problem with the growing size of web applications is the lack of
+ abstraction in the form of a module system 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Mikkonen07usingjavascript"
 
 \end_inset
 
 .
  One solution to this problem is providing an extra layer of abstraction
- on top of these scripts, that in turn can be subject to static type checking.
+ on top of these scripts, that in turn supports a module system, and can
+ be subject to static type checking.
  For example another, already existing, programming language that has these
  features can be used 
 \begin_inset CommandInset citation
