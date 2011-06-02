@@ -4171,11 +4171,18 @@ C-x i
 
 \end_inset
 
- to show the interpreter terminal in a new frame.
+ available to show the interpreter terminal in a new frame by splitting
+ the current frame (unless already visible, in which case the focus is just
+ changed).
 \end_layout
 
 \begin_layout Standard
-The interpreter supports a subset of the GHCi commands (table 
+There will also be an attempt to load the haskell file, and if found, the
+ file contents will be written into the buffer.
+\end_layout
+
+\begin_layout Standard
+The interpreter terminal supports a subset of the GHCi commands (table 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "Interpreter-commands"
@@ -4184,6 +4191,11 @@ reference "Interpreter-commands"
 
 ), allows evaluation of Haskell expressions, and also includes a command
  for evaluation of JavaScript expressions.
+\end_layout
+
+\begin_layout Standard
+It only allows insertion/deletion of a character/selection on the user input
+ on the last line.
 \end_layout
 
 \begin_layout Standard
@@ -4610,13 +4622,22 @@ name "sub:User-Interface"
 User Interface
 \end_layout
 
+\begin_layout Standard
+Commands in Ymacs are added using modes.
+ A mode contains a keymap to be checked before the default keymap, and a
+ Ymacs tokenizer that handles coloring.
+\end_layout
+
 \begin_layout Subsubsection
 The Haskell mode
 \end_layout
 
 \begin_layout Standard
 A Haskell mode for buffers containing Haskell code.
- It currently only contains the command 
+\end_layout
+
+\begin_layout Standard
+The command 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
@@ -4626,11 +4647,9 @@ C-x i
 
 \end_inset
 
-to show the interpreter.
- If the interpreter is visible in a frame, the focus will be changed to
- that buffer, otherwise the current frame is split show it.
+ calls a global function that searches for the interpreter buffer.
  There can only be a single interpreter buffer, so a new interpreter buffer
- is only created if it does not exist.
+ is only created if it does not already exist.
 \end_layout
 
 \begin_layout Subsubsection
@@ -4638,11 +4657,8 @@ The Interpreter terminal
 \end_layout
 
 \begin_layout Standard
-A terminal is needed to interact with the interpreter properly.
-\end_layout
-
-\begin_layout Standard
-To modify an ordinary buffer into a terminal, the 
+The terminal is an ordinary buffer modified in several ways, together with
+ a mode that traps 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
@@ -4652,9 +4668,7 @@ ENTER
 
 \end_inset
 
- key is a Ymacs command that will read the last line of the buffer send
- the command on the line to the interpreter.
- The 
+ and 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
@@ -4664,38 +4678,22 @@ TAB
 
 \end_inset
 
- key is a Ymacs command that sends the command on the last line to the interpret
-er, and the buffer is modified depending on if there is none, one, or many
- matches.
+.
 \end_layout
 
 \begin_layout Standard
-The highlighting for the buffer is coloring lines beginning with 
-\begin_inset Quotes eld
-\end_inset
-
-Error: 
-\begin_inset Quotes erd
-\end_inset
-
- and 
-\begin_inset Quotes eld
-\end_inset
-
-> 
-\begin_inset Quotes eld
-\end_inset
-
- to make output easier to read.
+Functions to insert and delete text are wrapped into new functions that
+ will be called instead, to prevent inserting text anywhere in the buffer.
 \end_layout
 
 \begin_layout Standard
-When an interpreter buffer is created, the buffer object itself is modified
- to only allow deletions of characters and selections on the user input
- on the last line, and insertion of text is modified so that text is always
- added at the end of the buffer.
- These changes are achieved by replacing existing functions on the buffer
- with new functions that calls the old ones when appropriate.
+The buffer contains a reference to the interpreter object, and can therefore
+ call the interpreter methods to execute commands.
+ The buffer also adds a callback to the interpreter so that error messages
+ from the commands are not return values from the interpreter, but instead
+ calls to functions that add output to the buffer.
+ This allows output to be written to the buffer while the interpreter is
+ working, and not all at once at the end.
 \end_layout
 
 \begin_layout Subsubsection
@@ -4703,20 +4701,11 @@ Setting modes automatically
 \end_layout
 
 \begin_layout Standard
-Since no mode is automatically set for new buffers, the creation of a new
- buffer has been modified so that it sets a mode for the buffer based upon
- what the extension of the name of the buffer is.
- This makes it possible to create a new buffer with a 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-.hs
-\end_layout
-
-\end_inset
-
- extension, and the Haskell mode will be set.
+Since no mode is automatically set for new buffers, the method that handles
+ creation of new Ymacs buffers has been wrapped in a new method that sets
+ a mode for the buffer based upon what the extension of the name of the
+ buffer is.
+ The implementation is similar for opening an existing module.
 \end_layout
 
 \begin_layout Subsubsection
@@ -4724,8 +4713,17 @@ Interpreter
 \end_layout
 
 \begin_layout Standard
-The interpreter contains an instance of the compiler, which it uses to load
- code, look up names, and compile expressions.
+The interpreter contains the implementation of all commands.
+\end_layout
+
+\begin_layout Standard
+It contains an instance of the compiler which it uses to load code, look
+ up names, and compile expressions.
+\end_layout
+
+\begin_layout Standard
+Compiler output is sent to the interpreter via callbacks, so the compiler
+ does not know about the interpreter.
 \end_layout
 
 \begin_layout Subsection
