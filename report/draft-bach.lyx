@@ -1586,7 +1586,7 @@ status open
 \begin_inset Graphics
 	filename adsgadgs.png
 	lyxscale 50
-	width 14cm
+	width 12cm
 
 \end_inset
 
@@ -4082,11 +4082,13 @@ t for JSHC, several modifications has been done to the default environment.
 placement H
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
 	filename JSHCscreen_smaller.png
+	lyxscale 20
+	width 12.2cm
 
 \end_inset
 
@@ -4214,17 +4216,17 @@ TAB
 
 \begin_layout Standard
 \begin_inset Float table
-placement h
+placement H
 wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="10" columns="2">
 <features>
 <column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="4.5in">
+<column alignment="center" valignment="top" width="3.6in">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -4577,7 +4579,7 @@ status open
 \begin_inset Graphics
 	filename gen-prog-structure.png
 	lyxscale 50
-	width 14.5cm
+	width 12.2cm
 
 \end_inset
 
