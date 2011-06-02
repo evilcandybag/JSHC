@@ -2,7 +2,7 @@
 \lyxformat 345
 \begin_document
 \begin_header
-\textclass scrreprt
+\textclass extreport
 \begin_preamble
 \pagenumbering{roman}
 \let\myTOC\tableofcontents
@@ -12,6 +12,7 @@
 \pagenumbering{arabic}
 }
 \end_preamble
+\options Abstract
 \use_default_options true
 \begin_modules
 logicalmkup
@@ -117,7 +118,30 @@ JSHC
 
  and another JavaScript based Haskell implementation is presented, as well
  as some unexpected issues with the Haskell specification.
- <TODO: solution to the double abstract - problem>
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+%
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+renewcommand
+\backslash
+abstractname{Sammanfattning} 
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Abstract
@@ -172,6 +196,20 @@ JSHC
  och en annan JavaScript-baserad Haskellimplementation presenteras, tillsammans
  med en redogörelse för vissa oväntade komplikationer rörande Haskellspecifikati
 onen.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+%
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1403,8 +1441,8 @@ key "dragon-book"
 \end_layout
 
 \begin_layout Standard
-A compiler is a program that, given program code, produceTop level namespace?s
- new code in another language, the 
+A compiler is a program that, given program code, produces new code in another
+ language, the 
 \begin_inset Flex CharStyle:Strong
 status collapsed
 
@@ -2632,6 +2670,18 @@ key "git"
 \end_inset
 
  version control system was used.
+\end_layout
+
+\begin_layout Standard
+To allow for compatibility with as many web browsers and JavaScript engines
+ as possible, all code in JSHC is compliant with the ECMAScript standard
+\begin_inset CommandInset citation
+LatexCommand cite
+key "ecma-262"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -10418,7 +10468,7 @@ The idea was that the interpreter should support adding paths to Haskell
 \begin_inset CommandInset bibtex
 LatexCommand bibtex
 bibfiles "jshc"
-options "plain"
+options "bibtotoc,plain"
 
 \end_inset
 
