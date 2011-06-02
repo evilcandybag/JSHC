@@ -66,36 +66,112 @@ logicalmkup
 
 \begin_layout Abstract
 Development of large web based applications using scripting languages such
- as PHP or JavaScript, can be difficult given the lack of static type checking
- in such languages.
- We argue that static type checking can help programmers avoid common errors
- when developing large web applications.
+ as PHP or JavaScript can be difficult given the lack of static type checking
+ and abstraction through module systems in many such languages.
+ We argue that static type checking and module systems can help programmers
+ avoid common errors when developing large web applications.
  The literature indicates that adding an extra layer of abstraction on top
- of the scripting languages that can be subject to static type checking
- can be a solution to this problem.
+ of the scripting languages that provides these features can be a solution
+ to this problem.
  
 \end_layout
 
 \begin_layout Abstract
 We suggest a solution where the statically typed functional language Haskell
  is compiled to JavaScript code, enabling programmers to create web applications
- in a type safe environment.
+ in a modular and type safe environment.
  
 \end_layout
 
 \begin_layout Abstract
-An implementation of a subset Haskell to JavaScript compiler written in
- JavaScript, JSHC, is presented as a proof of concept.
+An implementation of a compiler, supporting compilation of a subset Haskell
+ to JavaScript, 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+JSHC
+\end_layout
+
+\end_inset
+
+, is presented as a proof of concept.
  The compiler has a graphical interface in the form of an Emacs-like text
  editor extended to contain an interpreter terminal, to allow execution
  of arbitrary expressions.
+ To allow for client-side compilation, the compiler is written entirely
+ in JavaScript.
  
 \end_layout
 
 \begin_layout Abstract
-A comparison between JSHC and another JavaScript based Haskell implementation
- is presented, as well as some unexpected issues with the Haskell specification.
+A comparison between 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+JSHC
+\end_layout
+
+\end_inset
+
+ and another JavaScript based Haskell implementation is presented, as well
+ as some unexpected issues with the Haskell specification.
+ <TODO: solution to the double abstract - problem>
+\end_layout
+
+\begin_layout Abstract
+Utveckling av stora webbaserade applikationer med hjälp av skriptspråk såsom
+ PHP och JavaScript kan vara svårt i och med avsaknaden av statisk typkontroll
+ och abstraktion genom modulsystem i många sådana språk.
+ Vi argumenterar för att statisk typkontroll och modulsystem kan hjälpa
+ programmerare att undvika vanliga fel vid utveckling av stora webapplikationer.
+ Literaturen pekar på att ett extra lager med abstraktion ovanpå skriptspråken,
+ som erbjuder dessa möjligheter kan vara en lösning på problemet.
+\end_layout
+
+\begin_layout Abstract
+Vi föreslår en lösning där det statiskt typade funktionella språket Haskell
+ kompileras till JavaScript-kod.
+ Detta gör det möjligt att skapa webapplikationer i en modulär och typsäker
+ miljö.
+\end_layout
+
+\begin_layout Abstract
+En implementation av en kompilator med stöd för kompilering av en delmängd
+ av Haskell till Javaskript, 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+JSHC
+\end_layout
+
+\end_inset
+
+, presenteras som prototyplösning på problemet.
+ Kompilatorn har ett grafiskt gränssnitt i form av en Emacs-lik texteditor
+ som utökats med en kommandotolk, för att möjliggöra exekvering av godtyckliga
+ uttryck.
+ För att kompileringen ska kunna köras på klientsidan är kompilatorn skriven
+ helt i JavaScript.
  
+\end_layout
+
+\begin_layout Abstract
+En jämförelse mellan 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+JSHC
+\end_layout
+
+\end_inset
+
+ och en annan JavaScript-baserad Haskellimplementation presenteras, tillsammans
+ med en redogörelse för vissa oväntade komplikationer rörande Haskellspecifikati
+onen.
 \end_layout
 
 \begin_layout Standard
@@ -274,7 +350,7 @@ Purpose
 
 \begin_layout Standard
 The purpose of this project is to implement a Haskell compiler that generates
- JavaScript code.
+ JavaScript code, JSHC (JavaScript Haskell Compiler).
  The compiler is to be written entirely in JavaScript, to ensure compatibility
  with most major modern browsers, and relieve users of the burden of having
  to download and install a compiler to their system.
@@ -9890,7 +9966,7 @@ Comparison with other implementations
 
 \begin_layout Standard
 We have chosen to only compare with other Haskell interpreters/compilers
- written in Javascript, and we only know of one.
+ written in JavaScript, and we only know of one.
 \end_layout
 
 \begin_layout Subsection
@@ -10163,7 +10239,7 @@ key "Mikkonen07usingjavascript"
 \end_inset
 
  were surprisingly difficult to overcome as the project grew.
- 
+ <TODO: more here>
 \end_layout
 
 \begin_layout Subsection
