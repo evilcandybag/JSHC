@@ -7078,6 +7078,298 @@ JSHC's back-end takes an intermediate representation in the form of an AST
 \end_layout
 
 \begin_layout Subsubsection
+Internal libraries
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Internal-libraries"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To implement some basic functionality of the generated code which cannot
+ be efficiently defined in Haskell (or is needed for our implementation
+ to operate at all), an internal JavaScript library was developed.
+ This library contains functions for handling integer arithmetics, arithmetic
+ comparisons, laziness and pattern matching.
+ 
+\end_layout
+
+\begin_layout Standard
+Since JavaScript does not have integers built in, the arithmetics for the
+ Haskell integer types requires internal libraries that manage integer behaviour
+, such as overflow.
+\end_layout
+
+\begin_layout Standard
+Laziness is implemented by creating a JavaScript object called 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Thunk
+\end_layout
+
+\end_inset
+
+.
+ When a lazy expression is created, the strict JavaScript expression is
+ wrapped in a JavaScript function (without parameters), which is subsequently
+ wrapped in a 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Thunk
+\end_layout
+
+\end_inset
+
+ object.
+ When the result is needed, a method of the 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Thunk
+\end_layout
+
+\end_inset
+
+ object is called, which calls the function and assigns the value to a variable.
+ Whenever the result is needed again, the value of the variable is returned.
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+<TODO: proofread> Pattern matching is handled by an internal function, 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+match
+\end_layout
+
+\end_inset
+
+, that is sent an expression, 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\end_layout
+
+\end_inset
+
+, and an array of pairs 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+pattern
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+,
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+rhs
+\end_layout
+
+\end_inset
+
+
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+}
+\end_layout
+
+\end_inset
+
+, where 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+pattern
+\end_layout
+
+\end_inset
+
+ is the pattern to match the result of 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\end_layout
+
+\end_inset
+
+ to, and 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+rhs
+\end_layout
+
+\end_inset
+
+ is a function that takes any bindings made in 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+pattern
+\end_layout
+
+\end_inset
+
+ as arguments, and returns the right hand side expression of that particular
+ pattern match alternative.
+ The pairs are then matched sequentially, one at a time until a match is
+ found or there are no more alternatives to match.
+ When a match is found, 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+match
+\end_layout
+
+\end_inset
+
+ evaluates 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+rhs
+\end_layout
+
+\end_inset
+
+ with its bindings as arguments.
+\end_layout
+
+\begin_layout Standard
+Matching of a pattern against an expression is done lazily and recursively.
+ 
+\end_layout
+
+\begin_layout Standard
+Constructor patterns first evaluate 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\end_layout
+
+\end_inset
+
+, then match the name and arity of the constructor in 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\end_layout
+
+\end_inset
+
+, then recursively match all the constructor's arguments from left to right.
+ Tuple patterns work in the same way as constructor patterns, but without
+ the comparison of constructor names, as there are none.
+\end_layout
+
+\begin_layout Standard
+Integer patterns first evaluate 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\end_layout
+
+\end_inset
+
+ and then return a positive match if the value of 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\end_layout
+
+\end_inset
+
+ is equal to the pattern.
+\end_layout
+
+\begin_layout Standard
+Wildcard and variable patterns both match 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\end_layout
+
+\end_inset
+
+ without evaluating it, with the difference that variable patterns also
+ add it to the set of bindings.
+ 
+\end_layout
+
+\begin_layout Standard
+When there are no patterns left to match 
+\end_layout
+
+\begin_layout Subsubsection
 Code generation
 \end_layout
 
@@ -9113,295 +9405,89 @@ If a variable identifier is not qualified, it is declared localy, and is
  
 \end_layout
 
-\begin_layout Subsubsection
-Internal libraries
-\begin_inset CommandInset label
-LatexCommand label
-name "sub:Internal-libraries"
+\begin_layout Paragraph
+Laziness
+\end_layout
+
+\begin_layout Standard
+To achieve lazy evaluation, the evaluation of some compiled expressions
+ must be delayed.
+\end_layout
+
+\begin_layout Standard
+Affected expressions are case expressions, function application, and compiled
+ internal functions with 0 parameters, while unaffected expressions are
+ integer constants, functions (lambda expressions and compiled internal
+ functions with >0 parameters), and tuples.
+\end_layout
+
+\begin_layout Standard
+The laziness is achieved by wrapping a compiled expression 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+e
+\end_layout
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-To implement some basic functionality of the generated code which cannot
- be efficiently defined in Haskell (or is needed for our implementation
- to operate at all), an internal JavaScript library was developed.
- This library contains functions for handling integer arithmetics, arithmetic
- comparisons, laziness and pattern matching.
- 
-\end_layout
-
-\begin_layout Standard
-Since JavaScript does not have integers built in, the arithmetics for the
- Haskell integer types requires internal libraries that manage integer behaviour
-, such as overflow.
-\end_layout
-
-\begin_layout Standard
-Laziness is implemented by creating a JavaScript object called 
+ in a 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
 \begin_layout Plain Layout
 Thunk
 \end_layout
+
+\end_inset
+
+ and a function as described in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Internal-libraries"
 
 \end_inset
 
 .
- When a lazy expression is created, the strict JavaScript expression is
- wrapped in a JavaScript closure, which is subsequently wrapped in a 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-Thunk
-\end_layout
-
-\end_inset
-
- object.
- When the lazy value is needed, a method of the 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-Thunk
-\end_layout
-
-\end_inset
-
- object is called, which evaluates the closure and assigns the value to
- a variable.
  
-\begin_inset ERT
-status open
+\begin_inset Flex CharStyle:Emph
+status collapsed
 
 \begin_layout Plain Layout
-
-
-\backslash
-newline
+e
 \end_layout
 
 \end_inset
 
-
+ will now only be evaluated when the thunk is evaluated.
 \end_layout
 
 \begin_layout Standard
-<TODO: proofread> Pattern matching is handled by an internal function, 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-match
-\end_layout
-
-\end_inset
-
-, that is sent an expression, 
-\begin_inset Flex CharStyle:Emph
-status collapsed
-
-\begin_layout Plain Layout
-e
-\end_layout
-
-\end_inset
-
-, and an array of pairs 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-{
-\end_layout
-
-\end_inset
-
-
-\begin_inset Flex CharStyle:Emph
-status collapsed
-
-\begin_layout Plain Layout
-pattern
-\end_layout
-
-\end_inset
-
-
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-,
-\end_layout
-
-\end_inset
-
-
-\begin_inset Flex CharStyle:Emph
-status collapsed
-
-\begin_layout Plain Layout
-rhs
-\end_layout
-
-\end_inset
-
-
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-}
-\end_layout
-
-\end_inset
-
-, where 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-pattern
-\end_layout
-
-\end_inset
-
- is the pattern to match the result of 
-\begin_inset Flex CharStyle:Emph
-status collapsed
-
-\begin_layout Plain Layout
-e
-\end_layout
-
-\end_inset
-
- to, and 
-\begin_inset Flex CharStyle:Emph
-status collapsed
-
-\begin_layout Plain Layout
-rhs
-\end_layout
-
-\end_inset
-
- is a function that takes any bindings made in 
-\begin_inset Flex CharStyle:Emph
-status collapsed
-
-\begin_layout Plain Layout
-pattern
-\end_layout
-
-\end_inset
-
- as arguments, and returns the right hand side expression of that particular
- pattern match alternative.
- The pairs are then matched sequentially, one at a time until a match is
- found or there are no more alternatives to match.
- When a match is found, 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-match
-\end_layout
-
-\end_inset
-
- evaluates 
-\begin_inset Flex CharStyle:Emph
-status collapsed
-
-\begin_layout Plain Layout
-rhs
-\end_layout
-
-\end_inset
-
- with its bindings as arguments.
+To prevent evaluation of function arguments, all function arguments are
+ thunks.
+ Since the result of a function may be the argument to another function,
+ but not used within it, results of functions are also thunks.
 \end_layout
 
 \begin_layout Standard
-Matching of a pattern against an expression is done lazily and recursively.
- 
+Whenever an expression is compiled, the result is a pair containing the
+ string of the compiled haskell expression and a boolean with the strictness
+ of the expression.
 \end_layout
 
 \begin_layout Standard
-Constructor patterns first evaluate 
-\begin_inset Flex CharStyle:Emph
-status collapsed
-
-\begin_layout Plain Layout
-e
-\end_layout
-
-\end_inset
-
-, then match the name and arity of the constructor in 
-\begin_inset Flex CharStyle:Emph
-status collapsed
-
-\begin_layout Plain Layout
-e
-\end_layout
-
-\end_inset
-
-, then recursively match all the constructor's arguments from left to right.
- Tuple patterns work in the same way as constructor patterns, but without
- the comparison of constructor names, as there are none.
+Whenever a sub-expression is lazy and need to be strict, the sub-expression
+ thunk is evaluated.
+ If a sub-expression was strict and need to be lazy, the sub-expression
+ is wrapped in a thunk without function call, as the function is not necessary.
 \end_layout
 
 \begin_layout Standard
-Integer patterns first evaluate 
-\begin_inset Flex CharStyle:Emph
-status collapsed
-
-\begin_layout Plain Layout
-e
-\end_layout
-
-\end_inset
-
- and then return a positive match if the value of 
-\begin_inset Flex CharStyle:Emph
-status collapsed
-
-\begin_layout Plain Layout
-e
-\end_layout
-
-\end_inset
-
- is equal to the pattern.
-\end_layout
-
-\begin_layout Standard
-Wildcard and variable patterns both match 
-\begin_inset Flex CharStyle:Emph
-status collapsed
-
-\begin_layout Plain Layout
-e
-\end_layout
-
-\end_inset
-
- without evaluating it, with the difference that variable patterns also
- add it to the set of bindings.
- 
-\end_layout
-
-\begin_layout Standard
-When there are no patterns left to match 
+Since a name in a top-level binding might be accessed before it's expression
+ is compiled (e.g recursive definitions), all expressions in top-level bindings
+ are wrapped in a thunk and a function to prevent reading it until after
+ the code generation is complete.
 \end_layout
 
 \begin_layout Subsection
