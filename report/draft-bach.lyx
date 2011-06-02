@@ -7429,19 +7429,6 @@ reference "sec:B.2Intermediate-representation"
 In this description of the generated code, our methods of handling lazy
  evaluation are omitted to improve readability.
  These methods are instead described in <TODO: cross-reference>.
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-newline
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Paragraph
@@ -7630,8 +7617,7 @@ newline
 \end_layout
 
 \begin_layout Standard
-The only top-level declarations that generate any code are function declarations.
- Function declarations with the form: 
+Function declarations have the form 
 \begin_inset Flex CharStyle:Emph
 status collapsed
 
@@ -7681,13 +7667,13 @@ exp
 
 \end_inset
 
- is an arbitrary expression, are compiled to JavaScript assignment statements
- of the form 
+ is an arbitrary expression, and are compiled to JavaScript assignment statement
+s of the form 
 \begin_inset Flex CharStyle:Emph
 status collapsed
 
 \begin_layout Plain Layout
-f
+f'
 \end_layout
 
 \end_inset
@@ -7707,25 +7693,115 @@ status collapsed
 status collapsed
 
 \begin_layout Plain Layout
+exp'
+\end_layout
+
+\end_inset
+
+ where 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+f'
+\end_layout
+
+\end_inset
+
+ is the compilation of the identifier 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+f
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+exp'
+\end_layout
+
+\end_inset
+
+ the compilation of the expression 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
 exp
 \end_layout
 
 \end_inset
 
 .
-\begin_inset ERT
-status open
+\end_layout
+
+\begin_layout Standard
+Data declarations contain constructors of the form 
+\begin_inset Flex CharStyle:Code
+status collapsed
 
 \begin_layout Plain Layout
-
-
-\backslash
-newline
+C
 \end_layout
 
 \end_inset
 
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
 
+\begin_layout Plain Layout
+t
+\begin_inset Formula $_{\text{1}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+...
+ 
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+t
+\begin_inset Formula $_{\text{n}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ which are all compiled into curried functions in the same way as lambda
+ expressions in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "par:code-gen-Expressions"
+
+\end_inset
+
+.
+ The type variables, data constructor type arguments, and the type constructor
+ are not used.
 \end_layout
 
 \begin_layout Paragraph
@@ -9019,19 +9095,6 @@ e
 \end_inset
 
 .
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-newline
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Paragraph
