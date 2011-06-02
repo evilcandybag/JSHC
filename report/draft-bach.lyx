@@ -1,4 +1,4 @@
-#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+#LyX 1.6.9 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
@@ -2657,6 +2657,19 @@ The main part of this project was the development of the compiler itself.
  Five such components were identified; lexical analyser, parser, semantic
  analyser, code generator and graphical interface.
  Responsibility for these parts was then split between group members.
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
