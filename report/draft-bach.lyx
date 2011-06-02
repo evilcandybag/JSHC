@@ -17,7 +17,7 @@
 \pagenumbering{arabic}
 }
 \end_preamble
-\options Abstract
+\options Abstract a4paper
 \use_default_options true
 \begin_modules
 logicalmkup
@@ -33,7 +33,7 @@ logicalmkup
 \font_sf_scale 100
 \font_tt_scale 100
 
-\graphics default
+\graphics xetex
 \float_placement H
 \paperfontsize default
 \spacing single
