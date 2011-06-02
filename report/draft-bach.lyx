@@ -10217,7 +10217,7 @@ FFI: Foreign Function Interface
 \end_layout
 
 \begin_layout Standard
-Adding an FFI to JavaScript code would simplify the writing of the prelude,
+Adding an FFI to JavaScript code would simplify the writing of the Prelude,
  as primitive operations such as addition could be described using foreign
  imports instead of a name with a special prefix for which the type would
  be stored in the type checker when looking up the name instead of the type
@@ -10262,7 +10262,8 @@ Pretty printer
 \begin_layout Standard
 To give good error messages related to expressions within functions, a pretty
  printer is required.
- Currently, only the abstract syntax tree is available.
+ Currently, data constructors are shown using unnecessary parentheses, and
+ only the abstract syntax tree is available for expressions and patterns.
 \end_layout
 
 \begin_layout Subsubsection
