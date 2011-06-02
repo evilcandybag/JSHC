@@ -4635,7 +4635,7 @@ The Haskell mode
 \end_layout
 
 \begin_layout Standard
-A Haskell mode for buffers containing Haskell code.
+A Haskell mode has been created for buffers containing Haskell code.
 \end_layout
 
 \begin_layout Standard
@@ -4651,7 +4651,7 @@ C-x i
 
  calls a global function that searches for the interpreter buffer.
  There can only be a single interpreter buffer, so a new interpreter buffer
- is only created if it does not already exist.
+ is only created if one does not already exist.
 \end_layout
 
 \begin_layout Subsubsection
@@ -4660,7 +4660,7 @@ The Interpreter terminal
 
 \begin_layout Standard
 The terminal is an ordinary buffer modified in several ways, together with
- a mode that traps 
+ a mode that traps input from the 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
@@ -4680,7 +4680,7 @@ TAB
 
 \end_inset
 
-.
+ keys and assigns custom behaviour to them.
 \end_layout
 
 \begin_layout Standard
@@ -7168,7 +7168,7 @@ newline
 \end_layout
 
 \begin_layout Standard
-<TODO: proofread> Pattern matching is handled by an internal function, 
+Pattern matching is handled by an internal function, 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
@@ -7377,7 +7377,19 @@ e
 \end_layout
 
 \begin_layout Standard
-When there are no patterns left to match 
+When there are no sub-patterns left to match, if the match has succeeded
+ and 
+\begin_inset Flex CharStyle:Emph
+status collapsed
+
+\begin_layout Plain Layout
+rhs
+\end_layout
+
+\end_inset
+
+ can be executed, if the match fails the matching continues on the next
+ alternative.
 \end_layout
 
 \begin_layout Subsubsection
