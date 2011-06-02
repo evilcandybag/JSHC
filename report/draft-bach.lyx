@@ -7154,7 +7154,6 @@ Thunk
 
  object is called, which calls the function and assigns the value to a variable.
  Whenever the result is needed again, the value of the variable is returned.
- 
 \begin_inset ERT
 status open
 
@@ -7720,6 +7719,12 @@ newline
 \end_layout
 
 \begin_layout Paragraph
+\begin_inset CommandInset label
+LatexCommand label
+name "par:code-gen-Expressions"
+
+\end_inset
+
 Expressions
 \end_layout
 
@@ -9327,18 +9332,12 @@ Identifiers and literals
 \end_layout
 
 \begin_layout Standard
-Data constructor identifiers are compiled into JavaScript strings representing
- their unqualified Haskell identifiers.
- 
-\end_layout
-
-\begin_layout Standard
-Variable identifiers can be compiled in two ways.
- If they are qualified, they are declared at the top level and thus compiled
+Variable identifier can be compiled in two ways.
+ If they are qualified, they are declared at the top-level and thus compiled
  as members of the object representing the module, using JavaScript's associativ
 e array notation to enable members with non-alphanumeric characters as identifie
 rs.
- A variable name 
+ A variable identifier 
 \begin_inset Flex CharStyle:Emph
 status collapsed
 
@@ -9348,8 +9347,8 @@ id
 
 \end_inset
 
-, which is a reference to a function declared at the top level in any module,
- is compiled into JavaScript: 
+, which is a reference to an identifier declared at the top level in any
+ module, is compiled into JavaScript: 
 \begin_inset Flex CharStyle:Emph
 status collapsed
 
@@ -9414,9 +9413,101 @@ id
 \end_layout
 
 \begin_layout Standard
-If a variable identifier is not qualified, it is declared localy, and is
+If a variable identifier is not qualified, it is declared locally, and is
  compiled as a JavaScript string.
  
+\end_layout
+
+\begin_layout Standard
+Data constructor identifiers can only refer to top-level declarations, and
+ will always be compiled the same way as top-level variable identifiers.
+\end_layout
+
+\begin_layout Standard
+Since the foreign function interface as described in the Haskell report
+\begin_inset CommandInset citation
+LatexCommand cite
+key "haskell-report"
+
+\end_inset
+
+ is currently not implemented, any identifier located in the module 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+JSHC.Internal
+\end_layout
+
+\end_inset
+
+ is a reference to a javascript function.
+ These internal functions will be compiled into a curried function just
+ as for lambda expressions
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "par:code-gen-Expressions"
+
+\end_inset
+
+, but both parameters types and the return type will also be converted between
+ the javascript type and the corresponding haskell type as needed.
+ e.g The javascript implementation of the 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+>= :: Int32 -> Int32 -> Bool
+\end_layout
+
+\end_inset
+
+ operator is 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+JSHC.Internal.int32ge
+\end_layout
+
+\end_inset
+
+, where no parameter is converted as the representation is the same in javascrip
+t, but the result will be converted from a javascript boolean value to the
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+True
+\end_layout
+
+\end_inset
+
+ or 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+False
+\end_layout
+
+\end_inset
+
+ data constructor of 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Prelude.Bool
+\end_layout
+
+\end_inset
+
+.
+ If the internal function takes no parameters (such as the implementation
+ of undefined, which just throws a javascript exception) it is just an expressio
+n to be evaluated.
 \end_layout
 
 \begin_layout Paragraph
