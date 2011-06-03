@@ -8100,7 +8100,7 @@ reference "par:code-gen-Expressions"
 .
  The type constructor is used to create a JavaScript object, which is used
  as the JavaScript constructor called by its data constructors when they
- are applied.
+ have been applied to all arguments.
  The type variables and data constructor type arguments are not used.
 \end_layout
 
@@ -8366,9 +8366,9 @@ newline
 \end_layout
 
 \begin_layout Standard
-\paragraph_spacing onehalf
-Tuples are compiled into JavaScript array literals containing their members.
- Expressions of the form: 
+Tuple expressions are compiled into JavaScript objects containing an array
+ with all expressions.
+ Expressions of the form 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
@@ -8427,19 +8427,7 @@ status collapsed
 
 \end_inset
 
-, where 
-\begin_inset Flex CharStyle:Emph
-status collapsed
-
-\begin_layout Plain Layout
-\paragraph_spacing onehalf
-e
-\end_layout
-
-\end_inset
-
- represents arbitrary expressions, are compiled into the JavaScript array
- literal 
+ are compiled into JavaScript constructor calls with the argument 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
@@ -9187,61 +9175,6 @@ newline
 
 \end_layout
 
-\begin_layout Standard
-Negated expressions are converted into negated JavaScript expressions.
- Expressions of the form 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
--
-\end_layout
-
-\end_inset
-
-
-\begin_inset Flex CharStyle:Emph
-status collapsed
-
-\begin_layout Plain Layout
-e
-\end_layout
-
-\end_inset
-
-, where 
-\begin_inset Flex CharStyle:Emph
-status collapsed
-
-\begin_layout Plain Layout
-e
-\end_layout
-
-\end_inset
-
- is an arbitrary expression, compile into 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
--
-\end_layout
-
-\end_inset
-
-
-\begin_inset Flex CharStyle:Emph
-status collapsed
-
-\begin_layout Plain Layout
-e
-\end_layout
-
-\end_inset
-
-.
-\end_layout
-
 \begin_layout Paragraph
 Patterns and pattern matching
 \end_layout
@@ -9373,7 +9306,7 @@ p
 
 \begin_layout Standard
 Tuple patterns are compiled into JavaScript objects containing an array
- with all members.
+ with all tuple members.
  Patterns of the form 
 \begin_inset Flex CharStyle:Code
 status collapsed
@@ -9389,7 +9322,7 @@ status collapsed
 status collapsed
 
 \begin_layout Plain Layout
-e
+p
 \begin_inset Formula $_{\text{1}}$
 \end_inset
 
@@ -9414,7 +9347,7 @@ status collapsed
 status collapsed
 
 \begin_layout Plain Layout
-e
+p
 \begin_inset Formula $_{\text{n}}$
 \end_inset
 
