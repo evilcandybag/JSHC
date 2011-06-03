@@ -10480,8 +10480,8 @@ Input / output
 
 \begin_layout Standard
 Haskell's input/output needs to be implemented.
- Since most implementations of JavaScript do not allow direct access to
- standard I/O channels such as 
+ Since most implementations of JavaScript do not define standard I/O channels
+ such as 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
