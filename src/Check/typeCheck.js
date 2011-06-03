@@ -1115,6 +1115,7 @@ JSHC.Check.Ctx.prototype.lookupAny = function(comp,name,field){
             if( name.loc == "JSHC.Internal" ){
                 // TODO: should use foreign declarations instead to specify the type.
                 var iii_type = new JSHC.FunType([int32_type,int32_type,int32_type]);
+                var ii_type = new JSHC.FunType([int32_type,int32_type]);
                 var iib_type = new JSHC.FunType([int32_type,int32_type,bool_type]);
                 if( field == "type" ){
                     switch( name.id ){
@@ -1122,7 +1123,15 @@ JSHC.Check.Ctx.prototype.lookupAny = function(comp,name,field){
                     case "int32sub":
                     case "int32mul":
                     case "int32div":
+                    case "int32max":
+                    case "int32min":
                         return iii_type;
+
+                    case "int32negate":
+                    case "int32abs":
+                    case "int32signum":
+                        return ii_type;
+
                     case "int32lt":
                     case "int32gt":
                     case "int32le":
@@ -1130,9 +1139,11 @@ JSHC.Check.Ctx.prototype.lookupAny = function(comp,name,field){
                     case "int32eq":
                     case "int32ne":
                         return iib_type;
+
                     case "undefined":
                         var tyvar_a = new JSHC.TyVar("a");
                         return new JSHC.ForallType([tyvar_a],tyvar_a);
+
                     case "seq":
                         var tyvar_a = new JSHC.TyVar("a");
                         var tyvar_b = new JSHC.TyVar("b");

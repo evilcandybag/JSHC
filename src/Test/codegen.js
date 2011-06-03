@@ -105,8 +105,132 @@ JSHC.Test.Tests.codegen = function(tester){
 
                    // not evaluating function applications when compiling
                    "fones": null,
+
+                   "null []": "True",
+                   "null [undefined]": "False",
+
+                   "take 4 $ iterate (\\ x -> x + 1) 0": "[0,1,2,3]",
+
+                   "take 3 $ repeat 2": "[2,2,2]",
+                   
+                   "replicate 0 undefined": "[]",
+                   "replicate 3 5": "[5,5,5]",
+
+                   "[] ++ []": "[]",
+                   "[1] ++ []": "[1]",
+                   "[1,2] ++ []": "[1,2]",
+                   "[1,2,3] ++ []": "[1,2,3]",
+                   "[] ++ [1]": "[1]",
+                   "[1] ++ [2]": "[1,2]",
+                   "[1,2] ++ [3]": "[1,2,3]",
+                   "[1,2,3] ++ [4]": "[1,2,3,4]",
+                   "[] ++ [2,1]": "[2,1]",
+                   "[1] ++ [5,2]": "[1,5,2]",
+                   "[1,2] ++ [0,3]": "[1,2,0,3]",
+                   "[1,2,3] ++ [7,4]": "[1,2,3,7,4]",
+                   "[] ++ [0,2,1]": "[0,2,1]",
+                   "[1] ++ [9,5,2]": "[1,9,5,2]",
+                   "[1,2] ++ [4,0,3]": "[1,2,4,0,3]",
+                   "[1,2,3] ++ [0,7,4]": "[1,2,3,0,7,4]",
+
+                   "take 4 $ [1,2] ++ [3,4,undefined]": "[1,2,3,4]",
+                   "take 3 $ [1,2] ++ [3,undefined]": "[1,2,3]",
+                   "take 2 $ [1,2] ++ [undefined]": "[1,2]",
+                   "take 2 $ [1,2] ++ undefined": "[1,2]",
+                   "take 1 $ [1,undefined] ++ undefined": "[1]",
+                   "take 0 $ undefined ++ undefined": "[]",
+                   "take 0 $ undefined": "[]",
+
+                   "take 7 $ cycle [0,1,2]": "[0,1,2,0,1,2,0]",
+                   "take 0 $ cycle [undefined]": "[]",
+                   "take 1 $ cycle [2,undefined]": "[2]",
+                   "cycle []": null,
+
+                   "drop 3 [1,2,3,4,5]": "[4,5]",
+                   "drop 0 [1,2,3]": "[1,2,3]",
+                   "drop 1 [1,2]": "[2]",
+                   "drop 1 [3]": "[]",
+                   "drop 1 []": "[]",
+                   "drop 1 [undefined]": "[]",
+                   "drop 1 [undefined,2]": "[2]",
+                   "tail $ drop 0 [undefined,2]": "[2]",
+                   "drop 0 []": "[]",
+                   "drop 0 [4]": "[4]",
+
+                   "splitAt 0 [1,2,3,4,5]": "([],[1,2,3,4,5])",
+                   "splitAt 1 [1,2,3,4,5]": "([1],[2,3,4,5])",
+                   "splitAt 3 [1,2,3,4,5]": "([1,2,3],[4,5])",
+                   "splitAt 5 [1,2,3,4,5]": "([1,2,3,4,5],[])",
+                   "splitAt 6 [1,2,3,4,5]": "([1,2,3,4,5],[])",
+                   "splitAt 6 []": "([],[])",
+                   "splitAt (negate 1) []": "([],[])",
+
+                   "negate (0-3)": "3",
+                   "negate 0": "0",
+                   "negate 4": "-4",
+
+                   "signum 0": "0",
+                   "signum 2": "1",
+                   "signum (0-3)": "-1",
+
+                   "abs (0-3)": "3",
+                   "abs 0": "0",
+                   "abs 4": "4",
+
+                   "foldr1 (+) [3,4]": "7",
+                   "foldr1 (+) [0]": "0",
+                   "foldr1 (+) []": null,
+                   "foldr1 (\\ x y -> y) [3,4,5]": "5",
+                   "foldr1 (\\ x y -> y) [undefined,undefined,5]": "5",
+
+                   "foldl (++) [] [[1],[2],[3]]": "[1,2,3]",
+                   "take 2 $ foldl (++) [] [[1],[2],[undefined]]": "[1,2]",
+
+                   "reverse [1,2,3]": "[3,2,1]",
+                   "reverse [1,2]": "[2,1]",
+                   "reverse [1]": "[1]",
+                   "reverse []": "[]",
+                   "reverse undefined": null,
+
+                   "True && True": "True",
+                   "True && False": "False",
+                   "False && undefined": "False",
+
+                   "False || True": "True",
+                   "False || False": "False",
+                   "True || undefined": "True",
+
+                   "and []": "True",
+                   "and [True]": "True",
+                   "and [True,False]": "False",
+                   "and [True,False,undefined]": "False",
+                   "or []": "False",
+                   "or [True]": "True",
+                   "or [True,undefined]": "True",
+                   "or [False]": "False",
+                   "or [False,undefined]": null,
+
+                   "((\\ x -> x + 1) . (\\ x -> x + 2)) 0": "3",
+
+                   "any (\\ x -> x > 0 ) []": "False",
+                   "any (\\ x -> x > 0 ) [3,4]": "True",
+                   "any (\\ x -> x > 0 ) [negate 3]": "False",
+
+                   "elem 3 [3,4]": "True",
+                   "elem 5 [3,4]": "False",
+                   "elem 1 [1]": "True",
+                   "elem 1 [2]": "False",
+                   "elem 3 []": "False",
+
+                   "max 3 4": "4",
+                   "max 2 (negate 1)": "2",
+                   "min 3 4": "3",
+                   "min 2 (negate 1)": "-1",
         }
     }
+
+                   // f x y = (\ z -> z + x) . (\ z -> z + y)
+                   // "f 3 4 2": "9"
 
     cases.arith = {
         fileSystem: {"Arith": "module Arith where\n" +

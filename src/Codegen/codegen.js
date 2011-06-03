@@ -354,8 +354,48 @@ JSHC.Codegen.codegen = function (input,namespace) {
             throw new Error("compilation: missing internal name");
         }
 
+        var types;
+        switch( name ){
+        case "JSHC.Internal.int32add":
+        case "JSHC.Internal.int32sub":
+        case "JSHC.Internal.int32mul":
+        case "JSHC.Internal.int32div":
+        case "JSHC.Internal.int32max":
+        case "JSHC.Internal.int32min":
+          types = ["Int32","Int32","Int32"];
+          break;
+
+        case "JSHC.Internal.int32negate":
+        case "JSHC.Internal.int32abs":
+        case "JSHC.Internal.int32signum":
+          types = ["Int32","Int32"];
+          break;
+
+        case "JSHC.Internal.int32eq":
+        case "JSHC.Internal.int32lt":
+        case "JSHC.Internal.int32gt":
+        case "JSHC.Internal.int32le":
+        case "JSHC.Internal.int32ge":
+        case "JSHC.Internal.int32eq":
+        case "JSHC.Internal.int32ne":
+          types = ["Int32","Int32","Bool"];
+          break;
+
+        case "JSHC.Internal.seq":
+          types = ["any","any","any"];
+          break;
+
+        case "JSHC.Internal.undefined":
+          types = ["any"];
+          break;
+
+        default:
+          throw new Error("missing case for: "+name);
+        }
+
         var N = eval(name+".length");
         assert.ok(typeof N == "number", typeof N);
+        assert.ok(N == types.length-1, N + " != " + types.length-1);
 
         if( N === 0 ){
             // wrap foreign function (with no params) to be evaluated.
@@ -369,25 +409,33 @@ JSHC.Codegen.codegen = function (input,namespace) {
 
         buf.push("new JSHC.Thunk(function(){return "+name+"(");
         for(var ix=0 ; ix<N ; ix++){
-            buf.push("a"+ix+".v");
+
+            switch( types[ix] ){
+            case "Int32": case "Char": case "any":
+              // do nothing, since same representation in Haskell and JavaScript.
+              buf.push("a"+ix+".v");
+              break;
+            case "[Char]":
+              buf.push("JSHC.Internal.HSString_to_JSString(a"+ix+")");
+              break;
+            default:
+              throw new Error("missing case");
+            }
+
             buf.push(",");
         }
         buf.pop();   // remove last ",".
         buf.push(")");
 
         // if the result is a boolean, then create a True/False haskell value.
-        switch(name){
-        case "JSHC.Internal.int32eq":
-        case "JSHC.Internal.int32lt":
-        case "JSHC.Internal.int32gt":
-        case "JSHC.Internal.int32le":
-        case "JSHC.Internal.int32ge":
-        case "JSHC.Internal.int32eq":
-        case "JSHC.Internal.int32ne":
+        switch( types[types.length-1] ){
+        case "Bool":
             buf.push(" ? "+namespace+".Prelude.True.v : "+namespace+".Prelude.False.v");
             break;
-        default:
+        case "Int32": case "Char": case "any":
             break;
+        default:
+            throw new Error("missing case");
         }
         buf.push("})");  // end argument to JSHC.Thunk
 
@@ -415,7 +463,8 @@ JSHC.Codegen.codegen = function (input,namespace) {
             }
         } else {
 //                    var x = exp.id.substr(exp.loc.length);
-            var x = exp.id.substr(exp.id.lastIndexOf(".")+1);
+            //var x = exp.id.substr(exp.id.lastIndexOf(".")+1);
+            var x = exp.id;
 //                    r = r.substr(0, r.length-1);
             //res += "new JSHC.Thunk(function(){return ";
                     //filter out references to our internal libraries
@@ -424,6 +473,7 @@ JSHC.Codegen.codegen = function (input,namespace) {
             } else if ( exp instanceof JSHC.DaCon ) {
                 return [true,namespace + "." + exp.loc + "[\"" + x + "\"]"];
             } else {
+                assert.ok( x.length !== 0 );
                 return [false,namespace + "." + exp.loc + "[\"" + x + "\"]"];
             }
         }

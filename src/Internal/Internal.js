@@ -85,9 +85,35 @@ JSHC.Internal.int32div = function(a,b){
     return r;
 };
 
+// :: Int32 -> Int32 -> Int32
+JSHC.Internal.int32max = function(a,b){
+    return Math.max(a,b);
+};
+
+JSHC.Internal.int32min = function(a,b){
+    return Math.min(a,b);
+};
+
 // :: Int32 -> Int32 -> Bool
 JSHC.Internal.int32eq = function(a,b){
     return a===b;
+};
+
+// :: Int32 -> Int32
+JSHC.Internal.int32negate = function (a) {
+    return 0 - a;
+};
+
+// :: Int32 -> Int32
+JSHC.Internal.int32abs = function (a) {
+    return Math.abs(a);
+};
+
+// :: Int32 -> Int32
+JSHC.Internal.int32signum = function (a) {
+    if( a > 0 )return 1;
+    if( a < 0 )return -1;
+    return 0;
 };
 
 //JSHC.Internal.int32show = function(a){
@@ -143,6 +169,21 @@ JSHC.Internal.int32ne = function (a,b) {
 
 JSHC.Internal.seq = function (a,b) {
     return b;
+};
+
+/*
+  converts [Char] to a JavaScript String.
+*/
+JSHC.Internal.HSString_to_JSString = function(list){
+  str="";
+  var node = list.v;
+  while( node.dacon !== "[]" ){
+    assert.ok( node.dacon == ":" );
+    assert.ok( typeof node.args[0].v == "string" );
+    str += node.args[0].v;
+    node = node.args[1].v;
+  };
+  return str;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

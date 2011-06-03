@@ -2,6 +2,7 @@
 module Prelude where
 
 import Data.Int
+--import Data.Char
 
 --------------------------------------------------------------------------------
 -- booleans
@@ -54,6 +55,9 @@ infix 4 < , > , <= , >= , == , /=
 (>=) = JSHC.Internal.int32ge
 (==) = JSHC.Internal.int32eq
 (/=) = JSHC.Internal.int32ne
+
+max = JSHC.Internal.int32max
+min = JSHC.Internal.int32min
 
 --------------------------------------------------------------------------------
 -- functions
@@ -123,8 +127,8 @@ tail []         = undefined -- error "Prelude.tail: empty list"
 --init []     =  error "Prelude.init: empty list"
 
 --null        :: [a] -> Bool
---null []     = True
---null (_:_)  = False
+null []         = True
+null ((:) _ _)  = False
 
 -- length returns the length of a finite list as an Int.
 --length           :: [a] -> Int
@@ -139,8 +143,9 @@ length ((:) _ l) = 1 + length l
 --(_:xs) !! n         = xs !! (n-1)
 
 --foldl            :: (a -> b -> a) -> a -> [b] -> a
---foldl f z []     = z
---foldl f z (x:xs) = foldl f (f z x) xs
+foldl f z []         = z
+foldl f z ((:) x xs) = foldl f (f z x) xs
+
 
 --foldl1           :: (a -> a -> a) -> [a] -> a
 --foldl1 f (x:xs)  = foldl f x xs
@@ -166,6 +171,10 @@ foldr f z ((:) x xs) = f x (foldr f z xs)
 --foldr1 f [x]      =   x
 --foldr1 f (x:xs)   =   f x (foldr1 f xs)
 --foldr1 _ []       =   error "Prelude.foldr1: empty list"
+foldr1 f ixs = case ixs of
+  (:) x [] -> x
+  ((:) x xs) -> f x (foldr1 f xs)
+  [] -> undefined
 
 --scanr               :: (a -> b -> b) -> b -> [a] -> [b]
 --scanr f q0 []       = [q0]
@@ -179,17 +188,19 @@ foldr f z ((:) x xs) = f x (foldr f z xs)
 --                     where qs@(q:_) = scanr1 f xs
 
 --iterate     :: (a -> a) -> a -> [a]
---iterate f x = x : iterate f (f x
+iterate f x = x : iterate f (f x)
 
 --repeat   :: a -> [a]
---repeat x = xs where xs = x:xs
+-- repeat x = xs where xs = x : xs
+repeat x = x : repeat x
 
 --replicate     :: Int -> a -> [a]
---replicate n x = take n (repeat x)
+replicate n x = take n (repeat x)
 
 --cycle    :: [a] -> [a]
---cycle [] = error "Prelude.cycle: empty list"
+cycle [] = undefined -- error "Prelude.cycle: empty list"
 --cycle xs = xs' where xs' = xs ++ xs'
+cycle xs = xs ++ cycle xs
 
 --take                   :: Int -> [a] -> [a]
 --take n _      | n <= 0 =  []
@@ -205,9 +216,14 @@ take n es = if n <= 0
 --drop n xs     | n <= 0 =   xs
 --drop _ []              =   []
 --drop n (_:xs)          =   drop (n-1) xs
+drop n ixs = if n <= 0
+  then ixs
+  else case ixs of
+    [] -> ixs
+    ((:) _ xs) -> drop (n-1) xs
 
 --splitAt                   :: Int -> [a] -> ([a],[a])
---splitAt n xs              = (take n xs, drop n xs)
+splitAt n xs              = (take n xs, drop n xs)
 
 --takeWhile               :: (a -> Bool) -> [a] -> [a]
 --takeWhile p []          = []
@@ -231,20 +247,20 @@ take n es = if n <= 0
 --break p                 =  span (not . p)
 
 --reverse :: [a] -> [a]
---reverse = foldl (flip (:)) []
+reverse = foldl (flip (:)) []
 
 --and, or :: [Bool] -> Bool
---and     = foldr (&&) True
---or      = foldr (||) False
+and     = foldr (&&) True
+or      = foldr (||) False
 
 --any, all :: (a -> Bool) -> [a] -> Bool
---any p    = or . map p
---all p    = and . map p
+any p xs = or (map p xs)
+all p xs = and (map p xs)
 
---infix 4 `elem`, `notElem`
+infix 4 `elem`, `notElem`
 --elem, notElem :: (Eq a) => a -> [a] -> Bool
---elem x        = any (== x)
---notElem x     = all (/= x)
+elem x xs     = any ((==) x) xs
+notElem x xs  = all ((/=) x) xs
 
 --lookup           :: (Eq a) => a -> [(a,b)] -> Maybe b
 --lookup key []    = Nothing
@@ -311,3 +327,11 @@ snd (x,y) = y
 --  | p x        = x
 --  | otherwise  = until p f (f x)
 
+--------------------------------------------------------------------------------
+-- the Num class
+
+negate = JSHC.Internal.int32negate
+abs = JSHC.Internal.int32abs
+signum = JSHC.Internal.int32signum
+
+--------------------------------------------------------------------------------
