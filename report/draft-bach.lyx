@@ -1,4 +1,4 @@
-#LyX 1.6.9 created this file. For more info see http://www.lyx.org/
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
@@ -267,12 +267,36 @@ thispagestyle{empty}
 
 \end_layout
 
-\begin_layout Title
+\begin_layout Standard
+\begin_inset Newpage cleardoublepage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace vfill
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 \begin_inset ERT
 status open
 
 \begin_layout Plain Layout
 
+
+\backslash
+begin{flushleft}
 \end_layout
 
 \end_inset
@@ -281,7 +305,84 @@ status open
 \end_layout
 
 \begin_layout Standard
-\begin_inset Newpage cleardoublepage
+JSHC
+\end_layout
+
+\begin_layout Standard
+JavaScript Haskell Compiler
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+newline
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+© Staffan Björnesjö, Peter Holm
+\end_layout
+
+\begin_layout Standard
+June 2011
+\end_layout
+
+\begin_layout Standard
+Department of Computer Science and Engineering
+\end_layout
+
+\begin_layout Standard
+University of Gothenburg
+\end_layout
+
+\begin_layout Standard
+SE-412 96 Göteborg
+\end_layout
+
+\begin_layout Standard
+Sweden
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{flushleft}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace 7cm
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+thispagestyle{empty}
+\end_layout
+
 \end_inset
 
 
