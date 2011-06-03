@@ -4,6 +4,13 @@
 \begin_header
 \textclass extreport
 \begin_preamble
+\usepackage{fontspec}
+\usepackage{xunicode}
+\usepackage{xltxtra}
+\setmainfont{DejaVu Serif}
+
+\usepackage{fullpage}
+
 \pagenumbering{roman}
 \let\myTOC\tableofcontents
 \renewcommand\tableofcontents{%
@@ -11,8 +18,9 @@
 \clearpage
 \pagenumbering{arabic}
 }
+\date{}
 \end_preamble
-\options Abstract
+\options a4paper
 \use_default_options true
 \begin_modules
 logicalmkup
@@ -22,24 +30,27 @@ logicalmkup
 \font_roman lmodern
 \font_sans default
 \font_typewriter default
-\font_default_family default
+\font_default_family rmdefault
 \font_sc false
 \font_osf false
 \font_sf_scale 100
 \font_tt_scale 100
 
-\graphics default
+\graphics xetex
 \float_placement H
 \paperfontsize default
 \spacing single
 \use_hyperref true
+\pdf_title "JSHC - JavaScript Haskell Compiler"
+\pdf_author "Staffan Bjornesjo and Peter Holm"
+\pdf_keywords "Haskell JavaScript Compiler"
 \pdf_bookmarks true
 \pdf_bookmarksnumbered true
 \pdf_bookmarksopen false
 \pdf_bookmarksopenlevel 1
-\pdf_breaklinks false
+\pdf_breaklinks true
 \pdf_pdfborder false
-\pdf_colorlinks false
+\pdf_colorlinks true
 \pdf_backref false
 \pdf_pdfusetitle true
 \papersize default
@@ -64,6 +75,217 @@ logicalmkup
 \end_header
 
 \begin_body
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+centerline{
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename GU-logo.png
+	width 14cm
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+vfill
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{flushleft}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\size giant
+JSHC
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace medskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\size larger
+- JavaScript Haskell Compiler
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+\size large
+Bachelor
+\begin_inset Quotes ers
+\end_inset
+
+s thesis in Computer Science
+\shape default
+\size default
+
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\size largest
+STAFFAN BJÖRNESJÖ
+\end_layout
+
+\begin_layout Standard
+
+\size largest
+PETER HOLM
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace bigskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+University of Gothenburg
+\end_layout
+
+\begin_layout Standard
+Department of Computer Science and Engineering
+\end_layout
+
+\begin_layout Standard
+Göteborg, Sverige 2011
+\end_layout
+
+\begin_layout Standard
+Kandidatarbete/rapport nr 2011:032
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{flushleft}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+thispagestyle{empty}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Title
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage cleardoublepage
+\end_inset
+
+
+\end_layout
 
 \begin_layout Abstract
 Development of large web based applications using scripting languages such
@@ -273,7 +495,7 @@ key "haskell-report"
 
 \end_inset
 
- is one such language, with a well developed type system.
+ is one such language, with well developed type- and module systems.
  By compiling Haskell directly to JavaScript, we use its powerful type system
  to guard against some of the errors that are hard to avoid when writing
  large and complex applications with a dynamically typed language such as
@@ -1173,12 +1395,20 @@ status collapsed
 
 , and the data constructors 
 \family typewriter
-[] :: ∀a.
+[] :: 
+\family default
+∀
+\family typewriter
+a.
  [a]
 \family default
  (the empty list) and 
 \family typewriter
-(:) :: ∀a.
+(:) :: 
+\family default
+∀
+\family typewriter
+a.
  a -> [a] -> [a]
 \family default
  (creating a new list given a first element and the rest of the elements).
@@ -1247,7 +1477,17 @@ rhs
  evaluated with any variable bindings defined in the pattern0.
  Pattern matching is used in several places in Haskell, most notably function
  definitions, where they allow specifying different function behaviour depending
- on the arguments given, and 
+ on the arguments given (dividing the function into 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+clauses
+\end_layout
+
+\end_inset
+
+), and 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
@@ -1601,8 +1841,8 @@ status open
 \begin_inset Caption
 
 \begin_layout Plain Layout
-Graphic representation of an AST of a function definition in a simple language
- with Haskell- like syntax.
+Graphic representation of an abstract syntax tree of a function definition
+ in a simple language with Haskell- like syntax.
 \end_layout
 
 \end_inset
@@ -1783,9 +2023,9 @@ status collapsed
 
 \end_inset
 
- is actually 
+ is actually ∀
 \family typewriter
-∀a.
+a.
  [a] -> [a]
 \family default
 , where ∀ binds the type variable 
@@ -1965,7 +2205,11 @@ Instantiation of types
 \begin_layout Standard
 When using a data constructor such as 
 \family typewriter
-[] :: ∀a.[a]
+[] :: 
+\family default
+∀
+\family typewriter
+a.[a]
 \family default
 , one would want to use it with lists with different element types in different
  locations.
@@ -2597,7 +2841,7 @@ status open
 \begin_inset Graphics
 	filename Dependency groups.png
 	lyxscale 15
-	width 10cm
+	width 12cm
 
 \end_inset
 
@@ -3065,9 +3309,23 @@ target "http://jshc.insella.se/"
 \end_inset
 
 , where one can try out the JSHC interface and also download source code
- (which is distributed under the permissive MIT license).
- The source code contains a copy of Ymacs which uses the permissive BSD-3
- license.
+ (which is distributed under the permissive MIT license
+\begin_inset CommandInset citation
+LatexCommand cite
+key "MIT-license"
+
+\end_inset
+
+).
+ The source code contains a copy of Ymacs which is distributed under the
+ permissive BSD-3 license
+\begin_inset CommandInset citation
+LatexCommand cite
+key "BSD-3-license"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Section
@@ -3091,8 +3349,7 @@ reference "fig: shorthand syntax"
 
 \end_inset
 
- contains a simplified syntax reference for the subset of Haskell supported
- by JSHC.
+ contains a simplified syntax reference for the subset of Haskell supported.
  Note that some accuracy has been sacrificed in favour of simplicity in
  that figure.
  For brevity, module system syntax has been omitted.
@@ -3156,7 +3413,7 @@ Pattern matching in case-expressions and function definitions, using patterns
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset Flex CharStyle:Code
@@ -4057,7 +4314,16 @@ con → any constructor identifier
 \begin_inset Caption
 
 \begin_layout Plain Layout
-Simplified syntax reference for the subset of Haskell supported by JSHC
+Simplified syntax reference for the subset of Haskell supported by JSHC.
+ 
+\begin_inset Newline newline
+\end_inset
+
+Arrows denote the start of a rule, | denotes alternative productions of
+ a rule.
+ Items surrounded by angular brackets are references to a rule in the grammar
+ and items contained in square brackets are optional.
+ All other items represent strings.
 \end_layout
 
 \end_inset
@@ -4111,10 +4377,11 @@ sideways false
 status open
 
 \begin_layout Plain Layout
+\align center
 \begin_inset Graphics
 	filename JSHCscreen_smaller.png
 	lyxscale 20
-	width 12.2cm
+	width 16.5cm
 
 \end_inset
 
@@ -4146,8 +4413,7 @@ An interface for using the compiler has been created.
 \end_layout
 
 \begin_layout Standard
-The interface provides two initial buffers.
- A buffer named 
+The interface provides two initial buffers: a buffer named 
 \begin_inset Flex CharStyle:Code
 status collapsed
 
@@ -4205,8 +4471,9 @@ C-x i
 \end_layout
 
 \begin_layout Standard
-There will also be an attempt to load the Haskell file, and if found, the
- file contents will be written into the buffer.
+There will also be an attempt to load the Haskell file with the same name,
+ and if found in any of the paths provided, the file contents will be written
+ into the buffer.
 \end_layout
 
 \begin_layout Standard
@@ -4248,6 +4515,7 @@ sideways false
 status collapsed
 
 \begin_layout Plain Layout
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="10" columns="2">
 <features>
@@ -4574,14 +4842,15 @@ reference "sub:Checking-module-groups"
 \end_layout
 
 \begin_layout Standard
-The compiler will then for each module, translate the AST (see 
+The compiler will then for each module, translate the abstract syntax tree
+ (see 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:Simplify"
 
 \end_inset
 
-) to the IR, and then generate (see 
+) to the intermediate representation, and then generate (see 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:back-end"
@@ -4602,10 +4871,11 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
+\align center
 \begin_inset Graphics
 	filename gen-prog-structure.png
-	lyxscale 50
-	width 12.2cm
+	lyxscale 20
+	width 16.5cm
 
 \end_inset
 
@@ -4817,8 +5087,8 @@ key "haskell-report"
  Second, the generated array of tokens is run through a function that adds
  indentation information to the array in the form of special indentation
  tokens, and annotates tokens with position information.
- Whitespace and comments are discarded as they are no longer needed for
- position information.
+ Whitespace and comments are discarded after being used to calculate position
+ information, as they are no longer needed.
  Lastly, this array is fed into an object which interfaces with the parser
  according to the Jison/Bison style API
 \begin_inset CommandInset citation
@@ -5086,7 +5356,8 @@ n
 
 \end_inset
 
- represents the starting column of the first token on the new line.
+ represents the indentation of the starting column of the first token on
+ the new line.
  Given this array as input, the last stage of the lexer will deliver to
  the parser tokens representing a context-free version of the code which,
  converted back into Haskell source code, would look like this:
@@ -5484,7 +5755,14 @@ Type checking
 \end_layout
 
 \begin_layout Standard
-The monomorphism restriction (see 4.5.5 in the report) is not implemented.
+The monomorphism restriction (
+\begin_inset CommandInset citation
+LatexCommand cite
+key "haskell-report"
+
+\end_inset
+
+, chapter 4.5.5) is not implemented.
 \end_layout
 
 \begin_layout Standard
@@ -5645,8 +5923,8 @@ Translation to the intermediate representation
 \end_layout
 
 \begin_layout Standard
-This step translates the AST to the intermediate representation used by
- the back-end, see Appendix 
+This step translates the abstract syntax tree to the intermediate representation
+ used by the back-end, see Appendix 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:B.2Intermediate-representation"
@@ -7110,8 +7388,8 @@ Compiler back-end
 \end_layout
 
 \begin_layout Standard
-JSHC's back-end takes an intermediate representation in the form of an AST
- and compiles it to JavaScript code.
+JSHC's back-end takes an intermediate representation in the form of an abstract
+ syntax tree and compiles it to JavaScript code.
  
 \end_layout
 
@@ -7131,7 +7409,7 @@ To implement some basic functionality of the generated code which cannot
  be efficiently defined in Haskell (or is needed for our implementation
  to operate at all), an internal JavaScript library was developed.
  This library contains functions for handling integer arithmetics, arithmetic
- comparisons, laziness and pattern matching.
+ comparisons, lazy evaluation and pattern matching.
  
 \end_layout
 
@@ -7449,12 +7727,6 @@ reference "sec:B.2Intermediate-representation"
 \end_inset
 
 .
-\end_layout
-
-\begin_layout Standard
-In this description of the generated code, our methods of handling lazy
- evaluation are omitted to improve readability.
- These methods are instead described in <TODO: cross-reference>.
 \end_layout
 
 \begin_layout Paragraph
@@ -7818,7 +8090,7 @@ t
 \end_inset
 
  which are all compiled into curried functions in the same way as lambda
- expressions in 
+ expressions, as described in 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "par:code-gen-Expressions"
@@ -7826,8 +8098,10 @@ reference "par:code-gen-Expressions"
 \end_inset
 
 .
- The type variables, data constructor type arguments, and the type constructor
- are not used.
+ The type constructor is used to create a JavaScript object, which is used
+ as the JavaScript constructor called by its data constructors when they
+ are applied.
+ The type variables and data constructor type arguments are not used.
 \end_layout
 
 \begin_layout Paragraph
@@ -8241,163 +8515,8 @@ newline
 \end_layout
 
 \begin_layout Standard
-<TODO>Applications can be compiled in two different ways.
- If the application is a data constructor application, the application 
-\begin_inset Flex CharStyle:Emph
-status collapsed
-
-\begin_layout Plain Layout
-D
-\end_layout
-
-\end_inset
-
- 
-\begin_inset Flex CharStyle:Emph
-status collapsed
-
-\begin_layout Plain Layout
-e
-\begin_inset Formula $_{\text{1}}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
- 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-...
-\end_layout
-
-\end_inset
-
- 
-\begin_inset Flex CharStyle:Emph
-status collapsed
-
-\begin_layout Plain Layout
-e
-\begin_inset Formula $_{\text{n}}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
- where 
-\begin_inset Flex CharStyle:Emph
-status collapsed
-
-\begin_layout Plain Layout
-D
-\end_layout
-
-\end_inset
-
- is an arbitrary data constructor and 
-\begin_inset Flex CharStyle:Emph
-status collapsed
-
-\begin_layout Plain Layout
-e
-\end_layout
-
-\end_inset
-
- represents arbitrary expressions, the expression is compiled into a JavaScript
- array where the first element is a string with the identifier of the data
- constructor, followed by its arguments: 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-[
-\end_layout
-
-\end_inset
-
- 
-\begin_inset Flex CharStyle:Emph
-status collapsed
-
-\begin_layout Plain Layout
-D
-\end_layout
-
-\end_inset
-
- 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-,
-\end_layout
-
-\end_inset
-
-
-\begin_inset Flex CharStyle:Emph
-status collapsed
-
-\begin_layout Plain Layout
-e
-\begin_inset Formula $_{\text{1}}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
- 
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-, ...
- ,
-\end_layout
-
-\end_inset
-
- 
-\begin_inset Flex CharStyle:Emph
-status collapsed
-
-\begin_layout Plain Layout
-e
-\begin_inset Formula $_{\text{n}}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\begin_inset Flex CharStyle:Code
-status collapsed
-
-\begin_layout Plain Layout
-]
-\end_layout
-
-\end_inset
-
-.
- 
-\end_layout
-
-\begin_layout Standard
-If the application is a function application, JavaScript's ordinary function
- application is used.
+Application of data constructors and functions are compiled in the same
+ way; JavaScript's ordinary function application is used.
  Expressions of the form 
 \begin_inset Flex CharStyle:Emph
 status collapsed
@@ -8456,7 +8575,7 @@ f
 
 \end_inset
 
- is an arbitrary function expression and 
+ is an arbitrary function or data constructor expression and 
 \begin_inset Flex CharStyle:Emph
 status collapsed
 
@@ -9128,9 +9247,9 @@ Patterns and pattern matching
 \end_layout
 
 \begin_layout Standard
-Constructor patterns, like constructor applications, are compiled into JavaScrip
-t objects with one member containing the constructor identifier as a string,
- and one member containing an array with the constructor's arguments.
+Constructor patterns are compiled into JavaScript objects with one member
+ containing the constructor identifier as a string, and one member containing
+ an array with the constructor's arguments.
  Patterns of the form 
 \begin_inset Flex CharStyle:Emph
 status collapsed
@@ -9431,7 +9550,7 @@ Identifiers and literals
 \end_layout
 
 \begin_layout Standard
-Variable identifier can be compiled in two ways.
+Variable identifiers can be compiled in two ways.
  If they are qualified, they are declared at the top-level and thus compiled
  as members of the object representing the module, using JavaScript's associativ
 e array notation to enable members with non-alphanumeric characters as identifie
@@ -9540,7 +9659,7 @@ JSHC.Internal
 
 \end_inset
 
- is a reference to a JavaScript function.
+ is a treated as reference to a JavaScript function in the internal libraries.
  These internal functions will be compiled into a curried function just
  as for lambda expressions
 \begin_inset CommandInset ref
@@ -9611,6 +9730,13 @@ n to be evaluated.
 
 \begin_layout Paragraph
 Laziness
+\begin_inset CommandInset label
+LatexCommand label
+name "par:Laziness"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -9622,7 +9748,7 @@ To achieve lazy evaluation, the evaluation of some compiled expressions
 Affected expressions are case expressions, function application, and compiled
  internal functions with 0 parameters, while unaffected expressions are
  integer constants, functions (lambda expressions and compiled internal
- functions with >0 parameters), and tuples.
+ function, like constructor applications, s with >0 parameters), and tuples.
 \end_layout
 
 \begin_layout Standard
@@ -9669,7 +9795,17 @@ e
 
 \begin_layout Standard
 To prevent evaluation of function arguments, all function arguments are
- thunks.
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Thunk
+\end_layout
+
+\end_inset
+
+s.
  Since the result of a function may be the argument to another function,
  but not used within it, results of functions are also thunks.
 \end_layout
@@ -9682,9 +9818,29 @@ Whenever an expression is compiled, the result is a pair containing the
 
 \begin_layout Standard
 Whenever a sub-expression is lazy and need to be strict, the sub-expression
- thunk is evaluated.
+ 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Thunk
+\end_layout
+
+\end_inset
+
+ is evaluated.
  If a sub-expression was strict and need to be lazy, the sub-expression
- is wrapped in a thunk without function call, as the function is not necessary.
+ is wrapped in a 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Thunk
+\end_layout
+
+\end_inset
+
+ without function call, as the function is not necessary.
 \end_layout
 
 \begin_layout Standard
@@ -9725,6 +9881,7 @@ sideways false
 status open
 
 \begin_layout Plain Layout
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="17" columns="2">
 <features>
@@ -10354,20 +10511,16 @@ There are several minor syntactic features missing, such as sections (syntactic
 Some major missing features are described below.
 \end_layout
 
-\begin_layout Standard
-<TODO: write something about IO as well?>
-\end_layout
-
 \begin_layout Subsubsection
 FFI: Foreign Function Interface
 \end_layout
 
 \begin_layout Standard
-Adding an FFI to JavaScript code would simplify the writing of the Prelude,
- as primitive operations such as addition could be described using foreign
- imports instead of a name with a special prefix for which the type would
- be stored in the type checker when looking up the name instead of the type
- being written in a foreign function declaration.
+Adding a foreign function interface to JavaScript code would simplify the
+ writing of the Prelude, as primitive operations such as addition could
+ be described using foreign imports instead of a name with a special prefix
+ for which the type would be stored in the type checker when looking up
+ the name instead of the type being written in a foreign function declaration.
 \end_layout
 
 \begin_layout Standard
@@ -10386,6 +10539,60 @@ Function overloading through type classes is one of the most important features
  Overloading is an important part of Haskell, and is used by many of the
  most common functions in the standard Prelude.
  
+\end_layout
+
+\begin_layout Subsubsection
+Input / output
+\end_layout
+
+\begin_layout Standard
+Haskell's input/output needs to be implemented.
+ Since most implementations of JavaScript do not allow direct access to
+ standard I/O channels such as 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+stdin
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+stdout
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+stderr
+\end_layout
+
+\end_inset
+
+, some kind of simulation of these would be necessary.
+ For example, 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+stderr
+\end_layout
+
+\end_inset
+
+ could be represented by a browser's JavaScript console.
+ A file system would have to be simulated, for example as is done in JSHC
+ to store the code in a buffer, by a JavaScript map from file names to contents.
+  
 \end_layout
 
 \begin_layout Subsection
@@ -10436,7 +10643,45 @@ Code optimisation
 
 \begin_layout Standard
 As code generation has been designed without regard to speed, the generated
- code 
+ code is most likely slower than necessary.
+ For example, the naive method of solving lazy evaluation used in JSHC (wrap
+ everything that might need to be lazy in a 
+\begin_inset Flex CharStyle:Code
+status collapsed
+
+\begin_layout Plain Layout
+Thunk
+\end_layout
+
+\end_inset
+
+, see 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "par:Laziness"
+
+\end_inset
+
+) is unnecessarily inefficient.
+ One can reduce the amount of lazy evaluation used in a program by implementing
+ 
+\begin_inset Flex CharStyle:Strong
+status collapsed
+
+\begin_layout Plain Layout
+strictness analysis
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "strictness-analysis"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Section
@@ -10536,7 +10781,7 @@ key "Mikkonen07usingjavascript"
 \end_inset
 
  were surprisingly difficult to overcome as the project grew.
- <TODO: more here>
+ 
 \end_layout
 
 \begin_layout Subsection
