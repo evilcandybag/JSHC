@@ -1,4 +1,4 @@
-#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+#LyX 1.6.9 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
@@ -9917,7 +9917,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="17" columns="2">
+<lyxtabular version="3" rows="19" columns="2">
 <features>
 <column alignment="center" valignment="top" width="3.6in">
 <column alignment="center" valignment="top" width="0">
@@ -10033,7 +10033,7 @@ Either a b
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+Choice datatype
 \end_layout
 
 \end_inset
@@ -10114,6 +10114,26 @@ Arithmetic operators
 
 \begin_layout Plain Layout
 Arithmetic comparison operators
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+max, min, negate, abs, signum
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Arithmetic functions
 \end_layout
 
 \end_inset
@@ -10244,7 +10264,9 @@ Function application operators
 \begin_inset Text
 
 \begin_layout Plain Layout
-map, ++, filter, concat, concatMap, head, tail, take
+map, ++, filter, concat, concatMap, head, tail, null, length, foldl, foldl1,
+ foldr, foldr1, iterate, repeat, replicate, cycle, take, drop, splitAt,
+ reverse, and, or, any, all, elem, notElem, sum, product, maximum, minimum
 \end_layout
 
 \end_inset
@@ -10254,6 +10276,26 @@ map, ++, filter, concat, concatMap, head, tail, take
 
 \begin_layout Plain Layout
 List functions
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+fst, snd
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Tuple functions
 \end_layout
 
 \end_inset
@@ -10651,6 +10693,20 @@ To give good error messages related to expressions within functions, a pretty
  printer is required.
  Currently, data constructors are shown using unnecessary parentheses, and
  only the abstract syntax tree is available for expressions and patterns.
+\end_layout
+
+\begin_layout Subsubsection
+Coloring Haskell code
+\end_layout
+
+\begin_layout Standard
+A syntax-highlighting mode for Haskell code in the Ymacs buffers should
+ be added.
+\end_layout
+
+\begin_layout Standard
+We find the existing library support for coloring in Ymacs buffers insufficient
+ for our needs, so a custom library needs to be implemented.
 \end_layout
 
 \begin_layout Subsubsection
