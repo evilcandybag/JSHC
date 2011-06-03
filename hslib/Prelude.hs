@@ -148,8 +148,9 @@ foldl f z ((:) x xs) = foldl f (f z x) xs
 
 
 --foldl1           :: (a -> a -> a) -> [a] -> a
---foldl1 f (x:xs)  = foldl f x xs
---foldl1 _ []      = error "Prelude.foldl1: empty list"
+foldl1 f ((:) x xs)  = foldl f x xs
+foldl1 _ []          = undefined -- error "Prelude.foldl1: empty list"
+
 
 --scanl            :: (a -> b -> a) -> a -> [b] -> [a]
 --scanl f q xs     = q : (case xs of
@@ -269,15 +270,15 @@ notElem x xs  = all ((/=) x) xs
 --    | otherwise = lookup key xys
 
 --sum, product :: (Num a) => [a] -> a
---sum          = foldl (+) 0
---product      = foldl (*) 1
+sum          = foldl (+) 0
+product      = foldl (*) 1
 
 --maximum, minimum :: (Ord a) => [a] -> a
---maximum []       = error "Prelude.maximum: empty list"
---maximum xs       = foldl1 max xs
+maximum []       = undefined -- error "Prelude.maximum: empty list"
+maximum xs       = foldl1 max xs
 
---minimum []       =  error "Prelude.minimum: empty list"
---minimum xs       =  foldl1 min xs
+minimum []       = undefined -- error "Prelude.minimum: empty list"
+minimum xs       = foldl1 min xs
 
 --zip  :: [a] -> [b] -> [(a,b)]
 --zip  = zipWith (,)
