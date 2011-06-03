@@ -1,0 +1,11 @@
+JSHC is a Haskell compiler written entirely in javascript.
+
+The source code is distributed under the MIT License. See "LICENSE" for details.
+The source code contains a copy of Ymacs, which is distributed under the BSD-3
+license. These files are all located under "Ymacs/". See those files for
+license details.
+
+"index.html" runs the JSHC interface.
+"runtests.html" runs the JSHC test suite.
+
+See the report under "report/project-report-2011-06-03.pdf" for details.
