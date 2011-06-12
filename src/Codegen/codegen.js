@@ -158,6 +158,7 @@ JSHC.Codegen.codegen = function (input,namespace) {
                 res += apat.id;
                 break;
             default:
+                JSHC.alert("When compiling: \n\n", input)
                 throw new Error("comApat not defined for name " + apat.name); 
         }
         return res;
