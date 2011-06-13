@@ -119,6 +119,12 @@ JSHC.Codegen.codegen = function (input,namespace) {
              case "case":
 //                alert("comCase:\n\n" + JSHC.showAST(exp[i]))
                 return comExpCase(exp);
+             case "let":
+             case "fun-where":
+             	//JSHC.alert("compilING:", exp);
+             	var res = comExpDecls(exp);
+             	//JSHC.alert("compiled:", res);
+             	return res;
              default:
                 throw new Error("comExp not defined for name " + JSHC.showAST(exp));
         }
@@ -479,7 +485,35 @@ JSHC.Codegen.codegen = function (input,namespace) {
             }
         }
     };
+    
+    var comExpDecls = function(exp) {
+    	var res = "";
+    	res += " function() {\n"
+    	for (var i = 0; i < exp.decls.length; i++) {
+    		res += comLocalDecl(exp.decls[i]);
+    	}
+    	res += "return " + comExp(exp.exp)[1] + ";}();";
+    	return [false, res];	
+    };
+    
+    var comLocalDecl = function(decl) {
+        var res = "";
+        switch (decl.name) {
+            case "decl-fun":
+                res = "var " + (decl.ident.toString() + " = " + comRhs(decl.rhs)) + ";\n";
+                break;
+            default:
+                throw new Error("comLocalDecl not defined for name " + decl.name);
+        }
 
+        if( typeof res != "string" ){
+            JSHC.alert("compiling\n",decl);
+            JSHC.alert("to\n",res);
+            throw new Error("stop");
+        }
+
+        return res;
+    }
     var comExpLambda = function(lamb){
         if (lamb.atArg === undefined) {
             lamb.atArg = 0;
