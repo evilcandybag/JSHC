@@ -12,7 +12,8 @@
 //};
 
 JSHC.Simplify.runSimplify = function(ast) {
-    JSHC.Simplify.patSimplify(ast);
+	JSHC.alert("SIMPLIFYING:\n\n", ast); 
+    JSHC.Simplify.patSimplifyTop(ast);
 //    alert("AFTER patsimplify:\n\n" + JSHC.showAST(ast))
     JSHC.Simplify.simplify(ast);
 //    alert("AFTER simplify:\n\n" + JSHC.showAST(ast))
@@ -68,15 +69,22 @@ JSHC.Simplify.simplify["decl-fun"] = function(ast){
     // take all parameters in the LHS and add as lambdas on the RHS.
 
     var i;
-    var old_rhs = (ast.rhs.name === "fun-where")? 
-                        JSHC.Simplify.reduceWhere(ast.rhs) :
-                            JSHC.Simplify.reduceExp(ast.rhs);
+    var new_rhs;
+    
+    if (ast.rhs.name === "fun-where") {
+    	new_rhs = ast.rhs
+    	new_rhs.decls = JSHC.Simplify.patSimplifyDecls(ast.rhs.decls);
+    	new_rhs = JSHC.Simplify.reduceWhere(new_rhs);
+    } else {
+    	new_rhs = JSHC.Simplify.reduceExp(ast.rhs);
+    }
+                            
     
     if(ast.args.length > 0) {
-        ast.rhs = {name:"lambda", args: ast.args, rhs: old_rhs, pos: ast.pos};
+        ast.rhs = {name:"lambda", args: ast.args, rhs: new_rhs, pos: ast.pos};
         ast.args = [];
     } else {
-        ast.rhs = old_rhs;
+        ast.rhs = new_rhs;
     }
 };
 
@@ -102,6 +110,7 @@ JSHC.Simplify.reduceExp = function (exp) {
                 break;
 
             case "let":
+            	exp.decls = JSHC.Simplify.patSimplifyDecls(exp.decls);
                 var new_exp = {name:"tuple",members: [],pos: exp.pos};
                 var new_pat = {name:"tuple_pat", members: [],pos: exp.pos};
                 for (var i = 0; i < exp.decls.length; i++) {
@@ -210,17 +219,60 @@ JSHC.Simplify.reduceWhere = function (e) {
     return new_case; //{name: "infixexp", exps: [new_case], pos: e.pos}
 };
 
-JSHC.Simplify.patSimplify = function (ast) {
+JSHC.Simplify.patSimplifyTop = function (ast) {
 //    alert("RUNNING PATSIMPLIFY on: " + ast.modid)
     var old = ast.body.topdecls;
     var newbody = [];
-    var currentName = ""; 
-    var temp = [];
     var toMerge = {};
 
-    var merge = function(funs) {
+        
+    
+    for (var i = 0; i < old.length; i++) {
+        if (old[i].name === "topdecl-decl" && old[i].decl.name === "decl-fun") {
+            var fun = old[i].decl;
+
+            if (toMerge[fun.ident.id] === undefined)
+                toMerge[fun.ident.id] = [];
+               
+            toMerge[fun.ident.id].push(fun);
+        } else {
+            newbody.push(old[i]);
+        }
+
+    }
+    for (var k in toMerge) {
+        newbody.push({name: "topdecl-decl", decl: JSHC.Simplify.merge(toMerge[k])} );
+    }
+
+    ast.body.topdecls = newbody;
+};
+
+JSHC.Simplify.patSimplifyDecls = function(ast) {
+	var newdecls = [];
+	var toMerge = {};
+	
+	for (var i = 0; i < ast.length; i++)  {
+		if (ast[i].name === "decl-fun") {
+			var fun = ast[i];
+			
+			if (toMerge[fun.ident.id] === undefined)
+				toMerge[fun.ident.id] = [];
+				
+			toMerge[fun.ident.id].push(fun);
+		} else {
+			newdecls.push(ast[i]);
+		}
+	}
+	for (var k in toMerge) {
+		newdecls.push(JSHC.Simplify.merge(toMerge[k]));
+	}
+	
+	return newdecls;
+};
+
+JSHC.Simplify.merge = function(funs) {
       
-      assert.ok(funs.length > 0, "patSimplify.merge() shouldn't be called with a list of 0 length")
+      assert.ok(funs.length > 0, "JSHC.Simplify.merge() shouldn't be called with a list of 0 length")
         // check whether a one line function uses matching on its arguments      
       var hasMatching = false;
       for (var i = 0; i < funs[0].args.length; i++) {
@@ -252,37 +304,15 @@ JSHC.Simplify.patSimplify = function (ast) {
           //merge the different functions into one with a case-expression                  
           var newRhs = {name: "case", exp: newArgsT, alts: newAlts};
           var res = {name: "decl-fun", ident: funs[0].ident, args: newArgs, rhs: newRhs};
-          res = {name: "topdecl-decl", decl: res}
+          //res = {name: "topdecl-decl", decl: res}
           
           //push the merged function into the new body
 //          alert("pushed a merged function: " + JSHC.showAST(res))
-          newbody.push(res);
+          return res;
       } else if (funs.length === 1){
 //          alert("pushed a non-merged function: " + JSHC.showAST(funs[0]))
-          newbody.push({name: "topdecl-decl", decl: funs[0] });
+          return funs[0];
       }
-    }    
-    
-    for (var i = 0; i < old.length; i++) {
-        if (old[i].name === "topdecl-decl" && old[i].decl.name === "decl-fun") {
-            var fun = old[i].decl;
-
-            if (toMerge[fun.ident.id] === undefined)
-                toMerge[fun.ident.id] = [];
-               
-            toMerge[fun.ident.id].push(fun);
-        } else {
-            newbody.push(old[i]);
-        }
-
-    }
-    for (var k in toMerge) {
-        merge(toMerge[k]);
-    }
-//    if (temp.length > 0)
-//        merge(temp);
-//    alert("NEW BODY\n\n" + JSHC.showAST(newbody));
-    ast.body.topdecls = newbody;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -10,7 +10,9 @@ JSHC.Test.Tests.patternmatch = function(tester){
                      "f (C x) = x\n"+
                      "g (B,1) = 1\n"+
                      "g (C 2, 2) = 2\n"+
-                     "g (C x, y) = x + y\n"
+                     "g (C x, y) = x + y\n"+
+                     "x 1 = 3\n"+
+					 "x y = 5\n"
                       },
         commands: {"f B": "1",
                    "f (C 2)": "2",
@@ -18,7 +20,9 @@ JSHC.Test.Tests.patternmatch = function(tester){
                    "f (C 4)": "4",
                    "g (B,1)": "1",
                    "g (C 2, 2)": "2",
-                   "g ((C 1), 2)": "3"
+                   "g ((C 1), 2)": "3",
+                   "x 1": "3",
+                   "x 6": "5"
                    }
     }
 
