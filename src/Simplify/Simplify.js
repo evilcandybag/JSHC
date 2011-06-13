@@ -73,15 +73,19 @@ JSHC.Simplify.simplify["decl-fun"] = function(ast){
     var new_rhs;
     
     if (ast.rhs.name === "fun-where") {
-    	new_rhs = ast.rhs
-    	new_rhs.decls = JSHC.Simplify.patSimplifyDecls(ast.rhs.decls);
-    	new_rhs = JSHC.Simplify.reduceWhere(new_rhs);
+    	//JSHC.alert("args.length", ast.args.length);
+    	new_rhs = ast.rhs;
+    	new_rhs.decls = JSHC.Simplify.patSimplifyDecls(new_rhs.decls);
+    	for (var i = 0; i < new_rhs.decls.length; i++) {
+    		JSHC.Simplify.simplify(new_rhs.decls[i]);
+    	}
+    	new_rhs.exp = JSHC.Simplify.reduceExp(new_rhs.exp);
     } else {
     	new_rhs = JSHC.Simplify.reduceExp(ast.rhs);
     }
-                            
     
     if(ast.args.length > 0) {
+    	//JSHC.alert("making lambdas", ast, "with new_rhs:", new_rhs);
         ast.rhs = {name:"lambda", args: ast.args, rhs: new_rhs, pos: ast.pos};
         ast.args = [];
     } else {
@@ -116,24 +120,12 @@ JSHC.Simplify.reduceExp = function (exp) {
 
             case "let":
             	exp.decls = JSHC.Simplify.patSimplifyDecls(exp.decls);
-                var new_exp = {name:"tuple",members: [],pos: exp.pos};
-                var new_pat = {name:"tuple_pat", members: [],pos: exp.pos};
-                for (var i = 0; i < exp.decls.length; i++) {
-                    var temp = exp.decls[i];
-                    JSHC.Simplify.simplify(temp);
-                    switch (exp.decls[i].name) {
-                        case "decl-fun":
-                            new_exp.members.push(exp.decls[i].rhs);
-                            new_pat.members.push(exp.decls[i].ident);
-                            break;
-                        default:
-                            throw new JSHC.CompilerError("Simplify.reduceExp not defined for " + exp.decls[i].name);
-                    }
+            	for (var i = 0; i < exp.decls.length; i++) {
+                    JSHC.Simplify.simplify(exp.decls[i]);
                 }
+                JSHC.Simplify.reduceExp(exp.exp);
                 //new_exp = {name:"application", exps: [new_exp], pos: new_exp.pos}
                 //new_exp = {name:"infixexp", exps:[new_exp], pos: new_exp.pos};
-                exp = {name:"case", exp: new_exp, 
-                             alts: [{name:"alt", pat: new_pat, exp: exp.exp}]};
                 break;
 
             case "conpat":
@@ -281,7 +273,7 @@ JSHC.Simplify.merge = function(funs) {
         // check whether a one line function uses matching on its arguments      
       var hasMatching = false;
       for (var i = 0; i < funs[0].args.length; i++) {
-          if (funs[0].args[i].name !== "varname") {
+          if (funs[0].args[i].name !== "varname" ) {
                 hasMatching = true;
                 break;
           }

@@ -282,21 +282,21 @@ JSHC.Test.Tests.codegen = function(tester){
 
     cases.lets = {
         fileSystem: { "Lets": "module Lets where\n"+
-//           "a = let x = 1 in x\n"+
-//           "b = let x z = 1 + z in x 1\n"+
-//           "c = let\n x = 1\n y = 2\n in x + y\n"+
-//           "d = let x = 1\n        y = 2\n        in x + y\n"+
-//           "e =\n let x = 1\n     y = 2\n  in x + y\n"+
-           "f = let fac 0 = 1\n        fac n = n * fac (n-1)\n    in fac 4\n"
-//           "g = let x = 1:x in take 3 x\n"
+           "a = let x = 1 in x\n"+
+           "b = let x z = 1 + z in x 1\n"+
+           "c = let\n x = 1\n y = 2\n in x + y\n"+
+           "d = let x = 1\n        y = 2\n        in x + y\n"+
+           "e =\n let x = 1\n     y = 2\n  in x + y\n"+
+           "f = let fac 0 = 1\n        fac n = n * fac (n-1)\n    in fac 4\n"+
+           "g = let x = 1:x in take 3 x\n"
         },
         commands: {
-//            "a": "1",
-//            "b": "2",
-//            "c": "3",
-//            "d": "3",
-//            "e": "3",
-//            "f": "24",
+            "a": "1",
+            "b": "2",
+            "c": "3",
+            "d": "3",
+            "e": "3",
+            "f": "24",
 //            "g": "[1,1,1]",
         }
     }
