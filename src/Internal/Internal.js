@@ -297,8 +297,8 @@ JSHC.Internal.match = function(exp, alts) {
     }
 //}catch(err){JSHC.alert("unexpected error in match\n",err);}
 
-    throw new Error("Unhandled case in pattern match! " + JSHC.showAST(exp) + " alts:\n\n" + JSHC.showAST(alts)); //TODO: proper error reporting would be?
-    
+   // throw new Error("Unhandled case in pattern match! " + JSHC.showAST(exp) + " alts:\n\n" + JSHC.showAST(alts)); //TODO: proper error reporting would be?
+   throw new JSHC.RuntimeError("Unhandled case in pattern match!");  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
