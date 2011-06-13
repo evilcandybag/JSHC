@@ -13,18 +13,27 @@ JSHC.Internal.WildPat = function(varname){
     assert.ok(typeof varname == "string" || varname === undefined);
     this.varname = varname;
     this.name = "WildPat";
+    this.toString = function() {
+    	return "_";
+    };
 };
 
 JSHC.Internal.IntegerPat = function(number){
     assert.ok(typeof number == "number" );
     this.number = number;
     this.name = "IntegerPat";
+    this.toString = function () {
+    	return this.number;
+    }
 };
 
 JSHC.Internal.NamePat = function(varname){
     assert.ok(typeof varname == "string");
     this.varname = varname;
     this.name = "NamePat";
+    this.toString = function () {
+   		return this.varname;
+    };
 };
 
 JSHC.Internal.ConPat = function(dacon,args){
@@ -33,12 +42,18 @@ JSHC.Internal.ConPat = function(dacon,args){
     this.dacon = dacon;
     this.args = args;
     this.name = "ConPat";
+    this.toString = function () {
+    	return this.dacon + " " + this.args.join(" ");
+    };
 };
 
 JSHC.Internal.TuplePat = function(args){
     assert.ok(args instanceof Array);
     this.args = args;
     this.name = "TuplePat";
+    this.toString = function () {
+    	return "(" + args + ")";
+    }
 };
 
 JSHC.Internal.undefined = function() {
@@ -274,7 +289,7 @@ JSHC.Internal.match = function(exp, alts) {
                 return res;
 
             default: 
-                throw new Error("match_ needs definition for: " + pat.name);
+                throw new JSHC.RuntimeError("match_ needs definition for: " + pat.name);
         }
     }
 //try{
@@ -296,9 +311,14 @@ JSHC.Internal.match = function(exp, alts) {
         }
     }
 //}catch(err){JSHC.alert("unexpected error in match\n",err);}
-
+   var errPats = "[";
+   for (var i = 0; i < alts.length; i++) {
+   		errPats += alts[i].p.toString();
+   		errPats += " or ";
+   }
+   errPats = errPats.substring(0, errPats.length-4) + "]";
    // throw new Error("Unhandled case in pattern match! " + JSHC.showAST(exp) + " alts:\n\n" + JSHC.showAST(alts)); //TODO: proper error reporting would be?
-   throw new JSHC.RuntimeError("Unhandled case in pattern match!");  
+   throw new JSHC.RuntimeError("Unhandled case in pattern match: matching " + exp.v + " against alternatives: " + errPats);  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
