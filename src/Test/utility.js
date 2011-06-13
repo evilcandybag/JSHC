@@ -264,8 +264,10 @@ JSHC.Test.runData = function(tester,td){
         } else {
             if( tester.interpreter.errors > 0 ){
                 success = false;
+                info.push("got:");
                 info.push(tester.interpreter.errorList.join("\n"));
                 info.push(tester.interpreter.warningList.join("\n"));
+                info.push("when executing\""+command+"\"");
                 continue;
             }
             if ( tester.interpreter.messageList.length === 0 ) {

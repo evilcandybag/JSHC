@@ -278,10 +278,10 @@ JSHC.Codegen.codegen = function (input,namespace) {
             buf.push(modid+"[\""+dacon+"\"] = ");
 
             for(var jx=0 ; jx<N ; jx++){
-                buf.push("function(a"+jx+"){return ");
+                buf.push("function(a"+jx+"){return new JSHC.Thunk(");
             }
 
-            buf.push("new JSHC.Thunk(new "+modid+"[\":"+type.typ.tycon+"\"](\""+dacon+"\",[");
+            buf.push("new "+modid+"[\":"+type.typ.tycon+"\"](\""+dacon+"\",[");
             if( N > 0 ){
                 for(var jx=0 ; jx<N ; jx++){
                     buf.push("a"+jx);
@@ -289,10 +289,10 @@ JSHC.Codegen.codegen = function (input,namespace) {
                 }
                 buf.pop();   // remove last ",".
             }
-            buf.push("]))");
+            buf.push("])");
 
             for(var jx=0 ; jx<N ; jx++){
-                buf.push("}");
+                buf.push(")}");
             }
             buf.push("\n");
         }
@@ -345,6 +345,9 @@ JSHC.Codegen.codegen = function (input,namespace) {
                 buf.push(arg[1]);
             }
             buf.push(")");
+            if( ix+1 < app.exps.length ){
+                buf.push(".v");
+            }
         }
         buf.push("})");
         return [false,buf.join("")];
@@ -411,10 +414,10 @@ JSHC.Codegen.codegen = function (input,namespace) {
 
         var buf = [];
         for(var ix=0 ; ix<N ; ix++){
-            buf.push("function(a"+ix+"){return ");
+            buf.push("function(a"+ix+"){return new JSHC.Thunk(");
         }
 
-        buf.push("new JSHC.Thunk(function(){return "+name+"(");
+        buf.push(name+"(");
         for(var ix=0 ; ix<N ; ix++){
 
             switch( types[ix] ){
@@ -437,17 +440,17 @@ JSHC.Codegen.codegen = function (input,namespace) {
         // if the result is a boolean, then create a True/False haskell value.
         switch( types[types.length-1] ){
         case "Bool":
-            buf.push(" ? "+namespace+".Prelude.True.v : "+namespace+".Prelude.False.v");
+            buf.push(" ? "+namespace+".Prelude.True : "+namespace+".Prelude.False");
             break;
         case "Int32": case "Char": case "any":
             break;
         default:
             throw new Error("missing case");
         }
-        buf.push("})");  // end argument to JSHC.Thunk
+        //buf.push("}");
 
         for(var ix=0 ; ix<N ; ix++){
-            buf.push("}");
+            buf.push(")}");
         }
 
         //JSHC.alert("comExpInternal\n",buf.join(""));
@@ -485,7 +488,7 @@ JSHC.Codegen.codegen = function (input,namespace) {
             }
         }
     };
-    
+
     var comExpDecls = function(exp) {
     	var res = "";
     	res += " function() {\n"
@@ -514,25 +517,30 @@ JSHC.Codegen.codegen = function (input,namespace) {
 
         return res;
     }
-    var comExpLambda = function(lamb){
-        if (lamb.atArg === undefined) {
-            lamb.atArg = 0;
-            lamb.arglen = lamb.args.length
+
+    var comExpLambda = function(lamb,atArg){
+        if (atArg === undefined) {
+            assert.ok( lamb.args.length > 0 );
+            atArg = 0;
         }
         var res = "";
-        if (lamb.atArg < lamb.arglen) {
-            var arg = lamb.args[lamb.atArg];
-            lamb.atArg++;
-            res += "function(" + comApat(arg) + "){ return " + comExpLambda(lamb)[1] + "}"
-        } else {
-            var rhs_code = comExp(lamb.rhs);
-            if( rhs_code[0] ){
-                res += "new JSHC.Thunk(" + rhs_code[1] + ")";
+        if (atArg < lamb.args.length) {
+            var arg = lamb.args[atArg];
+            res += "function(" + comApat(arg) + "){ return "
+
+            atArg++;
+            var code = comExpLambda(lamb,atArg);
+            if( code[0] ){
+                res += "new JSHC.Thunk(" + code[1] + ")";
             } else {
-                res += rhs_code[1];
+                res += code[1];
             }
+
+            res += "}";
+            return [true,res];
+        } else {
+            return comExp(lamb.rhs);
         }
-        return [true,res];
     };
 
     var comExpLit = function(exp){

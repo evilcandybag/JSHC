@@ -388,12 +388,12 @@ JSHC.Internal.Types["[]"].prototype.toString = function(){
   List Cons constructor
 */
 JSHC.Internal.Types["[].:"] = function(a){
-    return function(b){
+    return new JSHC.Thunk(function(b){
         assert.ok( a instanceof JSHC.Thunk );
         assert.ok( b instanceof JSHC.Thunk );
         //JSHC.alert("cons:\n",a,"\n",b);
         return new JSHC.Thunk(new JSHC.Internal.Types["[]"](":",[a,b]));
-    }
+    });
 };
 
 /*
