@@ -364,12 +364,14 @@ JSHC.Test.Tests.codegen = function(tester){
 
     cases.lambda = {
         fileSystem: {"Lambda": "module Lambda where\n"+
-        "a = \\ a -> g a\ng = \\ a -> a + 1\n"+
+        "a = \\ a -> g a\n"+
         "b = \\ a -> \n  case a of\n    1 -> 2\n    2 -> 1\n"+
         "c = \\ a b -> \n  case a of\n    b -> 2\n"+
         "d = \\ a b -> \n  case a of\n    b -> 2\n    2 -> 1\n"+
         "e = \\ a b c -> \n  case a of\n    b -> c\n"+
-        "f = \\ a b c -> \n  case a of\n    b -> 2\n    c -> 1\n"
+        "f = \\ a b c -> \n  case a of\n    b -> 2\n    c -> 1\n"+
+        "g = \\ a -> a + 1\n"+
+        "h = \\ 1 -> 2"
         },
         commands: {
         "a 1": "2",
@@ -377,7 +379,9 @@ JSHC.Test.Tests.codegen = function(tester){
         "c 1 1": "2",
         "d 1 2": "2",
         "e 1 1 3": "3",
-        "f 1 4 1": "2"
+        "f 1 4 1": "2",
+        "h 1": "2",
+        "h 3": null
         }
     }
 

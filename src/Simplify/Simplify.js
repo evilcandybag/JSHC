@@ -12,7 +12,8 @@
 //};
 
 JSHC.Simplify.runSimplify = function(ast) {
-	JSHC.alert("SIMPLIFYING:\n\n", ast); 
+	JSHC.Simplify.ast_modid = ast.modid
+//	JSHC.alert("SIMPLIFYING:\n\n", ast); 
     JSHC.Simplify.patSimplifyTop(ast);
 //    alert("AFTER patsimplify:\n\n" + JSHC.showAST(ast))
     JSHC.Simplify.simplify(ast);
@@ -106,7 +107,11 @@ JSHC.Simplify.reduceExp = function (exp) {
 
             case "lambda":
                 var rhs_new = JSHC.Simplify.reduceExp(exp.rhs)
-                exp = {name: "lambda", args: exp.args, rhs: rhs_new, pos: exp.pos};
+                var dummy = {name: "decl-fun", args: exp.args, rhs: rhs_new};
+                dummy = JSHC.Simplify.merge([dummy]);
+                exp = {name: "lambda", args: dummy.args, rhs: dummy.rhs, pos: exp.pos};
+                //if (JSHC.Simplify.ast_modid.toString() === "Lambda")
+                //	JSHC.alert("SIMPLIFIED A LAMBDA in " + JSHC.showAST(JSHC.Simplify.ast_modid) + "!\n\n",exp); 
                 break;
 
             case "let":
