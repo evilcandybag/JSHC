@@ -57,8 +57,10 @@ JSHC.Check.typeCheckTopDeclsInDepOrder = function(comp,ctx,topdecls){
         var topdecl = topdecls[i];
 
         //if the declaration is a fixity declaration, no typechecking needs to be done.
-        if (topdecl.name === "topdecl-decl" && topdecl.decl.name === "fixity")
+        if (topdecl.name === "topdecl-decl" && topdecl.decl.name === "fixity" ||
+            topdecl.name === "fixity" ){
            continue;
+        }
 
         var names = JSHC.Check.computeDeclaredNames(topdecls[i]);
 
@@ -87,8 +89,6 @@ JSHC.Check.typeCheckTopDeclsInDepOrder = function(comp,ctx,topdecls){
                 current_entry.addValue(topdecl);
             }
         }
-
-
     }
 
     // create action for each group
@@ -424,7 +424,10 @@ JSHC.Check.checkExp = function(comp,ctx,ast){
 	// add names (with their types) from decls
 	for(var ix=0 ; ix<ast.decls.length ; ix++){
 	    var decl = ast.decls[ix];
-	    if( decl.name !== "decl-fun" )continue;
+	    if( decl.name !== "decl-fun" ||
+	        ctx.isNameInCurrentContext(decl.ident) ){
+	        continue;
+	    }
 	    ctx.add(decl.ident,decl.ident.type);
 	}
 
@@ -434,7 +437,10 @@ JSHC.Check.checkExp = function(comp,ctx,ast){
 	// remove context with all names from the where-declaration.
 	for(var ix=0 ; ix<ast.decls.length ; ix++){
 	    var decl = ast.decls[ix];
-	    if( decl.name !== "decl-fun" )continue;
+	    if( decl.name !== "decl-fun" ||
+	        ctx.isNameInCurrentContext(decl.ident) ){
+	        continue;
+	    }
 	    ctx.rem(decl.ident);
 	}
 	ctx.pop();
