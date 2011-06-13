@@ -192,7 +192,7 @@ JSHC.Codegen.codegen = function (input,namespace) {
     var comExpCase = function(cas) {
         // does not matter if case gets a strict or lazy value
         var ex_code = comExp(cas.exp)[1];
-
+		assert.ok(typeof ex_code === "string" );
         var res = "";
         res += "new JSHC.Thunk(function(){return ";
 
