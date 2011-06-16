@@ -88,10 +88,10 @@ JSHC.Test.Tests.codegen = function(tester){
                    "length [undefined]": "1",
                    "head [ 1, undefined ]": "1",
                    "head (1 : [undefined])": "1",
-                   //"head [undefined]": null,
+                   "head [undefined]": null,
                    "length [undefined,undefined]": "2",
-                   //"head [undefined,undefined]": null,
-                   //"tail [undefined,undefined]": null,
+                   "head [undefined,undefined]": null,
+                   "tail [undefined,undefined]": null,
                    "length $ take 0 undefs": "0",
                    "length $ take 1 undefs": "1",
                    "length $ take 2 undefs": "2",
@@ -297,7 +297,8 @@ JSHC.Test.Tests.codegen = function(tester){
             "d": "3",
             "e": "3",
             "f": "24",
-//            "g": "[1,1,1]",
+            "g": "[1,1,1]",
+            "let { h = 1 } in h": "1",
         }
     }
 

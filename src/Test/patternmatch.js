@@ -1,9 +1,10 @@
 
 JSHC.Test.Tests.patternmatch = function(tester){
     var cases = {};
-    cases.pat = {
-        fileSystem: {"Pattern": "module Pattern where\n" +
+    cases.pat1 = {
+        fileSystem: {"Pattern1": "module Pattern1 where\n" +
                      "data A a = B | C a\n"+
+        			 "data X a = Y | Z a\n"+
                      "f B = 1\n"+
                      "f (C 2) = 2\n"+
                      "f (C 3) = 3\n"+
@@ -11,6 +12,9 @@ JSHC.Test.Tests.patternmatch = function(tester){
                      "g (B,1) = 1\n"+
                      "g (C 2, 2) = 2\n"+
                      "g (C x, y) = x + y\n"+
+                     "h (C Y) = 1\n"+
+                     "h (C (Z B)) = 2\n"+
+                     "h (C (Z (C 1))) = 3\n"+
                      "x 1 = 3\n"+
 					 "x y = 5\n"
                       },
@@ -21,10 +25,15 @@ JSHC.Test.Tests.patternmatch = function(tester){
                    "g (B,1)": "1",
                    "g (C 2, 2)": "2",
                    "g ((C 1), 2)": "3",
+                   "h (C Y)": "1",
+                   "h (C (Z B))": "2",
+                   "h (C (Z (C 1)))": "3",
+                   "h (C (Z (C 2)))": null,
                    "x 1": "3",
                    "x 6": "5"
                    }
-    }
+    };
+    
 
     for(var cname in cases){
         JSHC.Test.runData(tester,
