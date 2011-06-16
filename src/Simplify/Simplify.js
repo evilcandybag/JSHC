@@ -8,6 +8,7 @@ JSHC.Simplify.runSimplify = function(ast) {
 //    alert("AFTER patsimplify:\n\n" + JSHC.showAST(ast))
     JSHC.Simplify.simplifyModule(ast);
 //    alert("AFTER simplify:\n\n" + JSHC.showAST(ast))
+    JSHC.Simplify.renameLocalNames(ast);
 }
 
 //JSHC.Simplify.simplify = function(ast){
@@ -294,5 +295,320 @@ JSHC.Simplify.merge = function(funs) {
           return funs[0];
       }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+JSHC.Simplify.renameLocalNames = function(ast){
+    var topdecls = ast.body.topdecls;
+
+    var usednames = new JSHC.Set(false);
+
+    // find all declared and used names in sub-expressions and add to a set
+    // starting with all top-level variable names. any local renames will work
+    // as long as no names in this set is used.
+    for (var ix = 0; ix < topdecls.length; ix++) {
+        if (topdecls[ix].name === "topdecl-decl" && topdecls[ix].decl.name === "decl-fun") {
+            JSHC.Simplify.findUsedNamesInDecl(usednames, topdecls[ix].decl);
+        }
+    }
+
+    // rename local names
+    var namemaps = [{}];
+    for (var ix = 0; ix < topdecls.length; ix++) {
+        if (topdecls[ix].name === "topdecl-decl" && topdecls[ix].decl.name === "decl-fun") {
+            JSHC.Simplify.renameLocalNamesInExp(usednames, namemaps, topdecls[ix].decl.rhs);
+        }
+    }
+};
+
+JSHC.Simplify.renameLocalDeclaredName = function(usednames, namemaps, old_name){
+
+    // check if valid javascript name. if so, do not change it.
+    if( old_name.id.match(/[a-zA-Z][a-zA-Z0-9_]*/) ){
+        return old_name;
+    }
+
+    var old_ident = old_name.id;
+    var new_ident = [];
+
+    // produce a new name
+    for(var ix=0 ; ix<old_ident.length ; ix++ ){
+        var ch = old_ident[ix];
+        if( ch.match(/[a-zA-Z0-9_]/) ){
+            new_ident.push(ch);
+            continue;
+        }
+        switch( old_ident[ix] ){
+        case '!': new_ident.push("bang"); break;
+        case '#': new_ident.push("hash"); break;
+        case '$': new_ident.push("buck"); break;
+        case '%': new_ident.push("mod"); break;
+        case '&': new_ident.push("and"); break;
+        case '*': new_ident.push("star"); break;
+        case '+': new_ident.push("plus"); break;
+        case '.': new_ident.push("dot"); break;
+        case '/': new_ident.push("slash"); break;
+        case '<': new_ident.push("lt"); break;
+        case '=': new_ident.push("eq"); break;
+        case '>': new_ident.push("gt"); break;
+        case '?': new_ident.push("maybe"); break;
+        case '@': new_ident.push("at"); break;
+        case '\\':new_ident.push("back"); break;
+        case '^': new_ident.push("roof"); break;
+        case '|': new_ident.push("bar"); break;
+        case '-': new_ident.push("sub"); break;
+        case '~': new_ident.push("tilde"); break;
+        case ':': new_ident.push("colon"); break;
+        default:  new_ident.push("_");
+        }
+    }
+    new_ident = new_ident.join("");
+
+    // make sure the new name is unique
+    var number = 0;
+    while( usednames.contains(new_ident+number) === true ){
+        number++;
+    }
+    new_ident = new_ident + number;
+
+    // create new name using the new ident
+    new_name = new JSHC.VarName(new_ident,{},false);
+
+    // must add new name to both 'usednames' and 'namemaps'.
+    namemaps[namemaps.length-1][old_ident] = new_name;
+    usednames.add([new_ident]);
+
+    //JSHC.alert("renameLocalName: declared: \n",new_ident,"\ninstead of\n",old_ident);
+
+    return new_name;
+};
+
+JSHC.Simplify.renameLocalUsedName = function(usednames, namemaps, name){
+    // ignore qualified names
+    if( name.loc !== undefined ){
+        return name;
+    }
+
+    var replacement;
+    for(var ix=namemaps.length-1 ; ix>=0 ; ix--){
+        replacement = namemaps[ix][name.id];
+	if( replacement !== undefined ){
+	    break;
+	}
+    }
+    if( replacement === undefined )return name;
+
+    //JSHC.alert("renameLocalName: used:\n",name);
+
+    assert.ok( replacement instanceof JSHC.VarName );
+    return replacement;
+};
+
+JSHC.Simplify.renameLocalNamesInDecl = function(usednames, namemaps, decl){
+
+    // rename declared name
+    decl.ident = JSHC.Simplify.renameLocalDeclaredName(usednames, namemaps, decl.ident);
+
+    namemaps.push({});
+
+    // rename names in patterns
+    for(var ix=0; ix < decl.args.length ; ix++ ){
+        decl.args[ix] = JSHC.Simplify.renameLocalNamesInPat(usednames, namemaps, decl.args[ix]);
+    }
+
+    // rename names in the RHS
+    decl.rhs = JSHC.Simplify.renameLocalNamesInExp(usednames, namemaps, decl.rhs);
+
+    namemaps.pop();
+};
+
+/*
+    returns the new pattern
+*/
+JSHC.Simplify.renameLocalNamesInPat = function(usednames, namemaps, pat){
+    switch (pat.name) {
+    case "varname":
+        return JSHC.Simplify.renameLocalDeclaredName(usednames, namemaps, pat);
+
+    case "tuple_pat":
+        // rename within each member in exp.members
+        for(var ix=0 ; ix<pat.members.length ; ix++){
+            pat.members[ix] = JSHC.Simplify.renameLocalNamesInPat(usednames, namemaps, pat.members[ix]);
+        }
+        return pat;
+
+    case "dacon":
+    case "integer-lit":
+        return pat;
+
+    case "conpat":
+        // rename within each pat in pat.pats
+        for(var ix=0 ; ix<pat.pats.length ; ix++){
+            pat.pats[ix] = JSHC.Simplify.renameLocalNamesInPat(usednames, namemaps, pat.pats[ix]);
+        }
+        return pat;
+
+    case "wildcard":
+        return pat;
+
+    default:
+        throw new JSHC.CompilerError("Simplify.renameLocalNamesInPat not defined for " + pat.name);
+    }
+};
+
+/*
+    returns the new expression
+*/
+JSHC.Simplify.renameLocalNamesInExp = function(usednames, namemaps, exp){
+    switch (exp.name) {
+    case "lambda":
+        // rename in each pattern
+        for(var ix=0 ; ix<exp.args.length ; ix++){
+            exp.args[ix] = JSHC.Simplify.renameLocalNamesInPat(usednames, namemaps, exp.args[ix]);
+        }
+
+        exp.rhs = JSHC.Simplify.renameLocalNamesInExp(usednames, namemaps, exp.rhs);
+        return exp;
+
+    case "tuple":
+        // rename within each member in exp.members
+        for(var ix=0 ; ix<exp.members.length ; ix++){
+            exp.members[ix] = JSHC.Simplify.renameLocalNamesInExp(usednames, namemaps, exp.members[ix]);
+        }
+        return exp;
+
+    case "case":
+        // rename within exp.exp
+        exp.exp = JSHC.Simplify.renameLocalNamesInExp(usednames, namemaps, exp.exp);
+
+        // rename within each alternative alt in exp.alts
+        for(var ix=0 ; ix<exp.alts.length ; ix++){
+            exp.alts[ix].pat = JSHC.Simplify.renameLocalNamesInPat(usednames, namemaps, exp.alts[ix].pat);
+            exp.alts[ix].exp = JSHC.Simplify.renameLocalNamesInExp(usednames, namemaps, exp.alts[ix].exp);
+        }
+        return exp;
+
+    case "application":
+        // rename within each exp in exp.exps
+        for(var ix=0 ; ix<exp.exps.length ; ix++){
+            exp.exps[ix] = JSHC.Simplify.renameLocalNamesInExp(usednames, namemaps, exp.exps[ix]);
+        }
+        return exp;
+
+    case "fun-where":
+    case "let":
+        namemaps.push({});
+        for(var ix=0 ; ix<exp.decls.length ; ix++){
+            JSHC.Simplify.renameLocalNamesInDecl(usednames, namemaps, exp.decls[ix]);
+        }
+        exp.exp = JSHC.Simplify.renameLocalNamesInExp(usednames, namemaps, exp.exp);
+        namemaps.pop();
+        return exp;
+
+    case "dacon":
+    case "integer-lit":
+        return exp;
+
+    case "varname":
+        return JSHC.Simplify.renameLocalUsedName(usednames, namemaps, exp);
+
+    default:
+        throw new JSHC.CompilerError("Simplify.renameLocalNamesInExp not defined for " + exp.name);
+    }
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+JSHC.Simplify.findUsedNamesInDecl = function(usednames, decl){
+    usednames.add(decl.ident.id);
+    for(var ix=0; ix < decl.args.length ; ix++ ){
+        JSHC.Simplify.findUsedNamesInPat(usednames, decl.args[ix]);
+    }
+    JSHC.Simplify.findUsedNamesInExp(usednames, decl.rhs);
+};
+
+JSHC.Simplify.findUsedNamesInPat = function(usednames, pat){
+    switch (pat.name) {
+    case "varname":
+        usednames.add(pat.id);
+        break;
+
+    case "tuple_pat":
+        for(var ix=0 ; ix<pat.members.length ; ix++){
+            JSHC.Simplify.findUsedNamesInPat(usednames, pat.members[ix]);
+        }
+        break;
+
+    case "dacon":
+    case "integer-lit":
+        break;
+
+    case "conpat":
+        // rename within each pat in pat.pats
+        for(var ix=0 ; ix<pat.pats.length ; ix++){
+            JSHC.Simplify.findUsedNamesInPat(usednames, pat.pats[ix]);
+        }
+        break;
+
+    case "wildcard":
+        break;
+
+    default:
+        throw new JSHC.CompilerError("Simplify.findUsedNamesInPat not defined for " + pat.name);
+    }
+};
+
+/*
+    returns the new expression
+*/
+JSHC.Simplify.findUsedNamesInExp = function(usednames, exp){
+    switch (exp.name) {
+    case "lambda":
+        for(var ix=0 ; ix<exp.args.length ; ix++){
+            JSHC.Simplify.findUsedNamesInPat(usednames, exp.args[ix]);
+        }
+        JSHC.Simplify.findUsedNamesInExp(usednames, exp.rhs);
+        break;
+
+    case "tuple":
+        for(var ix=0 ; ix<exp.members.length ; ix++){
+            JSHC.Simplify.findUsedNamesInExp(usednames, exp.members[ix]);
+        }
+        break;
+
+    case "case":
+        JSHC.Simplify.findUsedNamesInExp(usednames, exp.exp);
+        for(var ix=0 ; ix<exp.alts.length ; ix++){
+            JSHC.Simplify.findUsedNamesInPat(usednames, exp.alts[ix].pat);
+            JSHC.Simplify.findUsedNamesInExp(usednames, exp.alts[ix].exp);
+        }
+        break;
+
+    case "application":
+        for(var ix=0 ; ix<exp.exps.length ; ix++){
+            JSHC.Simplify.findUsedNamesInExp(usednames, exp.exps[ix]);
+        }
+        break;
+
+    case "fun-where":
+    case "let":
+        for(var ix=0 ; ix<exp.decls.length ; ix++){
+            JSHC.Simplify.findUsedNamesInDecl(usednames, exp.decls[ix]);
+        }
+        JSHC.Simplify.findUsedNamesInExp(usednames, exp.exp);
+        break;
+
+    case "dacon":
+    case "integer-lit":
+        break;
+
+    case "varname":
+        usednames.add(exp.id);
+        break;
+
+    default:
+        throw new JSHC.CompilerError("Simplify.findUsedNamesInExp not defined for " + exp.name);
+    }
+};
 
 ////////////////////////////////////////////////////////////////////////////////
