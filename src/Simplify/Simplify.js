@@ -1,40 +1,30 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+JSHC.Simplify.runSimplify = function(ast) {
+    JSHC.Simplify.ast_modid = ast.modid
+//    JSHC.alert("SIMPLIFYING:\n\n", ast); 
+    JSHC.Simplify.patSimplifyTop(ast);
+//    alert("AFTER patsimplify:\n\n" + JSHC.showAST(ast))
+    JSHC.Simplify.simplifyModule(ast);
+//    alert("AFTER simplify:\n\n" + JSHC.showAST(ast))
+}
+
 //JSHC.Simplify.simplify = function(ast){
 //    assert.ok( ast !== undefined && ast.name !== undefined, "param 'ast' must be an AST");
-//    var f = this.checkNames[ast.name];
+//    var f = this.simplify[ast.name];
 //    if( f === undefined ){
-//	throw new Error("no definition for "+ast.name);
+//        throw new Error("no definition for "+ast.name);
 //    }
 //    assert.ok( f instanceof Function, ast.name+" <: Function." )
 //    f.call(this,ast);
 //};
 
-JSHC.Simplify.runSimplify = function(ast) {
-	JSHC.Simplify.ast_modid = ast.modid
-//	JSHC.alert("SIMPLIFYING:\n\n", ast); 
-    JSHC.Simplify.patSimplifyTop(ast);
-//    alert("AFTER patsimplify:\n\n" + JSHC.showAST(ast))
-    JSHC.Simplify.simplify(ast);
-//    alert("AFTER simplify:\n\n" + JSHC.showAST(ast))
-}
-
-JSHC.Simplify.simplify = function(ast){
-    assert.ok( ast !== undefined && ast.name !== undefined, "param 'ast' must be an AST");
-    var f = this.simplify[ast.name];
-    if( f === undefined ){
-	throw new Error("no definition for "+ast.name);
-    }
-    assert.ok( f instanceof Function, ast.name+" <: Function." )
-    f.call(this,ast);
+JSHC.Simplify.simplifyModule = function(ast){
+    JSHC.Simplify.simplifyBody(ast.body);
 };
 
-JSHC.Simplify.simplify["module"] = function(ast){
-    JSHC.Simplify.simplify(ast.body);
-};
-
-JSHC.Simplify.simplify["body"] = function(ast){
+JSHC.Simplify.simplifyBody = function(ast){
     var i;
     var ts = ast.topdecls;
     for(i=0;i<ts.length;i++){
@@ -56,17 +46,13 @@ JSHC.Simplify.simplify["body"] = function(ast){
                 }
                 ts.pop();
 	    } else {
-	        JSHC.Simplify.simplify(ts[i].decl);
+	        JSHC.Simplify.simplifyDeclFun(ts[i].decl);
 	    }
 	}
     }
 };
 
-//JSHC.Simplify.simplify["topdecl-decl"] = function(ast){
-//    JSHC.Simplify.simplify(ast.decl);
-//};
-
-JSHC.Simplify.simplify["decl-fun"] = function(ast){
+JSHC.Simplify.simplifyDeclFun = function(ast){
     // take all parameters in the LHS and add as lambdas on the RHS.
 
     var i;
@@ -77,7 +63,7 @@ JSHC.Simplify.simplify["decl-fun"] = function(ast){
     	new_rhs = ast.rhs;
     	new_rhs.decls = JSHC.Simplify.patSimplifyDecls(new_rhs.decls);
     	for (var i = 0; i < new_rhs.decls.length; i++) {
-    		JSHC.Simplify.simplify(new_rhs.decls[i]);
+	    JSHC.Simplify.simplifyDeclFun(new_rhs.decls[i]);
     	}
     	new_rhs.exp = JSHC.Simplify.reduceExp(new_rhs.exp);
     } else {
@@ -92,10 +78,6 @@ JSHC.Simplify.simplify["decl-fun"] = function(ast){
         ast.rhs = new_rhs;
     }
 };
-
-//JSHC.Simplify.simplify["infixexp"] = function(ast) {
-//    return JSHC.Simplify.reduceExp(ast);
-//};
 
 JSHC.Simplify.reduceExp = function (exp) {
 //        var exp = e.exps[0];
@@ -121,7 +103,7 @@ JSHC.Simplify.reduceExp = function (exp) {
             case "let":
             	exp.decls = JSHC.Simplify.patSimplifyDecls(exp.decls);
             	for (var i = 0; i < exp.decls.length; i++) {
-                    JSHC.Simplify.simplify(exp.decls[i]);
+                    JSHC.Simplify.simplifyDeclFun(exp.decls[i]);
                 }
                 JSHC.Simplify.reduceExp(exp.exp);
                 //new_exp = {name:"application", exps: [new_exp], pos: new_exp.pos}
@@ -197,7 +179,7 @@ JSHC.Simplify.reduceWhere = function (e) {
     var new_pat = {name:"tuple_pat", members: [],pos: e.decls.pos};
     for (var i = 0; i < e.decls.length; i++) {
         var temp = e.decls[i];
-        JSHC.Simplify.simplify(temp);
+        JSHC.Simplify.simplifyDeclFun(temp);
         switch (temp.name) {
             case "decl-fun":
                 new_exp.members.push(temp.rhs);
@@ -216,14 +198,15 @@ JSHC.Simplify.reduceWhere = function (e) {
     return new_case; //{name: "infixexp", exps: [new_case], pos: e.pos}
 };
 
+/*
+  merge top-decls for same identifier
+*/
 JSHC.Simplify.patSimplifyTop = function (ast) {
 //    alert("RUNNING PATSIMPLIFY on: " + ast.modid)
     var old = ast.body.topdecls;
     var newbody = [];
     var toMerge = {};
 
-        
-    
     for (var i = 0; i < old.length; i++) {
         if (old[i].name === "topdecl-decl" && old[i].decl.name === "decl-fun") {
             var fun = old[i].decl;
