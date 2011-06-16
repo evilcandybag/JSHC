@@ -491,11 +491,11 @@ JSHC.Codegen.codegen = function (input,namespace) {
 
     var comExpDecls = function(exp) {
     	var res = "";
-    	res += " function() {\n"
+    	res += " (function() {\n"
     	for (var i = 0; i < exp.decls.length; i++) {
     		res += comLocalDecl(exp.decls[i]);
     	}
-    	res += "return " + comExp(exp.exp)[1] + ";}();";
+    	res += "return " + comExp(exp.exp)[1] + ";}())";
     	return [false, res];	
     };
     
@@ -552,7 +552,7 @@ JSHC.Codegen.codegen = function (input,namespace) {
     if (input.name === "application" ||
         input.name === "varname" || input.name === "dacon" ||
         input.name === "integer-lit" || input.name === "case" ||
-        input.name === "lambda")
+        input.name === "lambda" || input.name === "let")
         return comSoloExp(input);
     else
         return comModule(input);
