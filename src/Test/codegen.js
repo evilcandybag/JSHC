@@ -269,7 +269,8 @@ JSHC.Test.Tests.codegen = function(tester){
            "b = x 1 where x z = 1 + z\n"+
            "c = x + y where\n x = 1\n y = 2\n"+
            "d = x + y where x = 1\n                y = 2\n"+
-           "e = x + y\n where\n  x = 1\n  y = 2\n"
+           "e = x + y\n where\n  x = 1\n  y = 2\n"+
+           "f = 3 +++ 4\n  where (+++) x y = x + y\n"
            },
         commands: {
             "a": "1",
@@ -277,6 +278,7 @@ JSHC.Test.Tests.codegen = function(tester){
             "c": "3",
             "d": "3",
             "e": "3",
+            "f": "7",
         }
     }
 
