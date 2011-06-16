@@ -88,10 +88,10 @@ JSHC.Test.Tests.codegen = function(tester){
                    "length [undefined]": "1",
                    "head [ 1, undefined ]": "1",
                    "head (1 : [undefined])": "1",
-                   //"head [undefined]": null,
+                   "head [undefined]": null,
                    "length [undefined,undefined]": "2",
-                   //"head [undefined,undefined]": null,
-                   //"tail [undefined,undefined]": null,
+                   "head [undefined,undefined]": null,
+                   "tail [undefined,undefined]": null,
                    "length $ take 0 undefs": "0",
                    "length $ take 1 undefs": "1",
                    "length $ take 2 undefs": "2",
@@ -288,7 +288,8 @@ JSHC.Test.Tests.codegen = function(tester){
            "d = let x = 1\n        y = 2\n        in x + y\n"+
            "e =\n let x = 1\n     y = 2\n  in x + y\n"+
            "f = let fac 0 = 1\n        fac n = n * fac (n-1)\n    in fac 4\n"+
-           "g = let x = 1:x in take 3 x\n"
+           "g = let x = 1:x in take 3 x\n"+
+           "h = let { x *** y = x + y ; x +++ y = x * y } in 1 *** 2 +++ 3"
         },
         commands: {
             "a": "1",
@@ -297,7 +298,9 @@ JSHC.Test.Tests.codegen = function(tester){
             "d": "3",
             "e": "3",
             "f": "24",
-//            "g": "[1,1,1]",
+            "g": "[1,1,1]",
+            "h": "7",
+            "let { z = 1 } in z": "1",
         }
     }
 
