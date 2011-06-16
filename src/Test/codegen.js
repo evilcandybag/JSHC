@@ -299,7 +299,7 @@ JSHC.Test.Tests.codegen = function(tester){
             "e": "3",
             "f": "24",
             "g": "[1,1,1]",
-            "h": "7",
+            "h": "9",
             "let { z = 1 } in z": "1",
         }
     }
