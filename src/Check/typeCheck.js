@@ -165,11 +165,6 @@ JSHC.Check.typeCheckLocalDecls = function (comp, decls) {
 */
 JSHC.Check.typeCheckTopdeclsTogether = function(comp,modid,ctx,topdecls){
 
-    // created for each group of topdecls, but could just as well be created
-    // once and used for all modules. doing it like this means that it does
-    // not have to be pass around.
-    //var freevars = new JSHC.Check.Freevars();
-
     ctx.push();  // context with all declared names in the group
 
     // add type variables to names that are visible to all declarations
@@ -190,6 +185,7 @@ JSHC.Check.typeCheckTopdeclsTogether = function(comp,modid,ctx,topdecls){
 
     //JSHC.alert("before checking the group:\n"+ctx.toString());
 
+    // infer types
     for(var ix=0 ; ix<topdecls.length ; ix++){
         try {
 	    JSHC.Check.checkTopdecl(comp,ctx,topdecls[ix]);
@@ -228,6 +224,48 @@ JSHC.Check.typeCheckTopdeclsTogether = function(comp,modid,ctx,topdecls){
         }
     }
 
+    // constrain using type signature
+    for(var ix=0 ; ix<topdecls.length ; ix++){
+        var decl = topdecls[ix];
+        if( decl.name == "topdecl-decl" ){
+            decl = decl.decl;
+        }
+        if( decl.name == "type-signature" ){
+            try {
+                //if( ctx.lookupTypeUnmodified(comp,ident) === undefined ){
+                //    comp.onError("type signature but not binding for "+decl.ident+".");
+                //}
+
+                // quantify type
+                decl.sig = ctx.quantifyType(decl.sig);
+                // check kind
+                var kind = JSHC.Check.checkType(comp,ctx,decl.sig);
+                // constrain kind to "*"
+                ctx.constrainValue(decl.sig, kind, JSHC.Check.StarKind);
+
+                // constrain type for each ident
+                for( var ix=0 ; ix<decl.vars.length ; ix++ ){
+                    ctx.constrainValue(decl.vars[ix], ctx.lookupTypeUnmodified(comp,decl.vars[ix]), decl.sig);
+                }
+                //JSHC.alert(ctx.toString());
+
+
+            } catch( err ){
+                if( err instanceof JSHC.TypeConstraintError ){
+                    if( err.pos === undefined ){
+                       err.pos = decl.pos;
+                    }
+                    if( err.mname === undefined ){
+                       err.mname = modid.id;
+                    }
+                    comp.onError(err);
+                } else {
+                    throw err;
+                }
+            }
+        }
+    }
+
     //JSHC.alert("after quantification:\n"+ctx.toString());
 
     ctx.pop();
@@ -240,8 +278,6 @@ JSHC.Check.checkTopdecl = function(comp,ctx,ast){
      break;
 
   case "decl-fun":
-
-         var ident = ast.ident;
 
          var rhs_type = JSHC.Check.checkExpPattern(comp,ctx,ast.args,ast.rhs);
 
@@ -269,17 +305,14 @@ JSHC.Check.checkTopdecl = function(comp,ctx,ast){
 	 //}
 
          //JSHC.alert("constraining: "+ctx.lookupType(comp,ident)+" to "+rhs_type+" for "+ast.ident+" in\n"+ctx.toString());
-         ctx.constrainValue(ast.ident, ctx.lookupTypeUnmodified(comp,ident), rhs_type);
+         ctx.constrainValue(ast.ident, ctx.lookupTypeUnmodified(comp,ast.ident), rhs_type);
 	 break;
 
   // skip fixity and type signature declarations
   // TODO: should have been removed by the name checker.
   case "fixity":
       break;
-      
   case "type-signature":
-      //var kind = JSHC.Check.checkType(comp,ctx,ast.sig);
-      //ctx.constrainValue(ast.sig, kind, JSHC.Check.StarKind);
       break;
 
   case "topdecl-data": // .constrs
@@ -369,6 +402,9 @@ JSHC.Check.checkTopdecl = function(comp,ctx,ast){
   };
 };
 
+/*
+    infers the kind of a type
+*/
 JSHC.Check.checkType = function(comp,ctx,ast){
     assert.ok( ctx !== undefined );
     assert.ok( ast !== undefined );
@@ -380,11 +416,16 @@ JSHC.Check.checkType = function(comp,ctx,ast){
         return ctx.lookupKind(comp,ast);
 
     case "funtype":
-        var ret_type = ast.types[ast.types.length-1];
-        for(var ix=ast.types.length-2 ; ix>0 ; ix--){
-            var ret_type = new JSHC.FunType([ast.types[ix],ret_type]);
+        //var ret_type = ast.types[ast.types.length-1];
+        //for(var ix=ast.types.length-2 ; ix>0 ; ix--){
+            //var ret_type = new JSHC.FunType([ast.types[ix],ret_type]);
+        //}
+        //return ret_type;
+        for(var ix=0 ; ix<ast.types.length ; ix++ ){
+            var ty_kind = JSHC.Check.checkType(comp,ctx,ast.types[ix]);
+            ctx.constrainValue(ast.types[ix], ty_kind, JSHC.Check.StarKind);
         }
-        return ret_type;
+        return JSHC.Check.StarKind;
 
     case "apptype":
         var lhs_kind = JSHC.Check.checkType(comp,ctx,ast.lhs);
@@ -394,6 +435,17 @@ JSHC.Check.checkType = function(comp,ctx,ast){
         var fun_type = new JSHC.FunType([rhs_kind, ret_type]);
         ctx.constrainValue(ast.lhs, lhs_kind, fun_type);
         return ret_type;
+
+    case "forall":
+        // add all bound type variables
+        for(var binding in ast.binds){
+            ctx.add(ast.binds[binding]);
+        }
+
+        // check the type
+        JSHC.Check.checkType(comp,ctx,ast.type);
+
+        return JSHC.Check.StarKind;
 
     default:
 	throw new Error("missing case for "+ast.name);
@@ -1614,6 +1666,12 @@ JSHC.Check.computeUsedNamesIn = function(dnames, lspace, unames, ast){
             var exps = ast.exps;
             for(var i=0 ; i<exps.length ; i++){
                 find(exps[i]);
+            }
+            break;
+
+	case "funtype":
+            for(var t=0 ; t<ast.types.length ; t++){
+               find(ast.types[t]);
             }
             break;
 

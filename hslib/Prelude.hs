@@ -72,10 +72,10 @@ infixr 9 .
 (.) :: (b -> c) -> (a -> b) -> a -> c
 f . g = \ x -> f (g x)
 
-flip :: (a -> b -> c) -> b -> a -> c
+-- flip :: (a -> b -> c) -> b -> a -> c
 flip f x y = f y x
 
-seq :: a -> b -> b
+-- seq :: a -> b -> b
 seq = JSHC.Internal.seq
 
 infixr 0 $, $!, `seq`
