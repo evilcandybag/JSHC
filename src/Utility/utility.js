@@ -85,8 +85,13 @@ JSHC.showPos = function(pos){
         return "unknown position";
     }
 
-    return "line "+pos.first_line+"-"+pos.last_line+", "+
-           "column "+pos.first_column+"-"+pos.last_column;
+    var line = (pos.last_line - pos.first_line > 0) ?
+                (pos.first_line + "-" + pos.last_line) :
+                pos.first_line;
+    var column = (pos.last_column - pos.first_column > 0) ?
+                (pos.first_column + "-" + pos.last_column) :
+                pos.first_column;
+    return "line " + line + ", column " + column;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
