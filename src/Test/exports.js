@@ -29,6 +29,7 @@ JSHC.Test.Tests.exports = function(tester){
        commands: {
          "A.x": "3",
          "B.x": "4",
+         "x": null,
        }
     }
 

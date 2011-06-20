@@ -15,6 +15,11 @@ JSHC.Test.Tests.patternmatch = function(tester){
                      "h (C Y) = 1\n"+
                      "h (C (Z B)) = 2\n"+
                      "h (C (Z (C 1))) = 3\n"+
+                     "i (Z (C 1)) = 1\n"+
+                     "i (Z (C _)) = 2\n"+
+                     "i (Z (C 3)) = 3\n"+
+                     "i (Z _) = 4\n"+
+                     "i (Z B) = 5\n"+
                      "x 1 = 3\n"+
 					 "x y = 5\n"
                       },
@@ -29,6 +34,10 @@ JSHC.Test.Tests.patternmatch = function(tester){
                    "h (C (Z B))": "2",
                    "h (C (Z (C 1)))": "3",
                    "h (C (Z (C 2)))": null,
+                   "i (Z (C 1))": "1",
+                   "i (Z (C 2))": "2",
+                   "i (Z (C 3))": "2",
+                   "i (Z B)": "4",
                    "x 1": "3",
                    "x 6": "5"
                    }
