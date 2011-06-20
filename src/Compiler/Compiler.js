@@ -287,9 +287,9 @@ JSHC.Compiler.prototype.checkExp = function (exp){
     res = {name: "module", modid: {name: "modname", id: "interact+"}, body: res};
     
     JSHC.addToplevelNamespace(this,res);
-    JSHC.Check.nameCheck(this,res);
-    JSHC.Fixity.fixityResolution(res);
-    JSHC.Check.typeCheck(this,[res]);
+    JSHC.Check.nameCheck(this,res);      if( this.errors > 0 ){ return; }
+    JSHC.Fixity.fixityResolution(res);   if( this.errors > 0 ){ return; }
+    JSHC.Check.typeCheck(this,[res]);    if( this.errors > 0 ){ return; }
     JSHC.Simplify.runSimplify(res);
     return res.body.topdecls[0].decl;
 };

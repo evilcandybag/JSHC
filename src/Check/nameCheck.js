@@ -65,7 +65,7 @@ JSHC.Check.lookupName = function(comp,module,lspace,name){
         }
         return false;
     }
-    
+
     // check if in tspace
     if( (name.loc === undefined || name.loc === module.modid.id) && !hasLocals(nspace) ){
         // handle unqualified name or qualified with the module it is within
@@ -130,6 +130,7 @@ JSHC.Check.lookupName = function(comp,module,lspace,name){
 //	alert("tspace:\n\n"+JSHC.showAST(module.body.tspace))
 //	alert("LSPACE:\n\n"JSHC.showAST(lspace))
         comp.onError(new JSHC.SourceError(module.modid, name.pos, name.toStringQ()+" not in scope"));
+        //if( comp.errors > 0 )assert.ok( false );
     } else if( amount === 1 ){
         // declared in one location (topdecl or import)
         var matched_name = nspace.getAny();
@@ -150,7 +151,7 @@ JSHC.Check.lookupName = function(comp,module,lspace,name){
 	// error: ambiguity since more than one declaration in scope
 	msg = ["Ambiguity. Names in scope: "];
         
-    msg = msg.concat(nspace.getKeys());
+        msg = msg.concat(nspace.getKeys());
 
 	comp.onError(new JSHC.SourceError(module.modid,name.pos,msg.join(" ")));
     }
