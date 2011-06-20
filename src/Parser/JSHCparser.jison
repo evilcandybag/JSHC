@@ -73,7 +73,7 @@ body // : object
             if ($2[i].name == "impdecl" && !atdecs) {
                 imps.push($2[i]);
             } else if ($2[i].name == "impdecl" && atdecs) {
-                throw new Error("Parse error: import declaration in statement block at line " + $2[i].pos.first_line);
+                throw new JSHC.ParseError("import declaration in statement block at line " + $2[i].pos.first_line ,$2[i].pos,"import declaration in statement block");
             } else {
                 atdecs = true;
                 decs.push($2[i]);
